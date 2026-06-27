@@ -23,9 +23,18 @@
             </MudButton>
 
             <div class="page-heading recipe-heading">
-                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@_recipe.Category</MudChip>
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="recipe-badges">
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@CategoryText</MudChip>
+                    @if (_recipe.IsDraft)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">Draft</MudChip>
+                    }
+                </MudStack>
                 <MudText Typo="Typo.h3">@_recipe.Name</MudText>
-                <MudText Typo="Typo.body1" Color="Color.Secondary">@_recipe.Description</MudText>
+                @if (!string.IsNullOrWhiteSpace(_recipe.Description))
+                {
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">@_recipe.Description</MudText>
+                }
             </div>
 
             <MudStack Row Class="recipe-actions">
@@ -75,33 +84,52 @@
 
             <MudPaper Class="detail-section ingredient-section" Elevation="0">
                 <MudText Typo="Typo.h5">Ingredients</MudText>
-                <MudList T="RecipeIngredient" Dense="true" Class="ingredient-list">
-                    @foreach (var ingredient in _recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
-                    {
-                        <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
-                            @ingredient.DisplayText
-                        </MudListItem>
-                    }
-                </MudList>
+                @if (_recipe.Ingredients.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha ingredients.</MudText>
+                }
+                else
+                {
+                    <MudList T="RecipeIngredient" Dense="true" Class="ingredient-list">
+                        @foreach (var ingredient in _recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
+                                @ingredient.DisplayText
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
             </MudPaper>
 
             <MudPaper Class="detail-section steps-section" Elevation="0">
                 <MudText Typo="Typo.h5">Passos</MudText>
-                <MudStack Spacing="2">
-                    @foreach (var step in _recipe.Steps.OrderBy(step => step.Order))
-                    {
-                        <div class="detail-step">
-                            <MudText Typo="Typo.subtitle1">@step.Order. @step.Title</MudText>
-                            <MudText Typo="Typo.body1">@step.Instruction</MudText>
-                            @if (step.TimerMinutes is not null)
-                            {
-                                <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Outlined" Size="Size.Small" Icon="@Icons.Material.Filled.Timer">
-                                    @step.TimerMinutes min
-                                </MudChip>
-                            }
-                        </div>
-                    }
-                </MudStack>
+                @if (_recipe.Steps.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha passos.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="2">
+                        @foreach (var step in _recipe.Steps.OrderBy(step => step.Order))
+                        {
+                            <div class="detail-step">
+                                <MudText Typo="Typo.subtitle1">@step.Order. @step.Title</MudText>
+                                <MudText Typo="Typo.body1">@step.Instruction</MudText>
+                                @if (step.TimerMinutes is not null)
+                                {
+                                    <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Outlined" Size="Size.Small" Icon="@Icons.Material.Filled.Timer">
+                                        @step.TimerMinutes min
+                                    </MudChip>
+                                }
+                            </div>
+                        }
+                    </MudStack>
+                }
+            </MudPaper>
+
+            <MudPaper Class="detail-section notes-section" Elevation="0">
+                <MudText Typo="Typo.h5">Notes</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha notes.</MudText>
             </MudPaper>
         </MudStack>
     }
@@ -113,6 +141,7 @@
 
     private Recipe? _recipe;
     private bool _isLoading = true;
+    private string CategoryText => string.IsNullOrWhiteSpace(_recipe?.Category) ? "Sense categoria" : _recipe.Category;
 
     protected override async Task OnParametersSetAsync()
     {

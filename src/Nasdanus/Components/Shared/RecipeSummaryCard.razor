@@ -5,9 +5,15 @@
         <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="2">
             <div>
                 <MudText Typo="Typo.h6">@Recipe.Name</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">@Recipe.Category</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@CategoryText</MudText>
             </div>
-            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Servings racions</MudChip>
+            <MudStack Row Spacing="1" Class="summary-badges">
+                @if (Recipe.IsDraft)
+                {
+                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined" Size="Size.Small">Draft</MudChip>
+                }
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Servings racions</MudChip>
+            </MudStack>
         </MudStack>
 
         @if (!string.IsNullOrWhiteSpace(Recipe.Description))
@@ -35,4 +41,6 @@
 @code {
     [Parameter, EditorRequired]
     public Recipe Recipe { get; set; } = default!;
+
+    private string CategoryText => string.IsNullOrWhiteSpace(Recipe.Category) ? "Sense categoria" : Recipe.Category;
 }

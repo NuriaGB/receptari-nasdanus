@@ -1,7 +1,11 @@
 @page "/cook/{Id:int}"
 @inject RecipeService Recipes
+@inject IJSRuntime JS
 
 <PageTitle>@(_recipe is null ? "Cuinar" : $"Cuinar - {_recipe.Name}")</PageTitle>
+
+<NavigationLock ConfirmExternalNavigation="@HasUnfinishedSession"
+                OnBeforeInternalNavigation="ConfirmInternalNavigationAsync" />
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell cooking-shell">
     @if (_isLoading)
@@ -38,6 +42,10 @@
                     <MudText Typo="Typo.h4">@step.Title</MudText>
                     <MudText Typo="Typo.body1" Class="cook-instruction">@step.Instruction</MudText>
                     <StepTimer Minutes="@step.TimerMinutes" @key="step.Id" />
+                    @if (_isFinished)
+                    {
+                        <MudAlert Severity="Severity.Success">Recepta finalitzada.</MudAlert>
+                    }
                 </MudStack>
             </MudPaper>
 
@@ -55,13 +63,13 @@
                 </MudItem>
                 <MudItem xs="12" sm="4" Class="complete-action">
                     <MudButton OnClick="CompleteCurrentStep"
-                               Disabled="@IsCurrentStepCompleted"
+                               Disabled="@IsCompleteActionDisabled"
                                FullWidth="true"
                                Variant="Variant.Filled"
                                Color="Color.Secondary"
                                Size="Size.Large"
-                               StartIcon="@Icons.Material.Filled.CheckCircle">
-                        @(IsCurrentStepCompleted ? "Completat" : "Completar")
+                               StartIcon="@CompleteActionIcon">
+                        @CompleteActionLabel
                     </MudButton>
                 </MudItem>
                 <MudItem xs="6" sm="4">
@@ -86,6 +94,7 @@
 
     private Recipe? _recipe;
     private bool _isLoading = true;
+    private bool _isFinished;
     private int _currentIndex;
     private readonly HashSet<int> _completedStepIds = [];
 
@@ -95,6 +104,16 @@
     private bool IsFirstStep => _currentIndex == 0;
     private bool IsLastStep => _currentIndex == OrderedSteps.Count - 1;
     private bool IsCurrentStepCompleted => _completedStepIds.Contains(CurrentStep.Id);
+    private bool HasUnfinishedSession => !_isLoading && !_isFinished && OrderedSteps.Count > 0 && CompletedCount < OrderedSteps.Count;
+    private bool IsCompleteActionDisabled => _isFinished || (!IsLastStep && IsCurrentStepCompleted);
+    private string CompleteActionLabel => _isFinished
+        ? "Finalitzat"
+        : IsLastStep
+            ? "Finalitzar recepta"
+            : IsCurrentStepCompleted
+                ? "Completat"
+                : "Completar";
+    private string CompleteActionIcon => IsLastStep ? Icons.Material.Filled.Flag : Icons.Material.Filled.CheckCircle;
     private double ProgressValue => OrderedSteps.Count == 0 ? 0 : ((_currentIndex + 1) * 100d) / OrderedSteps.Count;
     private string CurrentStepClass => IsCurrentStepCompleted ? "cook-step is-complete" : "cook-step";
 
@@ -102,6 +121,7 @@
     {
         _recipe = await Recipes.GetByIdAsync(Id);
         _currentIndex = 0;
+        _isFinished = false;
         _completedStepIds.Clear();
         _isLoading = false;
     }
@@ -124,6 +144,36 @@
 
     private void CompleteCurrentStep()
     {
+        if (IsLastStep)
+        {
+            FinishRecipe();
+            return;
+        }
+
         _completedStepIds.Add(CurrentStep.Id);
+        NextStep();
+    }
+
+    private void FinishRecipe()
+    {
+        _completedStepIds.Add(CurrentStep.Id);
+        _isFinished = true;
+    }
+
+    private async Task ConfirmInternalNavigationAsync(LocationChangingContext context)
+    {
+        if (!HasUnfinishedSession)
+        {
+            return;
+        }
+
+        var shouldLeave = await JS.InvokeAsync<bool>(
+            "confirm",
+            "Vols sortir del mode cuina sense finalitzar la recepta?");
+
+        if (!shouldLeave)
+        {
+            context.PreventNavigation();
+        }
     }
 }

@@ -9,6 +9,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
+        await EnsureRecipeStatusColumnAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
 
         if (!await db.Recipes.AnyAsync())
@@ -19,6 +20,39 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         await EnsureCurrentWeekSeedAsync(db);
+    }
+
+    private static async Task EnsureRecipeStatusColumnAsync(NasdanusDbContext db)
+    {
+        if (await RecipesHasColumnAsync(db, "Status"))
+        {
+            return;
+        }
+
+        await db.Database.ExecuteSqlRawAsync("""
+            ALTER TABLE "Recipes"
+            ADD COLUMN "Status" TEXT NOT NULL DEFAULT 'Active';
+            """);
+    }
+
+    private static async Task<bool> RecipesHasColumnAsync(NasdanusDbContext db, string columnName)
+    {
+        var connection = db.Database.GetDbConnection();
+        await db.Database.OpenConnectionAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "PRAGMA table_info('Recipes')";
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static async Task EnsurePlannerRecipeTableAsync(NasdanusDbContext db)

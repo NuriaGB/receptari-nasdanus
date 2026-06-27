@@ -1,0 +1,116 @@
+@inject RecipeService RecipeService
+
+<MudDialog>
+    <DialogContent>
+        <MudTabs Rounded="true" Elevation="0" Class="recipe-picker-tabs">
+            <MudTabPanel Text="Existents">
+                <MudStack Spacing="2" Class="recipe-picker-panel">
+                    <MudTextField T="string"
+                                  @bind-Value="_search"
+                                  Immediate="true"
+                                  Placeholder="Cerca recepta"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+
+                    <div class="picker-recipe-list">
+                        @foreach (var recipe in FilteredRecipes)
+                        {
+                            <MudPaper Class="picker-recipe-card" Elevation="0">
+                                <div>
+                                    <MudText Typo="Typo.subtitle1">@recipe.Name</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        @(string.IsNullOrWhiteSpace(recipe.Category) ? "Sense categoria" : recipe.Category)
+                                        @if (recipe.IsDraft)
+                                        {
+                                            <span> · Draft</span>
+                                        }
+                                    </MudText>
+                                </div>
+                                <MudButton OnClick="@(() => Pick(recipe.Id))"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Small">
+                                    Afegir
+                                </MudButton>
+                            </MudPaper>
+                        }
+                    </div>
+                </MudStack>
+            </MudTabPanel>
+
+            <MudTabPanel Text="Draft ràpid">
+                <MudStack Spacing="2" Class="quick-add-form">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Guarda una idea encara que faltin ingredients o passos.
+                    </MudText>
+
+                    <MudTextField T="string" Label="Nom" @bind-Value="_request.Name" Required="true" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField T="string" Label="Descripció curta" @bind-Value="_request.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" />
+                    <MudTextField T="string" Label="Categoria" @bind-Value="_request.Category" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField T="string" Label="Ingredients" Placeholder="Un ingredient per línia" @bind-Value="_request.IngredientsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+                    <MudTextField T="string" Label="Passos" Placeholder="Un pas per línia" @bind-Value="_request.StepsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" sm="4">
+                            <MudNumericField T="int?" Label="Prep. min" @bind-Value="_request.PreparationTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudNumericField T="int?" Label="Cocció min" @bind-Value="_request.CookingTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudNumericField T="int?" Label="Racions" @bind-Value="_request.Servings" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudButton OnClick="CreateAndPickAsync"
+                               Disabled="@string.IsNullOrWhiteSpace(_request.Name)"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Crear i afegir
+                    </MudButton>
+                </MudStack>
+            </MudTabPanel>
+        </MudTabs>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel·lar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public IReadOnlyList<Recipe> Recipes { get; set; } = [];
+
+    private readonly QuickAddRecipeRequest _request = new();
+    private string _search = string.Empty;
+
+    private IEnumerable<Recipe> FilteredRecipes => Recipes.Where(recipe =>
+        string.IsNullOrWhiteSpace(_search) || recipe.Name.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    private void Pick(int recipeId)
+    {
+        MudDialog.Close(DialogResult.Ok(recipeId));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task CreateAndPickAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_request.Name))
+        {
+            return;
+        }
+
+        var recipe = await RecipeService.CreateQuickDraftAsync(_request);
+        MudDialog.Close(DialogResult.Ok(recipe.Id));
+    }
+}

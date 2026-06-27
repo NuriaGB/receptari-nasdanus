@@ -8,6 +8,7 @@ public sealed class Recipe
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string Status { get; set; } = RecipeStatus.Active;
     public int PreparationTimeMinutes { get; set; }
     public int CookingTimeMinutes { get; set; }
     public int Difficulty { get; set; }
@@ -15,6 +16,15 @@ public sealed class Recipe
 
     public List<RecipeIngredient> Ingredients { get; set; } = [];
     public List<RecipeStep> Steps { get; set; } = [];
+
+    [NotMapped]
+    public bool IsDraft => string.Equals(Status, RecipeStatus.Draft, StringComparison.OrdinalIgnoreCase);
+}
+
+public static class RecipeStatus
+{
+    public const string Active = "Active";
+    public const string Draft = "Draft";
 }
 
 public sealed class RecipeIngredient

@@ -18,6 +18,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
             entity.Property(recipe => recipe.Name).HasMaxLength(160).IsRequired();
             entity.Property(recipe => recipe.Description).HasMaxLength(600);
             entity.Property(recipe => recipe.Category).HasMaxLength(64).IsRequired();
+            entity.Property(recipe => recipe.Status).HasMaxLength(32).IsRequired();
 
             entity.HasMany(recipe => recipe.Ingredients)
                 .WithOne(ingredient => ingredient.Recipe)

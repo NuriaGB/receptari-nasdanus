@@ -1,13 +1,23 @@
 @page "/recipes"
 @inject RecipeService Recipes
+@inject IDialogService DialogService
 
 <PageTitle>Nasdanus - Receptes</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="page-shell">
     <MudStack Spacing="3">
-        <div class="page-heading">
-            <MudText Typo="Typo.overline">Receptes</MudText>
-            <MudText Typo="Typo.h3">Receptari</MudText>
+        <div class="page-heading page-heading-actions">
+            <div>
+                <MudText Typo="Typo.overline">Receptes</MudText>
+                <MudText Typo="Typo.h3">Receptari</MudText>
+            </div>
+            <MudButton OnClick="OpenQuickAddAsync"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Add">
+                Nova recepta
+            </MudButton>
         </div>
 
         @if (_isLoading)
@@ -69,8 +79,30 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadRecipesAsync();
+        _isLoading = false;
+    }
+
+    private async Task OpenQuickAddAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<QuickAddRecipeDialog>("Nova recepta", options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled)
+        {
+            await LoadRecipesAsync();
+        }
+    }
+
+    private async Task LoadRecipesAsync()
+    {
         _recipes = await Recipes.GetAllAsync();
         _categories = await Recipes.GetCategoriesAsync();
-        _isLoading = false;
     }
 }

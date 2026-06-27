@@ -67,6 +67,7 @@
     private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, int RecipeId) change)
     {
         await Planner.AddRecipeAsync(change.Date, change.MealKind, change.RecipeId);
+        _recipes = await Recipes.GetAllAsync();
         await LoadWeekAsync();
     }
 

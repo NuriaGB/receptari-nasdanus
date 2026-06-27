@@ -25,20 +25,30 @@
                 </MudItem>
             </MudGrid>
 
-            <MudPaper Class="tomorrow-prep" Elevation="0">
-                <MudStack Spacing="2">
-                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@Icons.Material.Filled.EventRepeat" Color="Color.Primary" />
-                        <MudText Typo="Typo.h5">Preparar demà</MudText>
+            @if (_tomorrowReminders.Length > 0)
+            {
+                <MudPaper Class="tomorrow-prep" Elevation="0">
+                    <MudStack Spacing="2">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.EventRepeat" Color="Color.Primary" />
+                            <MudText Typo="Typo.h5">Preparar demà</MudText>
+                        </MudStack>
+                        <MudList T="string" Dense="true" Class="prep-list">
+                            @foreach (var reminder in _tomorrowReminders)
+                            {
+                                <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
+                                    @reminder
+                                </MudListItem>
+                            }
+                        </MudList>
                     </MudStack>
-                    <MudList T="string" Dense="true" Class="prep-list">
-                        @foreach (var reminder in _tomorrowReminders)
-                        {
-                            <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
-                                @reminder
-                            </MudListItem>
-                        }
-                    </MudList>
+                </MudPaper>
+            }
+
+            <MudPaper Class="week-summary" Elevation="0">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="week-summary-content">
+                    <MudIcon Icon="@Icons.Material.Filled.Insights" Color="Color.Primary" Size="Size.Small" />
+                    <MudText Typo="Typo.body2">Peix 0/2 · Llegums 0/1 · Verdures 0/7 · Proteïna baixa</MudText>
                 </MudStack>
             </MudPaper>
 
@@ -86,7 +96,10 @@
         return $"{recipe.PreparationTimeMinutes} min prep. · {recipe.CookingTimeMinutes} min cocció · {total} min total";
     }
 
-    private RenderFragment MealCard(string title, MealPlanSlot? slot) => @<MudPaper Class="meal-card" Elevation="0">
+    private static string MealCardClass(MealPlanSlot? slot) =>
+        slot?.PlannedRecipes.Count is not > 0 ? "meal-card is-empty" : "meal-card";
+
+    private RenderFragment MealCard(string title, MealPlanSlot? slot) => @<MudPaper Class="@MealCardClass(slot)" Elevation="0">
         <MudStack Spacing="2">
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
                 <MudText Typo="Typo.h5">@title</MudText>

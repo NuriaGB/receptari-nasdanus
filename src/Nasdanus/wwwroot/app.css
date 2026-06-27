@@ -58,6 +58,13 @@ h3:focus {
     gap: 0.35rem;
 }
 
+.page-heading-actions {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
 .bottom-nav {
     position: fixed;
     right: 1rem;
@@ -91,6 +98,10 @@ h3:focus {
     padding: 1.25rem;
 }
 
+.meal-card.is-empty {
+    min-height: 10rem;
+}
+
 .home-planned-recipe {
     display: grid;
     gap: 0.45rem;
@@ -112,6 +123,17 @@ h3:focus {
     border: 1px solid var(--nas-border);
     border-radius: 8px;
     background: var(--nas-panel);
+}
+
+.week-summary {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.week-summary-content {
+    flex-wrap: wrap;
 }
 
 .prep-list .mud-list-item {
@@ -136,6 +158,11 @@ h3:focus {
 
 .recipe-summary {
     padding: 1rem;
+}
+
+.summary-badges,
+.recipe-badges {
+    flex-wrap: wrap;
 }
 
 .summary-description {
@@ -227,19 +254,52 @@ h3:focus {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.45rem 0.25rem;
+    padding: 0.45rem;
     border: 1px solid var(--nas-border);
     border-radius: 8px;
     background: var(--nas-panel);
 }
 
-.planned-recipe-row a {
+.planned-recipe-name {
     overflow-wrap: anywhere;
     font-weight: 650;
 }
 
-.meal-select .mud-input-slot {
+.planned-recipe-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.quick-add-form {
+    min-width: 0;
+}
+
+.recipe-picker-tabs .mud-tabs-toolbar {
     min-height: 2.75rem;
+}
+
+.recipe-picker-panel {
+    padding-top: 0.75rem;
+}
+
+.picker-recipe-list {
+    display: grid;
+    gap: 0.65rem;
+    max-height: min(52vh, 28rem);
+    overflow-y: auto;
+    padding-right: 0.15rem;
+}
+
+.picker-recipe-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
 }
 
 .cooking-shell {
@@ -365,6 +425,11 @@ h3:focus {
         padding: 1.25rem 0.75rem 5.5rem;
     }
 
+    .page-heading-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
     .meal-card {
         min-height: auto;
         padding: 1rem;
@@ -415,6 +480,15 @@ h3:focus {
 
     .planner-grid {
         grid-template-columns: repeat(7, minmax(14rem, 1fr));
+    }
+
+    .planned-recipe-row,
+    .picker-recipe-card {
+        grid-template-columns: 1fr;
+    }
+
+    .planned-recipe-actions {
+        justify-content: space-between;
     }
 
     .cook-step {

@@ -1,0 +1,94 @@
+@inject RecipeService Recipes
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2" Class="quick-add-form">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Millor guardar una idea incompleta que perdre-la.
+            </MudText>
+
+            <MudTextField T="string"
+                          Label="Nom"
+                          @bind-Value="_request.Name"
+                          Required="true"
+                          Immediate="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+
+            <MudTextField T="string"
+                          Label="Descripció curta"
+                          @bind-Value="_request.Description"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Lines="2" />
+
+            <MudTextField T="string"
+                          Label="Categoria"
+                          @bind-Value="_request.Category"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+
+            <MudTextField T="string"
+                          Label="Ingredients"
+                          Placeholder="Un ingredient per línia"
+                          @bind-Value="_request.IngredientsText"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Lines="4" />
+
+            <MudTextField T="string"
+                          Label="Passos"
+                          Placeholder="Un pas per línia"
+                          @bind-Value="_request.StepsText"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Lines="4" />
+
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="int?" Label="Prep. min" @bind-Value="_request.PreparationTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="int?" Label="Cocció min" @bind-Value="_request.CookingTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="int?" Label="Racions" @bind-Value="_request.Servings" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel·lar</MudButton>
+        <MudButton OnClick="SaveAsync"
+                   Disabled="@IsSaveDisabled"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar draft
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly QuickAddRecipeRequest _request = new();
+
+    private bool IsSaveDisabled => string.IsNullOrWhiteSpace(_request.Name);
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (IsSaveDisabled)
+        {
+            return;
+        }
+
+        var recipe = await Recipes.CreateQuickDraftAsync(_request);
+        MudDialog.Close(DialogResult.Ok(recipe.Id));
+    }
+}
