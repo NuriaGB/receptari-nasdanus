@@ -156,7 +156,11 @@
 
     private void FinishRecipe()
     {
-        _completedStepIds.Add(CurrentStep.Id);
+        foreach (var step in OrderedSteps)
+        {
+            _completedStepIds.Add(step.Id);
+        }
+
         _isFinished = true;
     }
 
