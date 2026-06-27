@@ -1,0 +1,77 @@
+@page "/recipes"
+@rendermode InteractiveServer
+@inject RecipeService Recipes
+
+<PageTitle>Nasdanus - Receptes</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="page-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading">
+            <MudText Typo="Typo.overline">Receptes</MudText>
+            <MudText Typo="Typo.h3">Receptari</MudText>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudPaper Class="filter-bar" Elevation="0">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="8">
+                        <MudTextField T="string"
+                                      @bind-Value="_search"
+                                      Immediate="true"
+                                      Placeholder="Cerca per nom"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudSelect T="string"
+                                   @bind-Value="_category"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true"
+                                   AdornmentIcon="@Icons.Material.Filled.Category"
+                                   Adornment="Adornment.Start">
+                            <MudSelectItem T="string" Value="@string.Empty">Totes les categories</MudSelectItem>
+                            @foreach (var category in _categories)
+                            {
+                                <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <div class="recipe-list">
+                @foreach (var recipe in FilteredRecipes)
+                {
+                    <RecipeSummaryCard Recipe="recipe" />
+                }
+            </div>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<Recipe> _recipes = [];
+    private List<string> _categories = [];
+    private string _search = string.Empty;
+    private string _category = string.Empty;
+    private bool _isLoading = true;
+
+    private IEnumerable<Recipe> FilteredRecipes => _recipes.Where(recipe =>
+        (string.IsNullOrWhiteSpace(_search) || recipe.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(_category) || recipe.Category == _category));
+
+    protected override async Task OnInitializedAsync()
+    {
+        _recipes = await Recipes.GetAllAsync();
+        _categories = await Recipes.GetCategoriesAsync();
+        _isLoading = false;
+    }
+}

@@ -1,0 +1,45 @@
+@using Nasdanus.Domain
+
+<MudStack Spacing="1" Class="meal-slot-selector">
+    <MudText Typo="Typo.subtitle2">@Slot.MealKind.ToDisplayName()</MudText>
+    <MudSelect T="int"
+               Value="@SelectedRecipeId"
+               ValueChanged="OnRecipeChanged"
+               Variant="Variant.Outlined"
+               Margin="Margin.Dense"
+               Dense="true"
+               Class="meal-select">
+        <MudSelectItem T="int" Value="0">Sense recepta</MudSelectItem>
+        @foreach (var recipe in Recipes)
+        {
+            <MudSelectItem T="int" Value="@recipe.Id">@recipe.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    @if (Slot.Recipe is not null)
+    {
+        <MudButton Href="@($"/recipes/{Slot.Recipe.Id}")"
+                   Variant="Variant.Text"
+                   Color="Color.Primary"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Filled.OpenInNew">
+            Obrir
+        </MudButton>
+    }
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public MealPlanSlot Slot { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Recipe> Recipes { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<(DateOnly Date, MealKind MealKind, int? RecipeId)> RecipeChanged { get; set; }
+
+    private int SelectedRecipeId => Slot.RecipeId ?? 0;
+
+    private Task OnRecipeChanged(int recipeId) =>
+        RecipeChanged.InvokeAsync((Slot.Date, Slot.MealKind, recipeId == 0 ? null : recipeId));
+}

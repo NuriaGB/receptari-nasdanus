@@ -1,0 +1,121 @@
+@page "/recipes/{Id:int}"
+@inject RecipeService Recipes
+
+<PageTitle>@(_recipe is null ? "Recepta" : _recipe.Name)</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell">
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (_recipe is null)
+    {
+        <MudAlert Severity="Severity.Warning">No s'ha trobat la recepta.</MudAlert>
+    }
+    else
+    {
+        <MudStack Spacing="3">
+            <MudButton Href="/recipes"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                Receptes
+            </MudButton>
+
+            <div class="page-heading recipe-heading">
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@_recipe.Category</MudChip>
+                <MudText Typo="Typo.h3">@_recipe.Name</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary">@_recipe.Description</MudText>
+            </div>
+
+            <MudStack Row Class="recipe-actions">
+                <MudButton Href="@($"/cook/{_recipe.Id}")"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Restaurant">
+                    Cuinar
+                </MudButton>
+                <MudButton Disabled="true"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Edit">
+                    Editar
+                </MudButton>
+            </MudStack>
+
+            <MudGrid Spacing="2">
+                <MudItem xs="6" sm="3">
+                    <MudPaper Class="metric" Elevation="0">
+                        <MudText Typo="Typo.overline">Preparació</MudText>
+                        <MudText Typo="Typo.h6">@_recipe.PreparationTimeMinutes min</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudPaper Class="metric" Elevation="0">
+                        <MudText Typo="Typo.overline">Cocció</MudText>
+                        <MudText Typo="Typo.h6">@_recipe.CookingTimeMinutes min</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudPaper Class="metric" Elevation="0">
+                        <MudText Typo="Typo.overline">Dificultat</MudText>
+                        <MudText Typo="Typo.h6">@_recipe.Difficulty</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudPaper Class="metric" Elevation="0">
+                        <MudText Typo="Typo.overline">Racions</MudText>
+                        <MudText Typo="Typo.h6">@_recipe.Servings</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Class="detail-section" Elevation="0">
+                <MudText Typo="Typo.h5">Ingredients</MudText>
+                <MudList T="RecipeIngredient" Dense="true">
+                    @foreach (var ingredient in _recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
+                    {
+                        <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
+                            @ingredient.DisplayText
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+
+            <MudPaper Class="detail-section" Elevation="0">
+                <MudText Typo="Typo.h5">Passos</MudText>
+                <MudStack Spacing="2">
+                    @foreach (var step in _recipe.Steps.OrderBy(step => step.Order))
+                    {
+                        <div class="detail-step">
+                            <MudText Typo="Typo.subtitle1">@step.Order. @step.Title</MudText>
+                            <MudText Typo="Typo.body1">@step.Instruction</MudText>
+                            @if (step.TimerMinutes is not null)
+                            {
+                                <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Outlined" Size="Size.Small" Icon="@Icons.Material.Filled.Timer">
+                                    @step.TimerMinutes min
+                                </MudChip>
+                            }
+                        </div>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Recipe? _recipe;
+    private bool _isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _recipe = await Recipes.GetByIdAsync(Id);
+        _isLoading = false;
+    }
+}

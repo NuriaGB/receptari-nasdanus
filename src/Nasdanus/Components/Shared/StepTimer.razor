@@ -1,0 +1,133 @@
+@implements IAsyncDisposable
+
+@if (Minutes is > 0)
+{
+    <MudPaper Class="@TimerClass" Elevation="0">
+        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="timer-header">
+            <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icons.Material.Filled.Timer" Color="Color.Primary" />
+                <MudText Typo="Typo.subtitle1">Temporitzador</MudText>
+            </MudStack>
+            <MudText Typo="Typo.h4" Class="timer-value">@RemainingLabel</MudText>
+        </MudStack>
+
+        <MudStack Row Spacing="1" Class="timer-actions">
+            <MudButton OnClick="StartAsync"
+                       Disabled="@(_running || _remainingSeconds <= 0)"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.PlayArrow">
+                Inicia
+            </MudButton>
+            <MudButton OnClick="Pause"
+                       Disabled="@(!_running)"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Pause">
+                Pausa
+            </MudButton>
+            <MudButton OnClick="ResetTimer"
+                       Variant="Variant.Text"
+                       Color="Color.Secondary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Replay">
+                Reinicia
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public int? Minutes { get; set; }
+
+    private int? _loadedMinutes;
+    private int _remainingSeconds;
+    private bool _running;
+    private bool _finished;
+    private CancellationTokenSource? _timerCancellation;
+
+    private string RemainingLabel => TimeSpan.FromSeconds(_remainingSeconds)
+        .ToString(_remainingSeconds >= 3600 ? @"h\:mm\:ss" : @"m\:ss");
+
+    private string TimerClass => _finished ? "step-timer is-finished" : "step-timer";
+
+    protected override void OnParametersSet()
+    {
+        if (_loadedMinutes == Minutes)
+        {
+            return;
+        }
+
+        _loadedMinutes = Minutes;
+        ResetTimer();
+    }
+
+    private Task StartAsync()
+    {
+        if (_running || _remainingSeconds <= 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        _running = true;
+        _finished = false;
+        _timerCancellation = new CancellationTokenSource();
+        _ = RunTimerAsync(_timerCancellation.Token);
+        return Task.CompletedTask;
+    }
+
+    private async Task RunTimerAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                _remainingSeconds = Math.Max(0, _remainingSeconds - 1);
+
+                if (_remainingSeconds == 0)
+                {
+                    _running = false;
+                    _finished = true;
+                    _timerCancellation?.Dispose();
+                    _timerCancellation = null;
+                }
+
+                await InvokeAsync(StateHasChanged);
+
+                if (_finished)
+                {
+                    break;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void Pause()
+    {
+        _timerCancellation?.Cancel();
+        _timerCancellation?.Dispose();
+        _timerCancellation = null;
+        _running = false;
+    }
+
+    private void ResetTimer()
+    {
+        Pause();
+        _remainingSeconds = (Minutes ?? 0) * 60;
+        _finished = false;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _timerCancellation?.Cancel();
+        _timerCancellation?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

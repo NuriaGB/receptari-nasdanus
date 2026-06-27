@@ -1,6 +1,101 @@
-﻿@page "/"
+@page "/"
+@inject PlannerService Planner
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Nasdanus - Avui</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading">
+            <MudText Typo="Typo.overline">Avui</MudText>
+            <MudText Typo="Typo.h3">Què toca cuinar?</MudText>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12" sm="6">
+                    @MealCard("Dinar d'avui", _lunch)
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    @MealCard("Sopar d'avui", _dinner)
+                </MudItem>
+            </MudGrid>
+
+            <MudStack Row Class="home-actions">
+                <MudButton Href="/planner"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.CalendarMonth">
+                    Obrir planner
+                </MudButton>
+                <MudButton Href="/recipes"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.MenuBook">
+                    Receptes
+                </MudButton>
+            </MudStack>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private MealPlanSlot? _lunch;
+    private MealPlanSlot? _dinner;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
+        _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
+        _isLoading = false;
+    }
+
+    private static string TimeText(Recipe recipe)
+    {
+        var total = recipe.PreparationTimeMinutes + recipe.CookingTimeMinutes;
+        return $"{recipe.PreparationTimeMinutes} min prep. · {recipe.CookingTimeMinutes} min cocció · {total} min total";
+    }
+
+    private RenderFragment MealCard(string title, MealPlanSlot? slot) => @<MudPaper Class="meal-card" Elevation="0">
+        <MudStack Spacing="2">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudText Typo="Typo.h5">@title</MudText>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">Planificat</MudChip>
+            </MudStack>
+
+            @if (slot?.Recipe is null)
+            {
+                <MudText Typo="Typo.h6">Sense recepta assignada</MudText>
+                <MudButton Href="/planner"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CalendarMonth">
+                    Obrir planner
+                </MudButton>
+            }
+            else
+            {
+                <MudText Typo="Typo.h4" Class="meal-title">@slot.Recipe.Name</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary">@TimeText(slot.Recipe)</MudText>
+                <MudButton Href="@($"/recipes/{slot.Recipe.Id}")"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.OpenInNew">
+                    Obrir recepta
+                </MudButton>
+            }
+        </MudStack>
+    </MudPaper>;
+}
 
 <h1>Hello, world!</h1>
 

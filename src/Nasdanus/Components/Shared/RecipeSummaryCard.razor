@@ -1,0 +1,38 @@
+@using Nasdanus.Domain
+
+<MudPaper Class="recipe-summary" Elevation="0">
+    <MudStack Spacing="1">
+        <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="2">
+            <div>
+                <MudText Typo="Typo.h6">@Recipe.Name</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Recipe.Category</MudText>
+            </div>
+            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Servings racions</MudChip>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(Recipe.Description))
+        {
+            <MudText Typo="Typo.body2" Class="summary-description">@Recipe.Description</MudText>
+        }
+
+        <div class="summary-meta">
+            <span><MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" /> @Recipe.PreparationTimeMinutes min prep.</span>
+            <span><MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" /> @Recipe.CookingTimeMinutes min cocció</span>
+            <span><MudIcon Icon="@Icons.Material.Filled.SignalCellularAlt" Size="Size.Small" /> Dificultat @Recipe.Difficulty</span>
+        </div>
+
+        <MudStack Row Justify="Justify.FlexEnd">
+            <MudButton Href="@($"/recipes/{Recipe.Id}")"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.OpenInNew">
+                Obrir
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public Recipe Recipe { get; set; } = default!;
+}

@@ -1,0 +1,130 @@
+@page "/cook/{Id:int}"
+@rendermode InteractiveServer
+@inject RecipeService Recipes
+
+<PageTitle>@(_recipe is null ? "Cuinar" : $"Cuinar - {_recipe.Name}")</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell cooking-shell">
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (_recipe is null || OrderedSteps.Count == 0)
+    {
+        <MudAlert Severity="Severity.Warning">Aquesta recepta no té passos per cuinar.</MudAlert>
+    }
+    else
+    {
+        var step = CurrentStep;
+
+        <MudStack Spacing="3" Class="cook-stack">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="cook-topbar">
+                <MudButton Href="@($"/recipes/{_recipe.Id}")"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack">
+                    Recepta
+                </MudButton>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@CompletedCount/@OrderedSteps.Count completats</MudChip>
+            </MudStack>
+
+            <div class="cook-heading">
+                <MudText Typo="Typo.h5">@_recipe.Name</MudText>
+                <MudText Typo="Typo.subtitle1">Pas @(_currentIndex + 1) de @OrderedSteps.Count</MudText>
+                <MudProgressLinear Value="@ProgressValue" Color="Color.Primary" Rounded="true" Class="cook-progress" />
+            </div>
+
+            <MudPaper Class="@CurrentStepClass" Elevation="0">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h4">@step.Title</MudText>
+                    <MudText Typo="Typo.body1" Class="cook-instruction">@step.Instruction</MudText>
+                    <StepTimer Minutes="@step.TimerMinutes" @key="step.Id" />
+                </MudStack>
+            </MudPaper>
+
+            <MudGrid Spacing="2" Class="cook-actions">
+                <MudItem xs="6" sm="4">
+                    <MudButton OnClick="PreviousStep"
+                               Disabled="@IsFirstStep"
+                               FullWidth="true"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.ArrowBack">
+                        Anterior
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="4" Class="complete-action">
+                    <MudButton OnClick="CompleteCurrentStep"
+                               Disabled="@IsCurrentStepCompleted"
+                               FullWidth="true"
+                               Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.CheckCircle">
+                        @(IsCurrentStepCompleted ? "Completat" : "Completar")
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="6" sm="4">
+                    <MudButton OnClick="NextStep"
+                               Disabled="@IsLastStep"
+                               FullWidth="true"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">
+                        Següent
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Recipe? _recipe;
+    private bool _isLoading = true;
+    private int _currentIndex;
+    private readonly HashSet<int> _completedStepIds = [];
+
+    private List<RecipeStep> OrderedSteps => _recipe?.Steps.OrderBy(step => step.Order).ToList() ?? [];
+    private RecipeStep CurrentStep => OrderedSteps[_currentIndex];
+    private int CompletedCount => _completedStepIds.Count;
+    private bool IsFirstStep => _currentIndex == 0;
+    private bool IsLastStep => _currentIndex == OrderedSteps.Count - 1;
+    private bool IsCurrentStepCompleted => _completedStepIds.Contains(CurrentStep.Id);
+    private double ProgressValue => OrderedSteps.Count == 0 ? 0 : ((_currentIndex + 1) * 100d) / OrderedSteps.Count;
+    private string CurrentStepClass => IsCurrentStepCompleted ? "cook-step is-complete" : "cook-step";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _recipe = await Recipes.GetByIdAsync(Id);
+        _currentIndex = 0;
+        _completedStepIds.Clear();
+        _isLoading = false;
+    }
+
+    private void PreviousStep()
+    {
+        if (!IsFirstStep)
+        {
+            _currentIndex--;
+        }
+    }
+
+    private void NextStep()
+    {
+        if (!IsLastStep)
+        {
+            _currentIndex++;
+        }
+    }
+
+    private void CompleteCurrentStep()
+    {
+        _completedStepIds.Add(CurrentStep.Id);
+    }
+}

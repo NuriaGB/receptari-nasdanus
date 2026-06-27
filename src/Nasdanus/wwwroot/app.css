@@ -1,5 +1,262 @@
-h1:focus {
+:root {
+    --nas-ink: #1f2a25;
+    --nas-muted: #66746d;
+    --nas-border: #d8dfd8;
+    --nas-panel: #ffffff;
+    --nas-bg: #f7f8f4;
+    --nas-green: #2f7d5b;
+    --nas-tomato: #c2412d;
+    --nas-blue: #2f6f9f;
+    --nas-amber: #b7791f;
+}
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    color: var(--nas-ink);
+    background: var(--nas-bg);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+h1:focus,
+h2:focus,
+h3:focus {
     outline: none;
+}
+
+.mud-typography-overline {
+    letter-spacing: 0;
+    color: var(--nas-muted);
+    font-weight: 700;
+}
+
+.app-bar {
+    border-bottom: 1px solid var(--nas-border);
+}
+
+.app-logo {
+    color: var(--nas-green);
+    margin-right: 0.5rem;
+}
+
+.app-title {
+    font-weight: 800;
+}
+
+.main-content {
+    min-height: 100vh;
+    background: var(--nas-bg);
+}
+
+.page-shell {
+    padding: 2rem 1rem 6rem;
+}
+
+.page-heading {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.bottom-nav {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.35rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 30px rgba(31, 42, 37, 0.12);
+    z-index: 20;
+}
+
+.meal-card,
+.recipe-summary,
+.filter-bar,
+.detail-section,
+.metric,
+.planner-day,
+.cook-step,
+.step-timer {
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.meal-card {
+    min-height: 18rem;
+    padding: 1.25rem;
+}
+
+.meal-title {
+    line-height: 1.15;
+}
+
+.home-actions,
+.recipe-actions {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-bar {
+    padding: 1rem;
+}
+
+.recipe-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1rem;
+}
+
+.recipe-summary {
+    padding: 1rem;
+}
+
+.summary-description {
+    min-height: 2.5rem;
+}
+
+.summary-meta {
+    display: grid;
+    gap: 0.45rem;
+    color: var(--nas-muted);
+    font-size: 0.92rem;
+}
+
+.summary-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.recipe-heading {
+    max-width: 46rem;
+}
+
+.metric {
+    padding: 0.9rem;
+    min-height: 6rem;
+}
+
+.detail-section {
+    padding: 1.25rem;
+}
+
+.detail-step {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.planner-shell {
+    max-width: 100%;
+}
+
+.planner-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(12rem, 1fr));
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.planner-day {
+    min-width: 12rem;
+    padding: 0.85rem;
+}
+
+.planner-day-header {
+    display: flex;
+    min-height: 2.2rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.meal-slot-selector {
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.meal-select .mud-input-slot {
+    min-height: 2.75rem;
+}
+
+.cooking-shell {
+    max-width: 58rem;
+}
+
+.cook-stack {
+    min-height: calc(100vh - 8rem);
+}
+
+.cook-topbar {
+    gap: 1rem;
+}
+
+.cook-heading {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.cook-progress {
+    height: 0.7rem;
+}
+
+.cook-step {
+    display: flex;
+    min-height: 21rem;
+    padding: 1.5rem;
+    align-items: center;
+}
+
+.cook-step.is-complete {
+    border-color: var(--nas-green);
+    background: #f1f8f3;
+}
+
+.cook-instruction {
+    font-size: 1.25rem;
+    line-height: 1.55;
+}
+
+.cook-actions .mud-button-root,
+.timer-actions .mud-button-root {
+    min-height: 3.5rem;
+}
+
+.complete-action {
+    order: -1;
+}
+
+.step-timer {
+    padding: 1rem;
+    background: #fffaf0;
+    border-color: #ead9a5;
+}
+
+.step-timer.is-finished {
+    border-color: var(--nas-tomato);
+    background: #fff3ef;
+}
+
+.timer-header,
+.timer-actions {
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.timer-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--nas-amber);
 }
 
 .valid.modified:not([type=checkbox]) {
@@ -15,24 +272,53 @@ h1:focus {
 }
 
 .blazor-error-boundary {
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
-    padding: 1rem 1rem 1rem 3.7rem;
+    padding: 1rem;
     color: white;
+    background: #b32121;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
+.blazor-error-boundary::after {
+    content: "An error has occurred.";
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: #fff4bd;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+@media (min-width: 600px) {
+    .complete-action {
+        order: 0;
+    }
+}
+
+@media (max-width: 599px) {
+    .page-shell {
+        padding: 1.25rem 0.75rem 5.5rem;
     }
 
-.darker-border-checkbox.form-check-input {
-    border-color: #929292;
-}
+    .cook-step {
+        min-height: 18rem;
+        padding: 1rem;
+    }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+    .cook-instruction {
+        font-size: 1.12rem;
+    }
 }

@@ -1,0 +1,75 @@
+@page "/planner"
+@rendermode InteractiveServer
+@using System.Globalization
+@inject PlannerService Planner
+@inject RecipeService Recipes
+
+<PageTitle>Nasdanus - Planner</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="page-shell planner-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading">
+            <MudText Typo="Typo.overline">Planner</MudText>
+            <MudText Typo="Typo.h3">Setmana del @_weekStart.ToString("d/M/yyyy", CultureInfo.InvariantCulture)</MudText>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <div class="planner-grid" role="list">
+                @foreach (var day in _days)
+                {
+                    <MudPaper Class="planner-day" Elevation="0" role="listitem">
+                        <MudStack Spacing="2">
+                            <div class="planner-day-header">
+                                <MudText Typo="Typo.subtitle1">@FormatDay(day.Date)</MudText>
+                                @if (day.Date == _today)
+                                {
+                                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small">Avui</MudChip>
+                                }
+                            </div>
+
+                            <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" RecipeChanged="AssignRecipeAsync" />
+                            <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" RecipeChanged="AssignRecipeAsync" />
+                        </MudStack>
+                    </MudPaper>
+                }
+            </div>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private static readonly CultureInfo Catalan = CultureInfo.GetCultureInfo("ca-ES");
+
+    private DateOnly _today;
+    private DateOnly _weekStart;
+    private List<DayPlan> _days = [];
+    private List<Recipe> _recipes = [];
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _today = DateOnly.FromDateTime(DateTime.Today);
+        _weekStart = PlannerService.WeekStart(_today);
+        _recipes = await Recipes.GetAllAsync();
+        await LoadWeekAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadWeekAsync()
+    {
+        _days = await Planner.GetWeekAsync(_today);
+    }
+
+    private async Task AssignRecipeAsync((DateOnly Date, MealKind MealKind, int? RecipeId) change)
+    {
+        await Planner.AssignRecipeAsync(change.Date, change.MealKind, change.RecipeId);
+        await LoadWeekAsync();
+    }
+
+    private static string FormatDay(DateOnly date) => date.ToString("ddd d/M", Catalan);
+}
