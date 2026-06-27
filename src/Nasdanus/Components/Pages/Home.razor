@@ -25,6 +25,23 @@
                 </MudItem>
             </MudGrid>
 
+            <MudPaper Class="tomorrow-prep" Elevation="0">
+                <MudStack Spacing="2">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Filled.EventRepeat" Color="Color.Primary" />
+                        <MudText Typo="Typo.h5">Preparar demà</MudText>
+                    </MudStack>
+                    <MudList T="string" Dense="true" Class="prep-list">
+                        @foreach (var reminder in _tomorrowReminders)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
+                                @reminder
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudStack>
+            </MudPaper>
+
             <MudStack Row Class="home-actions">
                 <MudButton Href="/planner"
                            Variant="Variant.Filled"
@@ -49,6 +66,11 @@
     private MealPlanSlot? _lunch;
     private MealPlanSlot? _dinner;
     private bool _isLoading = true;
+    private readonly string[] _tomorrowReminders =
+    [
+        "Treu 2 pits de pollastre del congelador",
+        "Deixa l'arròs mesurat per al dinar"
+    ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +93,7 @@
                 <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">Planificat</MudChip>
             </MudStack>
 
-            @if (slot?.Recipe is null)
+            @if (slot?.PlannedRecipes.Count is not > 0)
             {
                 <MudText Typo="Typo.h6">Sense recepta assignada</MudText>
                 <MudButton Href="/planner"
@@ -83,15 +105,23 @@
             }
             else
             {
-                <MudText Typo="Typo.h4" Class="meal-title">@slot.Recipe.Name</MudText>
-                <MudText Typo="Typo.body1" Color="Color.Secondary">@TimeText(slot.Recipe)</MudText>
-                <MudButton Href="@($"/recipes/{slot.Recipe.Id}")"
-                           Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           Size="Size.Large"
-                           StartIcon="@Icons.Material.Filled.OpenInNew">
-                    Obrir recepta
-                </MudButton>
+                @foreach (var plannedRecipe in slot.PlannedRecipes.OrderBy(plannedRecipe => plannedRecipe.Order))
+                {
+                    if (plannedRecipe.Recipe is not null)
+                    {
+                        <div class="home-planned-recipe">
+                            <MudText Typo="Typo.h5" Class="meal-title">@plannedRecipe.Recipe.Name</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@TimeText(plannedRecipe.Recipe)</MudText>
+                            <MudButton Href="@($"/recipes/{plannedRecipe.Recipe.Id}")"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Medium"
+                                       StartIcon="@Icons.Material.Filled.OpenInNew">
+                                Obrir recepta
+                            </MudButton>
+                        </div>
+                    }
+                }
             }
         </MudStack>
     </MudPaper>;

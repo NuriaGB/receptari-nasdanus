@@ -9,6 +9,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
     public DbSet<RecipeStep> RecipeSteps => Set<RecipeStep>();
     public DbSet<MealPlanSlot> MealPlanSlots => Set<MealPlanSlot>();
+    public DbSet<MealPlanRecipe> MealPlanRecipes => Set<MealPlanRecipe>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +52,21 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
                 .HasMaxLength(16);
 
             entity.HasIndex(slot => new { slot.Date, slot.MealKind }).IsUnique();
+
+            entity.HasMany(slot => slot.PlannedRecipes)
+                .WithOne(plannedRecipe => plannedRecipe.MealPlanSlot)
+                .HasForeignKey(plannedRecipe => plannedRecipe.MealPlanSlotId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MealPlanRecipe>(entity =>
+        {
+            entity.HasOne(plannedRecipe => plannedRecipe.Recipe)
+                .WithMany()
+                .HasForeignKey(plannedRecipe => plannedRecipe.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(plannedRecipe => new { plannedRecipe.MealPlanSlotId, plannedRecipe.Order });
         });
     }
 }

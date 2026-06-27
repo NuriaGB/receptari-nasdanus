@@ -31,8 +31,8 @@
                                 }
                             </div>
 
-                            <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" RecipeChanged="AssignRecipeAsync" />
-                            <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" RecipeChanged="AssignRecipeAsync" />
+                            <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
+                            <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
                         </MudStack>
                     </MudPaper>
                 }
@@ -64,9 +64,15 @@
         _days = await Planner.GetWeekAsync(_today);
     }
 
-    private async Task AssignRecipeAsync((DateOnly Date, MealKind MealKind, int? RecipeId) change)
+    private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, int RecipeId) change)
     {
-        await Planner.AssignRecipeAsync(change.Date, change.MealKind, change.RecipeId);
+        await Planner.AddRecipeAsync(change.Date, change.MealKind, change.RecipeId);
+        await LoadWeekAsync();
+    }
+
+    private async Task RemoveRecipeAsync(int plannedRecipeId)
+    {
+        await Planner.RemoveRecipeAsync(plannedRecipeId);
         await LoadWeekAsync();
     }
 

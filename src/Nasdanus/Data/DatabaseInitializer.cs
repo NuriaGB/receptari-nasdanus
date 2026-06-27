@@ -9,6 +9,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
+        await EnsurePlannerRecipeTableAsync(db);
 
         if (!await db.Recipes.AnyAsync())
         {
@@ -18,6 +19,65 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         await EnsureCurrentWeekSeedAsync(db);
+    }
+
+    private static async Task EnsurePlannerRecipeTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "MealPlanRecipes" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_MealPlanRecipes" PRIMARY KEY AUTOINCREMENT,
+                "MealPlanSlotId" INTEGER NOT NULL,
+                "RecipeId" INTEGER NOT NULL,
+                "Order" INTEGER NOT NULL,
+                CONSTRAINT "FK_MealPlanRecipes_MealPlanSlots_MealPlanSlotId" FOREIGN KEY ("MealPlanSlotId") REFERENCES "MealPlanSlots" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_MealPlanRecipes_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_MealPlanRecipes_MealPlanSlotId_Order"
+            ON "MealPlanRecipes" ("MealPlanSlotId", "Order");
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_MealPlanRecipes_RecipeId"
+            ON "MealPlanRecipes" ("RecipeId");
+            """);
+
+        if (await MealPlanSlotsHasLegacyRecipeIdAsync(db))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                INSERT INTO "MealPlanRecipes" ("MealPlanSlotId", "RecipeId", "Order")
+                SELECT "Id", "RecipeId", 1
+                FROM "MealPlanSlots"
+                WHERE "RecipeId" IS NOT NULL
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM "MealPlanRecipes"
+                    WHERE "MealPlanRecipes"."MealPlanSlotId" = "MealPlanSlots"."Id"
+                  );
+                """);
+        }
+    }
+
+    private static async Task<bool> MealPlanSlotsHasLegacyRecipeIdAsync(NasdanusDbContext db)
+    {
+        var connection = db.Database.GetDbConnection();
+        await db.Database.OpenConnectionAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "PRAGMA table_info('MealPlanSlots')";
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            if (string.Equals(reader.GetString(1), "RecipeId", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static async Task EnsureCurrentWeekSeedAsync(NasdanusDbContext db)
@@ -44,18 +104,36 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
 
         await db.SaveChangesAsync();
 
-        var lunch = await db.MealPlanSlots.FirstAsync(slot => slot.Date == today && slot.MealKind == MealKind.Lunch);
-        var dinner = await db.MealPlanSlots.FirstAsync(slot => slot.Date == today && slot.MealKind == MealKind.Dinner);
+        var lunch = await db.MealPlanSlots
+            .Include(slot => slot.PlannedRecipes)
+            .FirstAsync(slot => slot.Date == today && slot.MealKind == MealKind.Lunch);
+        var dinner = await db.MealPlanSlots
+            .Include(slot => slot.PlannedRecipes)
+            .FirstAsync(slot => slot.Date == today && slot.MealKind == MealKind.Dinner);
 
-        lunch.RecipeId ??= await db.Recipes
-            .Where(recipe => recipe.Name == "Samuses de vedella amb verduretes a l'airfryer")
-            .Select(recipe => recipe.Id)
-            .FirstAsync();
+        if (lunch.PlannedRecipes.Count == 0)
+        {
+            lunch.PlannedRecipes.Add(new MealPlanRecipe
+            {
+                RecipeId = await db.Recipes
+                    .Where(recipe => recipe.Name == "Samuses de vedella amb verduretes a l'airfryer")
+                    .Select(recipe => recipe.Id)
+                    .FirstAsync(),
+                Order = 1
+            });
+        }
 
-        dinner.RecipeId ??= await db.Recipes
-            .Where(recipe => recipe.Name == "Cassoleta de verdures, pollastre i patata bullida")
-            .Select(recipe => recipe.Id)
-            .FirstAsync();
+        if (dinner.PlannedRecipes.Count == 0)
+        {
+            dinner.PlannedRecipes.Add(new MealPlanRecipe
+            {
+                RecipeId = await db.Recipes
+                    .Where(recipe => recipe.Name == "Cassoleta de verdures, pollastre i patata bullida")
+                    .Select(recipe => recipe.Id)
+                    .FirstAsync(),
+                Order = 1
+            });
+        }
 
         await db.SaveChangesAsync();
     }

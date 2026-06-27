@@ -1,30 +1,55 @@
 @using Nasdanus.Domain
 
 <MudStack Spacing="1" Class="meal-slot-selector">
-    <MudText Typo="Typo.subtitle2">@Slot.MealKind.ToDisplayName()</MudText>
-    <MudSelect T="int"
-               Value="@SelectedRecipeId"
-               ValueChanged="OnRecipeChanged"
-               Variant="Variant.Outlined"
-               Margin="Margin.Dense"
-               Dense="true"
-               Class="meal-select">
-        <MudSelectItem T="int" Value="0">Sense recepta</MudSelectItem>
-        @foreach (var recipe in Recipes)
-        {
-            <MudSelectItem T="int" Value="@recipe.Id">@recipe.Name</MudSelectItem>
-        }
-    </MudSelect>
-
-    @if (Slot.Recipe is not null)
-    {
-        <MudButton Href="@($"/recipes/{Slot.Recipe.Id}")"
+    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="meal-slot-title">
+        <MudText Typo="Typo.subtitle2">@Slot.MealKind.ToDisplayName()</MudText>
+        <MudButton OnClick="ShowAddSelector"
                    Variant="Variant.Text"
                    Color="Color.Primary"
                    Size="Size.Small"
-                   StartIcon="@Icons.Material.Filled.OpenInNew">
-            Obrir
+                   StartIcon="@Icons.Material.Filled.Add">
+            Afegir plat
         </MudButton>
+    </MudStack>
+
+    @if (PlannedRecipes.Count == 0)
+    {
+        <MudText Typo="Typo.body2" Color="Color.Secondary">Sense recepta</MudText>
+    }
+    else
+    {
+        <MudStack Spacing="1">
+            @foreach (var plannedRecipe in PlannedRecipes)
+            {
+                <div class="planned-recipe-row">
+                    <MudLink Href="@($"/recipes/{plannedRecipe.RecipeId}")" Color="Color.Primary">
+                        @plannedRecipe.Recipe?.Name
+                    </MudLink>
+                    <MudIconButton OnClick="@(() => RemoveRecipe.InvokeAsync(plannedRecipe.Id))"
+                                   Icon="@Icons.Material.Filled.Close"
+                                   Color="Color.Secondary"
+                                   Size="Size.Small"
+                                   aria-label="Treure plat" />
+                </div>
+            }
+        </MudStack>
+    }
+
+    @if (_isAdding)
+    {
+        <MudSelect T="int"
+                   Value="0"
+                   ValueChanged="OnRecipeSelected"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Dense="true"
+                   Class="meal-select">
+            <MudSelectItem T="int" Value="0">Tria una recepta</MudSelectItem>
+            @foreach (var recipe in Recipes)
+            {
+                <MudSelectItem T="int" Value="@recipe.Id">@recipe.Name</MudSelectItem>
+            }
+        </MudSelect>
     }
 </MudStack>
 
@@ -36,10 +61,30 @@
     public IReadOnlyList<Recipe> Recipes { get; set; } = [];
 
     [Parameter]
-    public EventCallback<(DateOnly Date, MealKind MealKind, int? RecipeId)> RecipeChanged { get; set; }
+    public EventCallback<(DateOnly Date, MealKind MealKind, int RecipeId)> AddRecipe { get; set; }
 
-    private int SelectedRecipeId => Slot.RecipeId ?? 0;
+    [Parameter]
+    public EventCallback<int> RemoveRecipe { get; set; }
 
-    private Task OnRecipeChanged(int recipeId) =>
-        RecipeChanged.InvokeAsync((Slot.Date, Slot.MealKind, recipeId == 0 ? null : recipeId));
+    private bool _isAdding;
+
+    private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
+        .OrderBy(plannedRecipe => plannedRecipe.Order)
+        .ToList();
+
+    private void ShowAddSelector()
+    {
+        _isAdding = true;
+    }
+
+    private async Task OnRecipeSelected(int recipeId)
+    {
+        if (recipeId == 0)
+        {
+            return;
+        }
+
+        _isAdding = false;
+        await AddRecipe.InvokeAsync((Slot.Date, Slot.MealKind, recipeId));
+    }
 }

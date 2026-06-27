@@ -14,7 +14,8 @@ public sealed class PlannerService(IDbContextFactory<NasdanusDbContext> dbContex
 
         var weekEnd = weekStart.AddDays(6);
         var slots = await db.MealPlanSlots
-            .Include(slot => slot.Recipe)
+            .Include(slot => slot.PlannedRecipes.OrderBy(plannedRecipe => plannedRecipe.Order))
+                .ThenInclude(plannedRecipe => plannedRecipe.Recipe)
             .Where(slot => slot.Date >= weekStart && slot.Date <= weekEnd)
             .AsNoTracking()
             .ToListAsync();
@@ -37,18 +38,41 @@ public sealed class PlannerService(IDbContextFactory<NasdanusDbContext> dbContex
         await EnsureWeekSlotsAsync(db, WeekStart(date));
 
         return await db.MealPlanSlots
-            .Include(slot => slot.Recipe)
+            .Include(slot => slot.PlannedRecipes.OrderBy(plannedRecipe => plannedRecipe.Order))
+                .ThenInclude(plannedRecipe => plannedRecipe.Recipe)
             .AsNoTracking()
             .SingleAsync(slot => slot.Date == date && slot.MealKind == mealKind);
     }
 
-    public async Task AssignRecipeAsync(DateOnly date, MealKind mealKind, int? recipeId)
+    public async Task AddRecipeAsync(DateOnly date, MealKind mealKind, int recipeId)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await EnsureWeekSlotsAsync(db, WeekStart(date));
 
-        var slot = await db.MealPlanSlots.SingleAsync(slot => slot.Date == date && slot.MealKind == mealKind);
-        slot.RecipeId = recipeId;
+        var slot = await db.MealPlanSlots
+            .Include(slot => slot.PlannedRecipes)
+            .SingleAsync(slot => slot.Date == date && slot.MealKind == mealKind);
+
+        var nextOrder = slot.PlannedRecipes.Count == 0 ? 1 : slot.PlannedRecipes.Max(plannedRecipe => plannedRecipe.Order) + 1;
+        slot.PlannedRecipes.Add(new MealPlanRecipe
+        {
+            RecipeId = recipeId,
+            Order = nextOrder
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    public async Task RemoveRecipeAsync(int plannedRecipeId)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var plannedRecipe = await db.MealPlanRecipes.FindAsync(plannedRecipeId);
+        if (plannedRecipe is null)
+        {
+            return;
+        }
+
+        db.MealPlanRecipes.Remove(plannedRecipe);
         await db.SaveChangesAsync();
     }
 

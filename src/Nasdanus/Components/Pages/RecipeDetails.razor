@@ -3,7 +3,7 @@
 
 <PageTitle>@(_recipe is null ? "Recepta" : _recipe.Name)</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell recipe-detail-shell">
     @if (_isLoading)
     {
         <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
@@ -30,6 +30,7 @@
 
             <MudStack Row Class="recipe-actions">
                 <MudButton Href="@($"/cook/{_recipe.Id}")"
+                           Class="recipe-primary-action"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Large"
@@ -45,7 +46,7 @@
                 </MudButton>
             </MudStack>
 
-            <MudGrid Spacing="2">
+            <MudGrid Spacing="2" Class="recipe-meta-grid">
                 <MudItem xs="6" sm="3">
                     <MudPaper Class="metric" Elevation="0">
                         <MudText Typo="Typo.overline">Preparació</MudText>
@@ -72,9 +73,9 @@
                 </MudItem>
             </MudGrid>
 
-            <MudPaper Class="detail-section" Elevation="0">
+            <MudPaper Class="detail-section ingredient-section" Elevation="0">
                 <MudText Typo="Typo.h5">Ingredients</MudText>
-                <MudList T="RecipeIngredient" Dense="true">
+                <MudList T="RecipeIngredient" Dense="true" Class="ingredient-list">
                     @foreach (var ingredient in _recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
                     {
                         <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
@@ -84,7 +85,7 @@
                 </MudList>
             </MudPaper>
 
-            <MudPaper Class="detail-section" Elevation="0">
+            <MudPaper Class="detail-section steps-section" Elevation="0">
                 <MudText Typo="Typo.h5">Passos</MudText>
                 <MudStack Spacing="2">
                     @foreach (var step in _recipe.Steps.OrderBy(step => step.Order))
