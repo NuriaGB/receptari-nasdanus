@@ -1,10 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using MudBlazor.Services;
 using Nasdanus.Components;
 using Nasdanus.Data;
 using Nasdanus.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -14,9 +18,14 @@ builder.Services.AddMudServices();
 
 var databasePath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "nasdanus.db");
 Directory.CreateDirectory(Path.GetDirectoryName(databasePath)!);
+var dataProtectionPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "keys");
+Directory.CreateDirectory(dataProtectionPath);
 
 builder.Services.AddDbContextFactory<NasdanusDbContext>(options =>
     options.UseSqlite($"Data Source={databasePath}"));
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath));
 
 builder.Services.AddScoped<DatabaseInitializer>();
 builder.Services.AddScoped<RecipeService>();

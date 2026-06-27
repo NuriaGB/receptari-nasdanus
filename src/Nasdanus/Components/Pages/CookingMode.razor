@@ -1,5 +1,4 @@
 @page "/cook/{Id:int}"
-@rendermode InteractiveServer
 @inject RecipeService Recipes
 
 <PageTitle>@(_recipe is null ? "Cuinar" : $"Cuinar - {_recipe.Name}")</PageTitle>
