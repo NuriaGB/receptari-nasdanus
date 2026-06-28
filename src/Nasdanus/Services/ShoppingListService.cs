@@ -200,7 +200,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         var name = ingredient.Name.Trim();
-        var unit = ingredient.Unit.Trim();
+        var unit = NormalizeUnit(ingredient.Unit.Trim());
         var category = Categorize(name);
         var key = $"{NormalizeName(name)}|{unit.ToLowerInvariant()}|{category}";
         var quantity = ScaledQuantity(ingredient, scale);
@@ -304,12 +304,23 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         {
             if (quantity is null)
             {
-                HasOnlyNumericQuantities = false;
                 if (!string.IsNullOrWhiteSpace(quantityText))
                 {
+                    if (HasOnlyNumericQuantities && Quantity is not null)
+                    {
+                        quantityTexts.Add(FormatQuantity(Quantity.Value));
+                    }
+
+                    HasOnlyNumericQuantities = false;
                     quantityTexts.Add(quantityText);
                 }
 
+                return;
+            }
+
+            if (!HasOnlyNumericQuantities)
+            {
+                quantityTexts.Add(FormatQuantity(quantity.Value));
                 return;
             }
 
@@ -328,9 +339,44 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
                 Category = Category,
                 Quantity = HasOnlyNumericQuantities ? Quantity : null,
                 QuantityText = quantityText,
-                Unit = Unit,
+                Unit = DisplayUnit(Unit, Quantity),
                 Order = order
             };
         }
+    }
+
+    private static string NormalizeUnit(string unit)
+    {
+        var normalized = unit.Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            "u" => "unitat",
+            "unitats" => "unitat",
+            "cullerades" => "cullerada",
+            "culleradetes" => "culleradeta",
+            "grapats" => "grapat",
+            "trossos" => "tros",
+            "trossets" => "trosset",
+            _ => normalized
+        };
+    }
+
+    private static string DisplayUnit(string unit, decimal? quantity)
+    {
+        if (quantity is null || quantity.Value == 1)
+        {
+            return unit;
+        }
+
+        return unit switch
+        {
+            "unitat" => "unitats",
+            "cullerada" => "cullerades",
+            "culleradeta" => "culleradetes",
+            "grapat" => "grapats",
+            "tros" => "trossos",
+            "trosset" => "trossets",
+            _ => unit
+        };
     }
 }
