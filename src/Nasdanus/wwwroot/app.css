@@ -257,50 +257,48 @@ h3:focus {
 }
 
 .recipe-ideas-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    gap: 0.45rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.recipe-idea-row {
-    display: grid;
+.recipe-idea-chip {
+    display: inline-grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    min-height: 2.4rem;
-    padding: 0.25rem 0.4rem;
-    border: 1px solid var(--nas-border);
-    border-radius: 8px;
-    background: #fbfcf9;
+    max-width: min(100%, 18rem);
+    min-height: 2.25rem;
+    padding: 0.15rem 0.25rem 0.15rem 0.7rem;
+    border: 1px solid #bad8de;
+    border-radius: 999px;
+    background: #eef8fa;
 }
 
 .recipe-idea-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #225968;
+    font-size: 0.9rem;
+    font-weight: 650;
 }
 
 .planner-grid {
     display: grid;
-    grid-template-columns: repeat(7, minmax(13.5rem, 1fr));
-    gap: 0;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    border: 1px solid var(--nas-border);
-    border-radius: 8px;
-    background: var(--nas-panel);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1rem;
+    align-items: start;
 }
 
-.planner-day-column {
+.planner-day-card {
     display: grid;
     align-content: start;
     gap: 0;
-    min-width: 13.5rem;
-    padding: 0.75rem;
-    border-right: 1px solid var(--nas-border);
-}
-
-.planner-day-column:last-child {
-    border-right: 0;
+    min-width: 0;
+    padding: 0.9rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
 }
 
 .planner-day-header {
@@ -334,6 +332,10 @@ h3:focus {
     gap: 0.35rem;
 }
 
+.empty-meal-text {
+    color: var(--nas-muted);
+}
+
 .planned-recipe-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
@@ -347,10 +349,12 @@ h3:focus {
 }
 
 .planned-recipe-name {
+    display: -webkit-box !important;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     font-weight: 650;
+    line-height: 1.2;
 }
 
 .planned-recipe-servings {
@@ -603,7 +607,7 @@ h3:focus {
     }
 
     .planner-grid {
-        grid-template-columns: repeat(7, minmax(15rem, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .picker-recipe-card {

@@ -18,7 +18,7 @@
 
     @if (PlannedRecipes.Count == 0)
     {
-        <MudText Typo="Typo.body2" Color="Color.Secondary">Sense recepta</MudText>
+        <MudText Typo="Typo.body2" Class="empty-meal-text">Sense recepta</MudText>
     }
     else
     {
@@ -26,9 +26,9 @@
             @foreach (var plannedRecipe in PlannedRecipes)
             {
                 <div class="planned-recipe-row">
-                    <MudText Typo="Typo.body2" Class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
+                    <span class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
                         @plannedRecipe.Recipe?.Name
-                    </MudText>
+                    </span>
                     <MudText Typo="Typo.caption" Class="planned-recipe-servings">
                         @PlannedServingsText(plannedRecipe)
                     </MudText>
