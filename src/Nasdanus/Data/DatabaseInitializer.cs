@@ -10,9 +10,12 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
         await EnsureRecipeStatusColumnAsync(db);
+        await EnsureRecipeFutureColumnsAsync(db);
         await EnsureRecipeIngredientScalingModeColumnAsync(db);
         await EnsureRecipeStepIngredientReferenceTableAsync(db);
+        await EnsureRecipeNotesTableAsync(db);
         await EnsureRecipePlanningMetadataTableAsync(db);
+        await EnsureRecipeFutureTablesAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
         await EnsureShoppingListTablesAsync(db);
 
@@ -39,6 +42,33 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             ALTER TABLE "Recipes"
             ADD COLUMN "Status" TEXT NOT NULL DEFAULT 'Active';
         """);
+    }
+
+    private static async Task EnsureRecipeFutureColumnsAsync(NasdanusDbContext db)
+    {
+        if (!await RecipesHasColumnAsync(db, "IsFavourite"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "Recipes"
+                ADD COLUMN "IsFavourite" INTEGER NOT NULL DEFAULT 0;
+                """);
+        }
+
+        if (!await RecipesHasColumnAsync(db, "Rating"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "Recipes"
+                ADD COLUMN "Rating" INTEGER NULL;
+                """);
+        }
+
+        if (!await RecipesHasColumnAsync(db, "SeasonalRecommendation"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "Recipes"
+                ADD COLUMN "SeasonalRecommendation" TEXT NOT NULL DEFAULT '';
+                """);
+        }
     }
 
     private static async Task EnsureRecipeIngredientScalingModeColumnAsync(NasdanusDbContext db)
@@ -74,6 +104,26 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         return false;
     }
 
+    private static async Task EnsureRecipeNotesTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "RecipeNotes" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_RecipeNotes" PRIMARY KEY AUTOINCREMENT,
+                "RecipeId" INTEGER NOT NULL,
+                "Section" TEXT NOT NULL,
+                "Content" TEXT NOT NULL,
+                "Order" INTEGER NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_RecipeNotes_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_RecipeNotes_RecipeId_Section_Order"
+            ON "RecipeNotes" ("RecipeId", "Section", "Order");
+            """);
+    }
+
     private static async Task EnsureRecipePlanningMetadataTableAsync(NasdanusDbContext db)
     {
         await db.Database.ExecuteSqlRawAsync("""
@@ -91,6 +141,41 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await db.Database.ExecuteSqlRawAsync("""
             CREATE INDEX IF NOT EXISTS "IX_RecipePlanningMetadata_RecipeId_Kind"
             ON "RecipePlanningMetadata" ("RecipeId", "Kind");
+            """);
+    }
+
+    private static async Task EnsureRecipeFutureTablesAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "RecipeTags" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_RecipeTags" PRIMARY KEY AUTOINCREMENT,
+                "RecipeId" INTEGER NOT NULL,
+                "Name" TEXT NOT NULL,
+                CONSTRAINT "FK_RecipeTags_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_RecipeTags_RecipeId_Name"
+            ON "RecipeTags" ("RecipeId", "Name");
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "RecipeCookingSessions" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_RecipeCookingSessions" PRIMARY KEY AUTOINCREMENT,
+                "RecipeId" INTEGER NOT NULL,
+                "CookedAt" TEXT NOT NULL,
+                "PlannedServings" INTEGER NULL,
+                "ActualServings" INTEGER NULL,
+                "Rating" INTEGER NULL,
+                "Notes" TEXT NOT NULL DEFAULT '',
+                CONSTRAINT "FK_RecipeCookingSessions_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_RecipeCookingSessions_RecipeId_CookedAt"
+            ON "RecipeCookingSessions" ("RecipeId", "CookedAt");
             """);
     }
 

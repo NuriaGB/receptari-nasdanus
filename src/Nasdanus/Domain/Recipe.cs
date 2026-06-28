@@ -13,10 +13,16 @@ public sealed class Recipe
     public int CookingTimeMinutes { get; set; }
     public int Difficulty { get; set; }
     public int Servings { get; set; }
+    public bool IsFavourite { get; set; }
+    public int? Rating { get; set; }
+    public string SeasonalRecommendation { get; set; } = string.Empty;
 
     public List<RecipeIngredient> Ingredients { get; set; } = [];
     public List<RecipeStep> Steps { get; set; } = [];
+    public List<RecipeNote> Notes { get; set; } = [];
     public List<RecipePlanningMetadata> PlanningMetadata { get; set; } = [];
+    public List<RecipeTag> Tags { get; set; } = [];
+    public List<RecipeCookingSession> CookingHistory { get; set; } = [];
 
     [NotMapped]
     public bool IsDraft => string.Equals(Status, RecipeStatus.Draft, StringComparison.OrdinalIgnoreCase);
@@ -46,6 +52,58 @@ public static class RecipePlanningMetadataKind
     public const string Monthly = "Monthly";
     public const string Seasonal = "Seasonal";
     public const string SpecialOccasion = "SpecialOccasion";
+}
+
+public sealed class RecipeNote
+{
+    public int Id { get; set; }
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+    public string Section { get; set; } = RecipeNoteSection.General;
+    public string Content { get; set; } = string.Empty;
+    public int Order { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public static class RecipeNoteSection
+{
+    public const string General = "General";
+    public const string CookingTips = "CookingTips";
+    public const string Variations = "Variations";
+
+    public static readonly string[] DisplayOrder =
+    [
+        General,
+        CookingTips,
+        Variations
+    ];
+
+    public static string ToDisplayName(string section) => section switch
+    {
+        CookingTips => "Cooking Tips",
+        Variations => "Variations",
+        _ => "General Notes"
+    };
+}
+
+public sealed class RecipeTag
+{
+    public int Id { get; set; }
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+public sealed class RecipeCookingSession
+{
+    public int Id { get; set; }
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+    public DateTime CookedAt { get; set; }
+    public int? PlannedServings { get; set; }
+    public int? ActualServings { get; set; }
+    public int? Rating { get; set; }
+    public string Notes { get; set; } = string.Empty;
 }
 
 public sealed class RecipeIngredient

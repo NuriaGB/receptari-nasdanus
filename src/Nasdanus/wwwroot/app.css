@@ -224,6 +224,16 @@ h3:focus {
     background: #fbfcf9;
 }
 
+.recipe-note-section {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.recipe-note-section .mud-list-item {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .planner-shell {
     max-width: 100%;
 }

@@ -148,7 +148,35 @@
 
             <MudPaper Class="detail-section notes-section" Elevation="0">
                 <MudText Typo="Typo.h5">Notes</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha notes.</MudText>
+                @if (_recipe.Notes.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha notes.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="2">
+                        @foreach (var section in RecipeNoteSection.DisplayOrder)
+                        {
+                            var notes = NotesFor(section);
+                            if (notes.Count == 0)
+                            {
+                                continue;
+                            }
+
+                            <div class="recipe-note-section">
+                                <MudText Typo="Typo.subtitle1">@RecipeNoteSection.ToDisplayName(section)</MudText>
+                                <MudList T="RecipeNote" Dense="true">
+                                    @foreach (var note in notes)
+                                    {
+                                        <MudListItem Icon="@Icons.Material.Filled.StickyNote2">
+                                            @note.Content
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            </div>
+                        }
+                    </MudStack>
+                }
             </MudPaper>
         </MudStack>
     }
@@ -186,6 +214,12 @@
                 : $"/cook/{_recipe.Id}?servings={_displayServings}";
         }
     }
+
+    private IReadOnlyList<RecipeNote> NotesFor(string section) =>
+        _recipe?.Notes
+            .Where(note => note.Section == section)
+            .OrderBy(note => note.Order)
+            .ToList() ?? [];
 
     protected override async Task OnParametersSetAsync()
     {
