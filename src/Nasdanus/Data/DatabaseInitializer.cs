@@ -14,6 +14,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await EnsureRecipeStepIngredientReferenceTableAsync(db);
         await EnsureRecipePlanningMetadataTableAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
+        await EnsureShoppingListTablesAsync(db);
 
         if (!await db.Recipes.AnyAsync())
         {
@@ -173,6 +174,44 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
                 WHERE "Recipes"."Id" = "MealPlanRecipes"."RecipeId"
             ), 0)
             WHERE "PlannedServings" <= 0;
+            """);
+    }
+
+    private static async Task EnsureShoppingListTablesAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "ShoppingLists" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_ShoppingLists" PRIMARY KEY AUTOINCREMENT,
+                "WeekStart" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                "UpdatedAt" TEXT NOT NULL
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_ShoppingLists_WeekStart"
+            ON "ShoppingLists" ("WeekStart");
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "ShoppingListItems" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_ShoppingListItems" PRIMARY KEY AUTOINCREMENT,
+                "ShoppingListId" INTEGER NOT NULL,
+                "Name" TEXT NOT NULL,
+                "Category" TEXT NOT NULL,
+                "QuantityText" TEXT NOT NULL DEFAULT '',
+                "Unit" TEXT NOT NULL DEFAULT '',
+                "Quantity" TEXT NULL,
+                "IsChecked" INTEGER NOT NULL DEFAULT 0,
+                "IsManual" INTEGER NOT NULL DEFAULT 0,
+                "Order" INTEGER NOT NULL,
+                CONSTRAINT "FK_ShoppingListItems_ShoppingLists_ShoppingListId" FOREIGN KEY ("ShoppingListId") REFERENCES "ShoppingLists" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_ShoppingListItems_ShoppingListId_Order"
+            ON "ShoppingListItems" ("ShoppingListId", "Order");
             """);
     }
 

@@ -1,0 +1,85 @@
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2" Class="shopping-item-dialog">
+            <MudTextField T="string"
+                          Label="Ingredient"
+                          @bind-Value="_request.Name"
+                          Required="true"
+                          Immediate="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+
+            <MudGrid Spacing="2">
+                <MudItem xs="7">
+                    <MudTextField T="string"
+                                  Label="Quantitat"
+                                  @bind-Value="_request.QuantityText"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="5">
+                    <MudTextField T="string"
+                                  Label="Unitat"
+                                  @bind-Value="_request.Unit"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+
+            <MudSelect T="string"
+                       Label="Categoria"
+                       @bind-Value="_request.Category"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Dense="true">
+                @foreach (var category in ShoppingCategory.DisplayOrder)
+                {
+                    <MudSelectItem T="string" Value="@category">@ShoppingCategory.ToDisplayName(category)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel·lar</MudButton>
+        <MudButton OnClick="Save"
+                   Disabled="@string.IsNullOrWhiteSpace(_request.Name)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public ShoppingListItem? Item { get; set; }
+
+    private readonly ShoppingItemEditRequest _request = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Item is null)
+        {
+            _request.Category = ShoppingCategory.Other;
+            return;
+        }
+
+        _request.Name = Item.Name;
+        _request.Category = Item.Category;
+        _request.QuantityText = Item.QuantityText;
+        _request.Unit = Item.Unit;
+    }
+
+    private void Save()
+    {
+        MudDialog.Close(DialogResult.Ok(_request));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

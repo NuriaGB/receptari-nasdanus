@@ -399,6 +399,91 @@ h3:focus {
     background: var(--nas-panel);
 }
 
+.shopping-toolbar,
+.shopping-group {
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.shopping-toolbar {
+    padding: 0.85rem 1rem;
+}
+
+.shopping-toolbar-content,
+.shopping-toolbar-actions {
+    flex-wrap: wrap;
+}
+
+.shopping-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+.shopping-group {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+.shopping-group-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.shopping-item-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    min-height: 3rem;
+    gap: 0.45rem;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.shopping-item-row.is-checked {
+    opacity: 0.68;
+}
+
+.shopping-item-row.is-checked .shopping-item-name {
+    text-decoration: line-through;
+}
+
+.shopping-item-main {
+    display: grid;
+    min-width: 0;
+    gap: 0.1rem;
+}
+
+.shopping-item-name {
+    overflow: hidden;
+    color: var(--nas-ink);
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shopping-item-amount {
+    color: var(--nas-muted);
+    font-size: 0.86rem;
+}
+
+.shopping-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.shopping-item-dialog {
+    min-width: 0;
+}
+
 .cooking-shell {
     max-width: 58rem;
 }
@@ -616,6 +701,28 @@ h3:focus {
 
     .planned-recipe-actions {
         justify-content: space-between;
+    }
+
+    .shopping-toolbar-content {
+        align-items: stretch !important;
+        flex-direction: column;
+    }
+
+    .shopping-toolbar-actions {
+        display: grid !important;
+        grid-template-columns: 1fr;
+    }
+
+    .shopping-groups {
+        grid-template-columns: 1fr;
+    }
+
+    .shopping-item-row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .shopping-item-row .mud-chip {
+        display: none;
     }
 
     .cook-serving-control {

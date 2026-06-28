@@ -1,0 +1,223 @@
+@page "/shopping"
+@using System.Globalization
+@inject ShoppingListService ShoppingLists
+@inject IDialogService DialogService
+
+<PageTitle>Nasdanus - Llista de compra</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="page-shell shopping-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading planner-heading">
+            <div>
+                <MudText Typo="Typo.overline">Compra</MudText>
+                <MudText Typo="Typo.h3">Llista de compra</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Setmana @WeekNumber · @WeekRangeText</MudText>
+            </div>
+            <MudStack Row Spacing="1" Class="planner-week-nav">
+                <MudButton OnClick="PreviousWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.ChevronLeft">
+                    Setmana anterior
+                </MudButton>
+                <MudButton OnClick="NextWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                    Setmana seguent
+                </MudButton>
+            </MudStack>
+        </div>
+
+        <MudPaper Class="shopping-toolbar" Elevation="0">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2" Class="shopping-toolbar-content">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@TotalItems items</MudChip>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@CheckedItems marcats</MudText>
+                </MudStack>
+                <MudStack Row Spacing="1" Class="shopping-toolbar-actions">
+                    <MudButton OnClick="RegenerateAsync"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Sync">
+                        Actualitzar del planner
+                    </MudButton>
+                    <MudButton OnClick="AddItemAsync"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Afegir manualment
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (_shoppingList is null || TotalItems == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                Encara no hi ha ingredients planificats per aquesta setmana.
+            </MudAlert>
+        }
+        else
+        {
+            <div class="shopping-groups">
+                @foreach (var category in VisibleCategories)
+                {
+                    <MudPaper Class="shopping-group" Elevation="0">
+                        <div class="shopping-group-heading">
+                            <MudText Typo="Typo.h6">@ShoppingCategory.ToDisplayName(category)</MudText>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@ItemsFor(category).Count</MudChip>
+                        </div>
+
+                        <MudStack Spacing="1">
+                            @foreach (var item in ItemsFor(category))
+                            {
+                                <div class="@ShoppingItemRowClass(item)">
+                                    <MudCheckBox T="bool"
+                                                 Value="@item.IsChecked"
+                                                 ValueChanged="@((bool value) => SetCheckedAsync(item, value))"
+                                                 Color="Color.Primary"
+                                                 Dense="true"
+                                                 aria-label="@($"Marcar {item.Name}")" />
+                                    <div class="shopping-item-main">
+                                        <span class="shopping-item-name" title="@item.Name">@item.Name</span>
+                                        <span class="shopping-item-amount">@AmountText(item)</span>
+                                    </div>
+                                    @if (item.IsManual)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">Manual</MudChip>
+                                    }
+                                    <div class="shopping-item-actions">
+                                        <MudIconButton OnClick="@(() => EditItemAsync(item))"
+                                                       Icon="@Icons.Material.Filled.Edit"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       aria-label="Editar item" />
+                                        <MudIconButton OnClick="@(() => DeleteItemAsync(item.Id))"
+                                                       Icon="@Icons.Material.Filled.DeleteOutline"
+                                                       Color="Color.Secondary"
+                                                       Size="Size.Small"
+                                                       aria-label="Eliminar item" />
+                                    </div>
+                                </div>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                }
+            </div>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private DateOnly _weekStart;
+    private Nasdanus.Domain.ShoppingList? _shoppingList;
+    private bool _isLoading = true;
+
+    private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
+    private string WeekRangeText => $"{_weekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_weekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
+    private IReadOnlyList<ShoppingListItem> Items => _shoppingList?.Items.OrderBy(item => item.Order).ToList() ?? [];
+    private int TotalItems => Items.Count;
+    private int CheckedItems => Items.Count(item => item.IsChecked);
+    private IEnumerable<string> VisibleCategories => ShoppingCategory.DisplayOrder
+        .Where(category => Items.Any(item => item.Category == category));
+
+    protected override async Task OnInitializedAsync()
+    {
+        _weekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
+        await LoadWeekAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadWeekAsync()
+    {
+        _shoppingList = await ShoppingLists.GetWeekAsync(_weekStart);
+    }
+
+    private async Task PreviousWeekAsync()
+    {
+        _weekStart = _weekStart.AddDays(-7);
+        await LoadWeekAsync();
+    }
+
+    private async Task NextWeekAsync()
+    {
+        _weekStart = _weekStart.AddDays(7);
+        await LoadWeekAsync();
+    }
+
+    private async Task RegenerateAsync()
+    {
+        _shoppingList = await ShoppingLists.RegenerateWeekAsync(_weekStart);
+    }
+
+    private async Task SetCheckedAsync(ShoppingListItem item, bool isChecked)
+    {
+        item.IsChecked = isChecked;
+        await ShoppingLists.SetCheckedAsync(item.Id, isChecked);
+    }
+
+    private async Task AddItemAsync()
+    {
+        var result = await OpenItemDialogAsync("Afegir item", null);
+        if (result is null)
+        {
+            return;
+        }
+
+        await ShoppingLists.AddManualItemAsync(_weekStart, result);
+        await LoadWeekAsync();
+    }
+
+    private async Task EditItemAsync(ShoppingListItem item)
+    {
+        var result = await OpenItemDialogAsync("Editar item", item);
+        if (result is null)
+        {
+            return;
+        }
+
+        await ShoppingLists.UpdateItemAsync(item.Id, result);
+        await LoadWeekAsync();
+    }
+
+    private async Task DeleteItemAsync(int itemId)
+    {
+        await ShoppingLists.DeleteItemAsync(itemId);
+        await LoadWeekAsync();
+    }
+
+    private async Task<ShoppingItemEditRequest?> OpenItemDialogAsync(string title, ShoppingListItem? item)
+    {
+        var parameters = new DialogParameters<ShoppingItemDialog>();
+        if (item is not null)
+        {
+            parameters.Add(dialog => dialog.Item, item);
+        }
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+        var dialog = await DialogService.ShowAsync<ShoppingItemDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        return result is not null && !result.Canceled && result.Data is ShoppingItemEditRequest request
+            ? request
+            : null;
+    }
+
+    private IReadOnlyList<ShoppingListItem> ItemsFor(string category) =>
+        Items.Where(item => item.Category == category).ToList();
+
+    private static string AmountText(ShoppingListItem item) =>
+        string.Join(" ", new[] { item.QuantityText, item.Unit }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static string ShoppingItemRowClass(ShoppingListItem item) =>
+        item.IsChecked ? "shopping-item-row is-checked" : "shopping-item-row";
+}

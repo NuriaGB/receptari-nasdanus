@@ -12,6 +12,8 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
     public DbSet<RecipePlanningMetadata> RecipePlanningMetadata => Set<RecipePlanningMetadata>();
     public DbSet<MealPlanSlot> MealPlanSlots => Set<MealPlanSlot>();
     public DbSet<MealPlanRecipe> MealPlanRecipes => Set<MealPlanRecipe>();
+    public DbSet<ShoppingList> ShoppingLists => Set<ShoppingList>();
+    public DbSet<ShoppingListItem> ShoppingListItems => Set<ShoppingListItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,6 +108,26 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(plannedRecipe => new { plannedRecipe.MealPlanSlotId, plannedRecipe.Order });
+        });
+
+        modelBuilder.Entity<ShoppingList>(entity =>
+        {
+            entity.Property(list => list.WeekStart).IsRequired();
+            entity.HasIndex(list => list.WeekStart).IsUnique();
+
+            entity.HasMany(list => list.Items)
+                .WithOne(item => item.ShoppingList)
+                .HasForeignKey(item => item.ShoppingListId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ShoppingListItem>(entity =>
+        {
+            entity.Property(item => item.Name).HasMaxLength(160).IsRequired();
+            entity.Property(item => item.Category).HasMaxLength(48).IsRequired();
+            entity.Property(item => item.QuantityText).HasMaxLength(48);
+            entity.Property(item => item.Unit).HasMaxLength(48);
+            entity.HasIndex(item => new { item.ShoppingListId, item.Order });
         });
     }
 }

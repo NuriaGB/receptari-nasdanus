@@ -30,6 +30,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddScoped<DatabaseInitializer>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<PlannerService>();
+builder.Services.AddScoped<ShoppingListService>();
 
 var app = builder.Build();
 
