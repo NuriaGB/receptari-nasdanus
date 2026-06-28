@@ -89,6 +89,106 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         return recipe;
     }
 
+    public async Task UpdateRecipeAsync(int id, RecipeEditRequest request)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var recipe = await db.Recipes
+            .Include(recipe => recipe.Ingredients)
+            .Include(recipe => recipe.Steps)
+                .ThenInclude(step => step.IngredientReferences)
+            .Include(recipe => recipe.Notes)
+            .FirstOrDefaultAsync(recipe => recipe.Id == id);
+
+        if (recipe is null)
+        {
+            return;
+        }
+
+        db.RecipeStepIngredientReferences.RemoveRange(recipe.Steps.SelectMany(step => step.IngredientReferences));
+        db.RecipeSteps.RemoveRange(recipe.Steps);
+        db.RecipeIngredients.RemoveRange(recipe.Ingredients);
+        db.RecipeNotes.RemoveRange(recipe.Notes);
+        await db.SaveChangesAsync();
+
+        recipe.Name = request.Name.Trim();
+        recipe.Description = request.Description.Trim();
+        recipe.Category = request.Category.Trim();
+        recipe.Servings = Math.Max(0, request.Servings);
+        recipe.PreparationTimeMinutes = Math.Max(0, request.PreparationTimeMinutes);
+        recipe.CookingTimeMinutes = Math.Max(0, request.CookingTimeMinutes);
+        recipe.Difficulty = Math.Clamp(request.Difficulty, 0, 5);
+
+        recipe.Ingredients = [];
+        recipe.Steps = [];
+        recipe.Notes = [];
+
+        var ingredientMap = new Dictionary<string, RecipeIngredient>(StringComparer.OrdinalIgnoreCase);
+        foreach (var ingredientRequest in request.Ingredients
+            .Where(ingredient => !string.IsNullOrWhiteSpace(ingredient.Name))
+            .Select((ingredient, index) => (Ingredient: ingredient, Order: index + 1)))
+        {
+            var ingredient = new RecipeIngredient
+            {
+                Name = ingredientRequest.Ingredient.Name.Trim(),
+                Quantity = ingredientRequest.Ingredient.Quantity.Trim(),
+                Unit = ingredientRequest.Ingredient.Unit.Trim(),
+                ScalingMode = NormalizeScalingMode(ingredientRequest.Ingredient.ScalingMode),
+                Order = ingredientRequest.Order
+            };
+            recipe.Ingredients.Add(ingredient);
+            ingredientMap[ingredientRequest.Ingredient.Key] = ingredient;
+        }
+
+        foreach (var stepRequest in request.Steps
+            .Where(step => !string.IsNullOrWhiteSpace(step.Title) || !string.IsNullOrWhiteSpace(step.Instruction))
+            .Select((step, index) => (Step: step, Order: index + 1)))
+        {
+            var step = new RecipeStep
+            {
+                Title = stepRequest.Step.Title.Trim(),
+                Instruction = stepRequest.Step.Instruction.Trim(),
+                TimerMinutes = stepRequest.Step.TimerMinutes,
+                Order = stepRequest.Order
+            };
+
+            foreach (var referenceRequest in stepRequest.Step.IngredientReferences
+                .Where(reference => ingredientMap.ContainsKey(reference.IngredientKey))
+                .Select((reference, index) => (Reference: reference, Order: index + 1)))
+            {
+                var ingredient = ingredientMap[referenceRequest.Reference.IngredientKey];
+                step.IngredientReferences.Add(new RecipeStepIngredientReference
+                {
+                    Ingredient = ingredient,
+                    IngredientName = ingredient.Name,
+                    Quantity = IngredientScaling.ParseQuantity(referenceRequest.Reference.QuantityText),
+                    QuantityText = referenceRequest.Reference.QuantityText.Trim(),
+                    Unit = referenceRequest.Reference.Unit.Trim(),
+                    Order = referenceRequest.Order
+                });
+            }
+
+            recipe.Steps.Add(step);
+        }
+
+        foreach (var noteRequest in request.Notes
+            .Where(note => !string.IsNullOrWhiteSpace(note.Content))
+            .Select((note, index) => (Note: note, Order: index + 1)))
+        {
+            recipe.Notes.Add(new RecipeNote
+            {
+                Section = NormalizeNoteSection(noteRequest.Note.Section),
+                Content = noteRequest.Note.Content.Trim(),
+                Order = noteRequest.Order
+            });
+        }
+
+        recipe.Status = IsIncomplete(recipe)
+            ? RecipeStatus.Draft
+            : RecipeStatus.Active;
+
+        await db.SaveChangesAsync();
+    }
+
     private static bool IsIncomplete(QuickAddRecipeRequest request, int ingredientCount, int stepCount) =>
         string.IsNullOrWhiteSpace(request.Category)
         || ingredientCount == 0
@@ -96,6 +196,28 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         || request.PreparationTimeMinutes is null
         || request.CookingTimeMinutes is null
         || request.Servings is null;
+
+    private static bool IsIncomplete(Recipe recipe) =>
+        string.IsNullOrWhiteSpace(recipe.Category)
+        || recipe.Ingredients.Count == 0
+        || recipe.Steps.Count == 0
+        || recipe.PreparationTimeMinutes <= 0
+        || recipe.CookingTimeMinutes <= 0
+        || recipe.Servings <= 0;
+
+    private static string NormalizeScalingMode(string scalingMode) =>
+        scalingMode switch
+        {
+            IngredientScalingMode.Fixed => IngredientScalingMode.Fixed,
+            IngredientScalingMode.Approximate => IngredientScalingMode.Approximate,
+            IngredientScalingMode.ToTaste => IngredientScalingMode.ToTaste,
+            _ => IngredientScalingMode.Linear
+        };
+
+    private static string NormalizeNoteSection(string section) =>
+        RecipeNoteSection.DisplayOrder.Contains(section)
+            ? section
+            : RecipeNoteSection.General;
 
     private static List<string> ParseLines(string text) => text
         .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

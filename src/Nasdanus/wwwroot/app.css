@@ -234,6 +234,90 @@ h3:focus {
     padding-right: 0;
 }
 
+.recipe-edit-shell {
+    max-width: 74rem;
+}
+
+.recipe-edit-section {
+    display: grid;
+    gap: 1rem;
+}
+
+.recipe-edit-section-heading,
+.recipe-edit-step-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.recipe-edit-row {
+    display: grid;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.ingredient-edit-row {
+    grid-template-columns: minmax(12rem, 1.4fr) minmax(7rem, 0.7fr) minmax(6rem, 0.6fr) minmax(8rem, 0.8fr) auto;
+}
+
+.edit-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.1rem;
+}
+
+.recipe-edit-step {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.step-ingredient-editor {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.step-ingredient-add {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.step-ingredient-ref-row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) minmax(6rem, 0.6fr) minmax(5rem, 0.5fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.step-ingredient-ref-name {
+    overflow: hidden;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recipe-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .planner-shell {
     max-width: 100%;
 }
@@ -699,6 +783,35 @@ h3:focus {
 
     .detail-step {
         padding: 0.85rem;
+    }
+
+    .recipe-edit-section-heading,
+    .recipe-edit-step-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ingredient-edit-row,
+    .step-ingredient-ref-row,
+    .step-ingredient-add {
+        grid-template-columns: 1fr;
+    }
+
+    .edit-row-actions {
+        justify-content: space-between;
+    }
+
+    .recipe-edit-actions {
+        position: sticky;
+        bottom: 4.7rem;
+        z-index: 12;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 0.55rem;
+        border: 1px solid var(--nas-border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 10px 28px rgba(31, 42, 37, 0.14);
     }
 
     .planner-grid {

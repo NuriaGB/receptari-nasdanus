@@ -1,0 +1,567 @@
+@page "/recipes/{Id:int}/edit"
+@inject RecipeService Recipes
+@inject NavigationManager Navigation
+
+<PageTitle>@(_recipe is null ? "Editar recepta" : $"Editar {_recipe.Name}")</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="page-shell recipe-edit-shell">
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (_recipe is null)
+    {
+        <MudAlert Severity="Severity.Warning">No s'ha trobat la recepta.</MudAlert>
+    }
+    else
+    {
+        <MudStack Spacing="3">
+            <MudButton Href="@($"/recipes/{Id}")"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                Tornar
+            </MudButton>
+
+            <div class="page-heading page-heading-actions">
+                <div>
+                    <MudText Typo="Typo.overline">Editar recepta</MudText>
+                    <MudText Typo="Typo.h3">@_edit.Name</MudText>
+                </div>
+                <MudButton OnClick="SaveAsync"
+                           Disabled="@(_isSaving || string.IsNullOrWhiteSpace(_edit.Name))"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Save">
+                    Guardar
+                </MudButton>
+            </div>
+
+            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+                <MudText Typo="Typo.h5">Dades basiques</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" Label="Nom" @bind-Value="_edit.Name" Required="true" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" Label="Categoria" @bind-Value="_edit.Category" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="Descripcio" @bind-Value="_edit.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudNumericField T="int" Label="Racions" @bind-Value="_edit.Servings" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudNumericField T="int" Label="Prep. min" @bind-Value="_edit.PreparationTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudNumericField T="int" Label="Coccio min" @bind-Value="_edit.CookingTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudNumericField T="int" Label="Dificultat" @bind-Value="_edit.Difficulty" Min="0" Max="5" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+                <div class="recipe-edit-section-heading">
+                    <MudText Typo="Typo.h5">Ingredients</MudText>
+                    <MudButton OnClick="AddIngredient"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Afegir
+                    </MudButton>
+                </div>
+
+                @if (_edit.Ingredients.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha ingredients.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="1">
+                        @foreach (var ingredient in _edit.Ingredients)
+                        {
+                            <div class="recipe-edit-row ingredient-edit-row" @key="ingredient">
+                                <MudTextField T="string" Label="Ingredient" @bind-Value="ingredient.Name" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" Class="edit-ingredient-name" />
+                                <MudTextField T="string" Label="Quantitat" @bind-Value="ingredient.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudTextField T="string" Label="Unitat" @bind-Value="ingredient.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudSelect T="string" Label="Escala" @bind-Value="ingredient.ScalingMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    <MudSelectItem T="string" Value="@IngredientScalingMode.Linear">Linear</MudSelectItem>
+                                    <MudSelectItem T="string" Value="@IngredientScalingMode.Fixed">Fixed</MudSelectItem>
+                                    <MudSelectItem T="string" Value="@IngredientScalingMode.Approximate">Approx.</MudSelectItem>
+                                    <MudSelectItem T="string" Value="@IngredientScalingMode.ToTaste">Al gust</MudSelectItem>
+                                </MudSelect>
+                                <div class="edit-row-actions">
+                                    <MudIconButton OnClick="@(() => MoveIngredient(ingredient, -1))"
+                                                   Disabled="@IsFirst(_edit.Ingredients, ingredient)"
+                                                   Icon="@Icons.Material.Filled.KeyboardArrowUp"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   aria-label="Moure ingredient amunt" />
+                                    <MudIconButton OnClick="@(() => MoveIngredient(ingredient, 1))"
+                                                   Disabled="@IsLast(_edit.Ingredients, ingredient)"
+                                                   Icon="@Icons.Material.Filled.KeyboardArrowDown"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   aria-label="Moure ingredient avall" />
+                                    <MudIconButton OnClick="@(() => RemoveIngredient(ingredient))"
+                                                   Icon="@Icons.Material.Filled.DeleteOutline"
+                                                   Color="Color.Secondary"
+                                                   Size="Size.Small"
+                                                   aria-label="Eliminar ingredient" />
+                                </div>
+                            </div>
+                        }
+                    </MudStack>
+                }
+            </MudPaper>
+
+            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+                <div class="recipe-edit-section-heading">
+                    <MudText Typo="Typo.h5">Passos</MudText>
+                    <MudButton OnClick="AddStep"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Add">
+                        Afegir
+                    </MudButton>
+                </div>
+
+                @if (_edit.Steps.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Encara no hi ha passos.</MudText>
+                }
+                else
+                {
+                    <MudStack Spacing="2">
+                        @foreach (var step in _edit.Steps)
+                        {
+                            <MudPaper Class="recipe-edit-step" Elevation="0" @key="step">
+                                <div class="recipe-edit-step-heading">
+                                    <MudText Typo="Typo.subtitle1">Pas @StepNumber(step)</MudText>
+                                    <div class="edit-row-actions">
+                                        <MudIconButton OnClick="@(() => MoveStep(step, -1))"
+                                                       Disabled="@IsFirst(_edit.Steps, step)"
+                                                       Icon="@Icons.Material.Filled.KeyboardArrowUp"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       aria-label="Moure pas amunt" />
+                                        <MudIconButton OnClick="@(() => MoveStep(step, 1))"
+                                                       Disabled="@IsLast(_edit.Steps, step)"
+                                                       Icon="@Icons.Material.Filled.KeyboardArrowDown"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       aria-label="Moure pas avall" />
+                                        <MudIconButton OnClick="@(() => RemoveStep(step))"
+                                                       Icon="@Icons.Material.Filled.DeleteOutline"
+                                                       Color="Color.Secondary"
+                                                       Size="Size.Small"
+                                                       aria-label="Eliminar pas" />
+                                    </div>
+                                </div>
+
+                                <MudGrid Spacing="2">
+                                    <MudItem xs="12" md="8">
+                                        <MudTextField T="string" Label="Titol" @bind-Value="step.Title" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudNumericField T="int?" Label="Timer min" @bind-Value="step.TimerMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudTextField T="string" Label="Descripcio" @bind-Value="step.Instruction" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" />
+                                    </MudItem>
+                                </MudGrid>
+
+                                <div class="step-ingredient-editor">
+                                    <MudText Typo="Typo.subtitle2">Ingredients d'aquest pas</MudText>
+                                    <div class="step-ingredient-add">
+                                        <MudSelect T="string"
+                                                   Label="Ingredient"
+                                                   @bind-Value="step.SelectedIngredientKey"
+                                                   Variant="Variant.Outlined"
+                                                   Margin="Margin.Dense"
+                                                   Dense="true">
+                                            <MudSelectItem T="string" Value="@string.Empty">Tria ingredient</MudSelectItem>
+                                            @foreach (var ingredient in IngredientOptions)
+                                            {
+                                                <MudSelectItem T="string" Value="@ingredient.Key">@ingredient.Name</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                        <MudButton OnClick="@(() => AddStepIngredient(step))"
+                                                   Disabled="@string.IsNullOrWhiteSpace(step.SelectedIngredientKey)"
+                                                   Variant="Variant.Outlined"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Add">
+                                            Afegir
+                                        </MudButton>
+                                    </div>
+
+                                    @if (step.IngredientReferences.Count == 0)
+                                    {
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">Cap ingredient assignat al pas.</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudStack Spacing="1">
+                                            @foreach (var reference in step.IngredientReferences)
+                                            {
+                                                <div class="step-ingredient-ref-row" @key="reference">
+                                                    <span class="step-ingredient-ref-name" title="@IngredientNameFor(reference)">
+                                                        @IngredientNameFor(reference)
+                                                    </span>
+                                                    <MudTextField T="string" Label="Quantitat" @bind-Value="reference.QuantityText" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                                    <MudTextField T="string" Label="Unitat" @bind-Value="reference.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                                    <MudIconButton OnClick="@(() => RemoveStepIngredient(step, reference))"
+                                                                   Icon="@Icons.Material.Filled.Close"
+                                                                   Color="Color.Secondary"
+                                                                   Size="Size.Small"
+                                                                   aria-label="Treure ingredient del pas" />
+                                                </div>
+                                            }
+                                        </MudStack>
+                                    }
+                                </div>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                }
+            </MudPaper>
+
+            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+                <MudText Typo="Typo.h5">Notes</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="4">
+                        <MudTextField T="string" Label="General Notes" @bind-Value="_generalNotesText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="5" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField T="string" Label="Cooking Tips" @bind-Value="_cookingTipsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="5" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField T="string" Label="Variations" @bind-Value="_variationsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="5" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <div class="recipe-edit-actions">
+                <MudButton OnClick="SaveAsync"
+                           Disabled="@(_isSaving || string.IsNullOrWhiteSpace(_edit.Name))"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Save">
+                    Guardar
+                </MudButton>
+                <MudButton Href="@($"/recipes/{Id}")"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large">
+                    Cancel·lar
+                </MudButton>
+            </div>
+        </MudStack>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Recipe? _recipe;
+    private RecipeEditViewModel _edit = new();
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private string _generalNotesText = string.Empty;
+    private string _cookingTipsText = string.Empty;
+    private string _variationsText = string.Empty;
+
+    private IReadOnlyList<IngredientRow> IngredientOptions => _edit.Ingredients
+        .Where(ingredient => !string.IsNullOrWhiteSpace(ingredient.Name))
+        .ToList();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _recipe = await Recipes.GetByIdAsync(Id);
+        if (_recipe is not null)
+        {
+            MapRecipe(_recipe);
+        }
+
+        _isLoading = false;
+    }
+
+    private void MapRecipe(Recipe recipe)
+    {
+        _edit = new RecipeEditViewModel
+        {
+            Name = recipe.Name,
+            Description = recipe.Description,
+            Category = recipe.Category,
+            Servings = recipe.Servings,
+            PreparationTimeMinutes = recipe.PreparationTimeMinutes,
+            CookingTimeMinutes = recipe.CookingTimeMinutes,
+            Difficulty = recipe.Difficulty
+        };
+
+        var ingredientKeyMap = new Dictionary<int, string>();
+        foreach (var ingredient in recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
+        {
+            var key = $"ingredient-{ingredient.Id}";
+            ingredientKeyMap[ingredient.Id] = key;
+            _edit.Ingredients.Add(new IngredientRow
+            {
+                Key = key,
+                Name = ingredient.Name,
+                Quantity = ingredient.Quantity,
+                Unit = ingredient.Unit,
+                ScalingMode = ingredient.ScalingMode
+            });
+        }
+
+        foreach (var step in recipe.Steps.OrderBy(step => step.Order))
+        {
+            var stepRow = new StepRow
+            {
+                Title = step.Title,
+                Instruction = step.Instruction,
+                TimerMinutes = step.TimerMinutes
+            };
+
+            foreach (var reference in step.IngredientReferences.OrderBy(reference => reference.Order))
+            {
+                if (reference.RecipeIngredientId is int ingredientId && ingredientKeyMap.TryGetValue(ingredientId, out var ingredientKey))
+                {
+                    stepRow.IngredientReferences.Add(new StepIngredientRow
+                    {
+                        IngredientKey = ingredientKey,
+                        IngredientName = reference.Ingredient?.Name ?? reference.IngredientName,
+                        QuantityText = reference.QuantityText,
+                        Unit = reference.Unit
+                    });
+                }
+            }
+
+            _edit.Steps.Add(stepRow);
+        }
+
+        _generalNotesText = NotesText(recipe, RecipeNoteSection.General);
+        _cookingTipsText = NotesText(recipe, RecipeNoteSection.CookingTips);
+        _variationsText = NotesText(recipe, RecipeNoteSection.Variations);
+    }
+
+    private void AddIngredient()
+    {
+        _edit.Ingredients.Add(new IngredientRow());
+    }
+
+    private void RemoveIngredient(IngredientRow ingredient)
+    {
+        _edit.Ingredients.Remove(ingredient);
+        foreach (var step in _edit.Steps)
+        {
+            step.IngredientReferences.RemoveAll(reference => reference.IngredientKey == ingredient.Key);
+        }
+    }
+
+    private void MoveIngredient(IngredientRow ingredient, int offset)
+    {
+        Move(_edit.Ingredients, ingredient, offset);
+    }
+
+    private void AddStep()
+    {
+        _edit.Steps.Add(new StepRow
+        {
+            Title = $"Pas {_edit.Steps.Count + 1}"
+        });
+    }
+
+    private void RemoveStep(StepRow step)
+    {
+        _edit.Steps.Remove(step);
+    }
+
+    private void MoveStep(StepRow step, int offset)
+    {
+        Move(_edit.Steps, step, offset);
+    }
+
+    private void AddStepIngredient(StepRow step)
+    {
+        var ingredient = _edit.Ingredients.FirstOrDefault(ingredient => ingredient.Key == step.SelectedIngredientKey);
+        if (ingredient is null || step.IngredientReferences.Any(reference => reference.IngredientKey == ingredient.Key))
+        {
+            step.SelectedIngredientKey = string.Empty;
+            return;
+        }
+
+        step.IngredientReferences.Add(new StepIngredientRow
+        {
+            IngredientKey = ingredient.Key,
+            IngredientName = ingredient.Name,
+            QuantityText = ingredient.Quantity,
+            Unit = ingredient.Unit
+        });
+        step.SelectedIngredientKey = string.Empty;
+    }
+
+    private static void RemoveStepIngredient(StepRow step, StepIngredientRow reference)
+    {
+        step.IngredientReferences.Remove(reference);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_edit.Name))
+        {
+            return;
+        }
+
+        _isSaving = true;
+        var request = BuildRequest();
+        await Recipes.UpdateRecipeAsync(Id, request);
+        Navigation.NavigateTo($"/recipes/{Id}");
+    }
+
+    private RecipeEditRequest BuildRequest() => new()
+    {
+        Name = _edit.Name,
+        Description = _edit.Description,
+        Category = _edit.Category,
+        Servings = _edit.Servings,
+        PreparationTimeMinutes = _edit.PreparationTimeMinutes,
+        CookingTimeMinutes = _edit.CookingTimeMinutes,
+        Difficulty = _edit.Difficulty,
+        Ingredients = _edit.Ingredients
+            .Select((ingredient, index) => new RecipeIngredientEditRequest
+            {
+                Key = ingredient.Key,
+                Name = ingredient.Name,
+                Quantity = ingredient.Quantity,
+                Unit = ingredient.Unit,
+                ScalingMode = ingredient.ScalingMode,
+                Order = index + 1
+            })
+            .ToList(),
+        Steps = _edit.Steps
+            .Select((step, index) => new RecipeStepEditRequest
+            {
+                Title = step.Title,
+                Instruction = step.Instruction,
+                TimerMinutes = step.TimerMinutes,
+                Order = index + 1,
+                IngredientReferences = step.IngredientReferences
+                    .Select((reference, referenceIndex) => new RecipeStepIngredientEditRequest
+                    {
+                        IngredientKey = reference.IngredientKey,
+                        QuantityText = reference.QuantityText,
+                        Unit = reference.Unit,
+                        Order = referenceIndex + 1
+                    })
+                    .ToList()
+            })
+            .ToList(),
+        Notes = BuildNotes()
+    };
+
+    private List<RecipeNoteEditRequest> BuildNotes()
+    {
+        var notes = new List<RecipeNoteEditRequest>();
+        AddNotes(notes, RecipeNoteSection.General, _generalNotesText);
+        AddNotes(notes, RecipeNoteSection.CookingTips, _cookingTipsText);
+        AddNotes(notes, RecipeNoteSection.Variations, _variationsText);
+        return notes;
+    }
+
+    private static void AddNotes(List<RecipeNoteEditRequest> notes, string section, string text)
+    {
+        foreach (var line in ParseNoteLines(text))
+        {
+            notes.Add(new RecipeNoteEditRequest
+            {
+                Section = section,
+                Content = line,
+                Order = notes.Count + 1
+            });
+        }
+    }
+
+    private string IngredientNameFor(StepIngredientRow reference) =>
+        _edit.Ingredients.FirstOrDefault(ingredient => ingredient.Key == reference.IngredientKey)?.Name
+        ?? reference.IngredientName;
+
+    private int StepNumber(StepRow step) => _edit.Steps.IndexOf(step) + 1;
+
+    private static bool IsFirst<T>(List<T> items, T item) => items.IndexOf(item) == 0;
+
+    private static bool IsLast<T>(List<T> items, T item) => items.IndexOf(item) == items.Count - 1;
+
+    private static void Move<T>(List<T> items, T item, int offset)
+    {
+        var index = items.IndexOf(item);
+        var nextIndex = index + offset;
+        if (index < 0 || nextIndex < 0 || nextIndex >= items.Count)
+        {
+            return;
+        }
+
+        items.RemoveAt(index);
+        items.Insert(nextIndex, item);
+    }
+
+    private static string NotesText(Recipe recipe, string section) =>
+        string.Join(Environment.NewLine, recipe.Notes
+            .Where(note => note.Section == section)
+            .OrderBy(note => note.Order)
+            .Select(note => note.Content));
+
+    private static IEnumerable<string> ParseNoteLines(string text) => text
+        .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(line => !string.IsNullOrWhiteSpace(line));
+
+    private sealed class RecipeEditViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public int Servings { get; set; }
+        public int PreparationTimeMinutes { get; set; }
+        public int CookingTimeMinutes { get; set; }
+        public int Difficulty { get; set; }
+        public List<IngredientRow> Ingredients { get; set; } = [];
+        public List<StepRow> Steps { get; set; } = [];
+    }
+
+    private sealed class IngredientRow
+    {
+        public string Key { get; set; } = Guid.NewGuid().ToString("N");
+        public string Name { get; set; } = string.Empty;
+        public string Quantity { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
+        public string ScalingMode { get; set; } = IngredientScalingMode.Linear;
+    }
+
+    private sealed class StepRow
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Instruction { get; set; } = string.Empty;
+        public int? TimerMinutes { get; set; }
+        public string SelectedIngredientKey { get; set; } = string.Empty;
+        public List<StepIngredientRow> IngredientReferences { get; set; } = [];
+    }
+
+    private sealed class StepIngredientRow
+    {
+        public string IngredientKey { get; set; } = string.Empty;
+        public string IngredientName { get; set; } = string.Empty;
+        public string QuantityText { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
+    }
+}
