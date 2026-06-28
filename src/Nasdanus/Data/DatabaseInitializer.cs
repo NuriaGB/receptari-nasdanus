@@ -10,6 +10,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
         await EnsureRecipeStatusColumnAsync(db);
+        await EnsureRecipePlanningMetadataTableAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
 
         if (!await db.Recipes.AnyAsync())
@@ -53,6 +54,26 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         return false;
+    }
+
+    private static async Task EnsureRecipePlanningMetadataTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "RecipePlanningMetadata" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_RecipePlanningMetadata" PRIMARY KEY AUTOINCREMENT,
+                "RecipeId" INTEGER NOT NULL,
+                "Kind" TEXT NOT NULL,
+                "Value" TEXT NOT NULL DEFAULT '',
+                "Notes" TEXT NOT NULL DEFAULT '',
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_RecipePlanningMetadata_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_RecipePlanningMetadata_RecipeId_Kind"
+            ON "RecipePlanningMetadata" ("RecipeId", "Kind");
+            """);
     }
 
     private static async Task EnsurePlannerRecipeTableAsync(NasdanusDbContext db)

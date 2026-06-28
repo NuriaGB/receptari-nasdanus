@@ -16,6 +16,7 @@ public sealed class Recipe
 
     public List<RecipeIngredient> Ingredients { get; set; } = [];
     public List<RecipeStep> Steps { get; set; } = [];
+    public List<RecipePlanningMetadata> PlanningMetadata { get; set; } = [];
 
     [NotMapped]
     public bool IsDraft => string.Equals(Status, RecipeStatus.Draft, StringComparison.OrdinalIgnoreCase);
@@ -25,6 +26,26 @@ public static class RecipeStatus
 {
     public const string Active = "Active";
     public const string Draft = "Draft";
+}
+
+public sealed class RecipePlanningMetadata
+{
+    public int Id { get; set; }
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+    public string Kind { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public static class RecipePlanningMetadataKind
+{
+    public const string WeeklyFavourite = "WeeklyFavourite";
+    public const string Fortnightly = "Fortnightly";
+    public const string Monthly = "Monthly";
+    public const string Seasonal = "Seasonal";
+    public const string SpecialOccasion = "SpecialOccasion";
 }
 
 public sealed class RecipeIngredient

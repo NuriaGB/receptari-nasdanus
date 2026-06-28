@@ -14,6 +14,37 @@
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.Search" />
 
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="string"
+                                       @bind-Value="_category"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Dense="true"
+                                       Adornment="Adornment.Start"
+                                       AdornmentIcon="@Icons.Material.Filled.Category">
+                                <MudSelectItem T="string" Value="@string.Empty">Totes les categories</MudSelectItem>
+                                @foreach (var category in Categories)
+                                {
+                                    <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="string"
+                                       @bind-Value="_mealType"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Dense="true"
+                                       Adornment="Adornment.Start"
+                                       AdornmentIcon="@Icons.Material.Filled.Restaurant">
+                                <MudSelectItem T="string" Value="@string.Empty">Tots els àpats</MudSelectItem>
+                                <MudSelectItem T="string" Value="@MealKind.Lunch.ToString()">Dinar</MudSelectItem>
+                                <MudSelectItem T="string" Value="@MealKind.Dinner.ToString()">Sopar</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+
                     <div class="picker-recipe-list">
                         @foreach (var recipe in FilteredRecipes)
                         {
@@ -87,11 +118,46 @@
     [Parameter]
     public IReadOnlyList<Recipe> Recipes { get; set; } = [];
 
+    [Parameter]
+    public MealKind SlotMealKind { get; set; }
+
     private readonly QuickAddRecipeRequest _request = new();
     private string _search = string.Empty;
+    private string _category = string.Empty;
+    private string _mealType = string.Empty;
 
-    private IEnumerable<Recipe> FilteredRecipes => Recipes.Where(recipe =>
-        string.IsNullOrWhiteSpace(_search) || recipe.Name.Contains(_search, StringComparison.OrdinalIgnoreCase));
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(_mealType) && SlotMealKind is MealKind.Lunch or MealKind.Dinner)
+        {
+            _mealType = SlotMealKind.ToString();
+        }
+    }
+
+    private IReadOnlyList<string> Categories => Recipes
+        .Select(recipe => recipe.Category)
+        .Where(category => !string.IsNullOrWhiteSpace(category))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(category => category)
+        .ToList();
+
+    private IEnumerable<Recipe> FilteredRecipes => Recipes
+        .Where(recipe =>
+            (string.IsNullOrWhiteSpace(_search) || recipe.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(_category) || string.Equals(recipe.Category, _category, StringComparison.OrdinalIgnoreCase)) &&
+            MatchesMealType(recipe))
+        .OrderBy(recipe => recipe.Name);
+
+    private bool MatchesMealType(Recipe recipe)
+    {
+        if (string.IsNullOrWhiteSpace(_mealType))
+        {
+            return true;
+        }
+
+        var displayName = Enum.Parse<MealKind>(_mealType).ToDisplayName();
+        return string.Equals(recipe.Category, displayName, StringComparison.OrdinalIgnoreCase);
+    }
 
     private void Pick(int recipeId)
     {

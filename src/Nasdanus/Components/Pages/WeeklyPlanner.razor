@@ -7,9 +7,26 @@
 
 <MudContainer MaxWidth="MaxWidth.False" Class="page-shell planner-shell">
     <MudStack Spacing="3">
-        <div class="page-heading">
-            <MudText Typo="Typo.overline">Planner</MudText>
-            <MudText Typo="Typo.h3">Setmana del @_weekStart.ToString("d/M/yyyy", CultureInfo.InvariantCulture)</MudText>
+        <div class="page-heading planner-heading">
+            <div>
+                <MudText Typo="Typo.overline">Planner</MudText>
+                <MudText Typo="Typo.h3">Setmana @WeekNumber</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@WeekRangeText</MudText>
+            </div>
+            <MudStack Row Spacing="1" Class="planner-week-nav">
+                <MudButton OnClick="PreviousWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.ChevronLeft">
+                    Setmana anterior
+                </MudButton>
+                <MudButton OnClick="NextWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                    Setmana següent
+                </MudButton>
+            </MudStack>
         </div>
 
         @if (_isLoading)
@@ -18,23 +35,49 @@
         }
         else
         {
+            <section class="recipe-ideas-section" aria-labelledby="recipe-ideas-title">
+                <div class="recipe-ideas-header">
+                    <MudText Typo="Typo.h5" id="recipe-ideas-title">Recipe Ideas</MudText>
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@RecipeIdeas.Count idees</MudChip>
+                </div>
+
+                @if (RecipeIdeas.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Totes les receptes visibles ja estan assignades aquesta setmana.</MudText>
+                }
+                else
+                {
+                    <div class="recipe-ideas-list">
+                        @foreach (var recipe in RecipeIdeas)
+                        {
+                            <div class="recipe-idea-row">
+                                <MudText Typo="Typo.body2" Class="recipe-idea-name">@recipe.Name</MudText>
+                                <MudIconButton Href="@($"/recipes/{recipe.Id}")"
+                                               Icon="@Icons.Material.Filled.OpenInNew"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               aria-label="Obrir recepta" />
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+
             <div class="planner-grid" role="list">
                 @foreach (var day in _days)
                 {
-                    <MudPaper Class="planner-day" Elevation="0" role="listitem">
-                        <MudStack Spacing="2">
-                            <div class="planner-day-header">
-                                <MudText Typo="Typo.subtitle1">@FormatDay(day.Date)</MudText>
-                                @if (day.Date == _today)
-                                {
-                                    <MudChip T="string" Color="Color.Secondary" Size="Size.Small">Avui</MudChip>
-                                }
-                            </div>
+                    <section class="planner-day-column" role="listitem">
+                        <div class="planner-day-header">
+                            <MudText Typo="Typo.subtitle1">@FormatDay(day.Date)</MudText>
+                            @if (day.Date == _today)
+                            {
+                                <MudChip T="string" Color="Color.Secondary" Size="Size.Small">Avui</MudChip>
+                            }
+                        </div>
 
-                            <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
-                            <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
-                        </MudStack>
-                    </MudPaper>
+                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
+                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
+                    </section>
                 }
             </div>
         }
@@ -48,7 +91,15 @@
     private DateOnly _weekStart;
     private List<DayPlan> _days = [];
     private List<Recipe> _recipes = [];
+    private HashSet<int> _plannedRecipeIds = [];
     private bool _isLoading = true;
+
+    private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
+    private string WeekRangeText => $"{_weekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_weekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
+    private IReadOnlyList<Recipe> RecipeIdeas => _recipes
+        .Where(recipe => !_plannedRecipeIds.Contains(recipe.Id))
+        .OrderBy(recipe => recipe.Name)
+        .ToList();
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,7 +112,11 @@
 
     private async Task LoadWeekAsync()
     {
-        _days = await Planner.GetWeekAsync(_today);
+        _days = await Planner.GetWeekAsync(_weekStart);
+        _plannedRecipeIds = _days
+            .SelectMany(day => day.Lunch.PlannedRecipes.Concat(day.Dinner.PlannedRecipes))
+            .Select(plannedRecipe => plannedRecipe.RecipeId)
+            .ToHashSet();
     }
 
     private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, int RecipeId) change)
@@ -74,6 +129,18 @@
     private async Task RemoveRecipeAsync(int plannedRecipeId)
     {
         await Planner.RemoveRecipeAsync(plannedRecipeId);
+        await LoadWeekAsync();
+    }
+
+    private async Task PreviousWeekAsync()
+    {
+        _weekStart = _weekStart.AddDays(-7);
+        await LoadWeekAsync();
+    }
+
+    private async Task NextWeekAsync()
+    {
+        _weekStart = _weekStart.AddDays(7);
         await LoadWeekAsync();
     }
 

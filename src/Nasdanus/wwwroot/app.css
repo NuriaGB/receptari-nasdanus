@@ -217,51 +217,128 @@ h3:focus {
     max-width: 100%;
 }
 
-.planner-grid {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(12rem, 1fr));
-    gap: 0.75rem;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
+.planner-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
-.planner-day {
-    min-width: 12rem;
-    padding: 0.85rem;
+.planner-week-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.recipe-ideas-section {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.recipe-ideas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.recipe-ideas-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.45rem;
+}
+
+.recipe-idea-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 2.4rem;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.recipe-idea-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.planner-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(13.5rem, 1fr));
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.planner-day-column {
+    display: grid;
+    align-content: start;
+    gap: 0;
+    min-width: 13.5rem;
+    padding: 0.75rem;
+    border-right: 1px solid var(--nas-border);
+}
+
+.planner-day-column:last-child {
+    border-right: 0;
 }
 
 .planner-day-header {
     display: flex;
-    min-height: 2.2rem;
+    min-height: 2rem;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--nas-border);
 }
 
 .meal-slot-selector {
-    padding: 0.75rem;
-    border: 1px solid var(--nas-border);
-    border-radius: 8px;
-    background: #fbfcf9;
+    padding: 0.7rem 0 0.85rem;
+    border-bottom: 1px solid var(--nas-border);
+    background: transparent;
+}
+
+.meal-slot-selector:last-child {
+    border-bottom: 0;
 }
 
 .meal-slot-title {
     gap: 0.5rem;
 }
 
+.meal-slot-heading {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 0.35rem;
+}
+
 .planned-recipe-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem;
+    min-height: 2.4rem;
+    gap: 0.35rem;
+    padding: 0.25rem 0.35rem;
     border: 1px solid var(--nas-border);
     border-radius: 8px;
     background: var(--nas-panel);
 }
 
 .planned-recipe-name {
-    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-weight: 650;
 }
 
@@ -430,6 +507,16 @@ h3:focus {
         flex-direction: column;
     }
 
+    .planner-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .planner-week-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
     .meal-card {
         min-height: auto;
         padding: 1rem;
@@ -479,10 +566,9 @@ h3:focus {
     }
 
     .planner-grid {
-        grid-template-columns: repeat(7, minmax(14rem, 1fr));
+        grid-template-columns: repeat(7, minmax(15rem, 1fr));
     }
 
-    .planned-recipe-row,
     .picker-recipe-card {
         grid-template-columns: 1fr;
     }

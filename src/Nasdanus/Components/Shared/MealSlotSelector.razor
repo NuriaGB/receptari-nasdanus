@@ -3,7 +3,10 @@
 
 <MudStack Spacing="1" Class="meal-slot-selector">
     <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="meal-slot-title">
-        <MudText Typo="Typo.subtitle2">@Slot.MealKind.ToDisplayName()</MudText>
+        <div class="meal-slot-heading">
+            <MudIcon Icon="@MealIcon" Color="Color.Primary" Size="Size.Small" />
+            <MudText Typo="Typo.subtitle2">@Slot.MealKind.ToDisplayName()</MudText>
+        </div>
         <MudButton OnClick="OpenPickerAsync"
                    Variant="Variant.Text"
                    Color="Color.Primary"
@@ -23,17 +26,15 @@
             @foreach (var plannedRecipe in PlannedRecipes)
             {
                 <div class="planned-recipe-row">
-                    <MudText Typo="Typo.body2" Class="planned-recipe-name">
+                    <MudText Typo="Typo.body2" Class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
                         @plannedRecipe.Recipe?.Name
                     </MudText>
                     <div class="planned-recipe-actions">
-                        <MudButton Href="@($"/recipes/{plannedRecipe.RecipeId}")"
-                                   Variant="Variant.Text"
-                                   Color="Color.Primary"
-                                   Size="Size.Small"
-                                   StartIcon="@Icons.Material.Filled.OpenInNew">
-                            Obrir
-                        </MudButton>
+                        <MudIconButton Href="@($"/recipes/{plannedRecipe.RecipeId}")"
+                                       Icon="@Icons.Material.Filled.OpenInNew"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       aria-label="Obrir recepta" />
                         <MudIconButton OnClick="@(() => RemoveRecipe.InvokeAsync(plannedRecipe.Id))"
                                        Icon="@Icons.Material.Filled.Close"
                                        Color="Color.Secondary"
@@ -62,12 +63,16 @@
     private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
         .OrderBy(plannedRecipe => plannedRecipe.Order)
         .ToList();
+    private string MealIcon => Slot.MealKind == MealKind.Lunch
+        ? Icons.Material.Filled.Restaurant
+        : Icons.Material.Filled.DarkMode;
 
     private async Task OpenPickerAsync()
     {
         var parameters = new DialogParameters<MealRecipePickerDialog>
         {
-            { dialog => dialog.Recipes, Recipes }
+            { dialog => dialog.Recipes, Recipes },
+            { dialog => dialog.SlotMealKind, Slot.MealKind }
         };
         var options = new DialogOptions
         {
