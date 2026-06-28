@@ -57,16 +57,20 @@ public sealed class RecipeIngredient
     public string Name { get; set; } = string.Empty;
     public string Quantity { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
+    public string ScalingMode { get; set; } = IngredientScalingMode.Linear;
 
     [NotMapped]
-    public string DisplayText
-    {
-        get
-        {
-            var amount = string.Join(" ", new[] { Quantity, Unit }.Where(value => !string.IsNullOrWhiteSpace(value)));
-            return string.IsNullOrWhiteSpace(amount) ? Name : $"{amount} {Name}";
-        }
-    }
+    public string DisplayText => ToDisplayText(scale: 1);
+
+    public string ToDisplayText(decimal scale) => IngredientScaling.FormatIngredient(this, scale);
+}
+
+public static class IngredientScalingMode
+{
+    public const string Linear = "linear";
+    public const string Fixed = "fixed";
+    public const string Approximate = "approximate";
+    public const string ToTaste = "to_taste";
 }
 
 public sealed class RecipeStep
@@ -78,4 +82,24 @@ public sealed class RecipeStep
     public string Title { get; set; } = string.Empty;
     public string Instruction { get; set; } = string.Empty;
     public int? TimerMinutes { get; set; }
+    public List<RecipeStepIngredientReference> IngredientReferences { get; set; } = [];
+}
+
+public sealed class RecipeStepIngredientReference
+{
+    public int Id { get; set; }
+    public int RecipeStepId { get; set; }
+    public RecipeStep? Step { get; set; }
+    public int? RecipeIngredientId { get; set; }
+    public RecipeIngredient? Ingredient { get; set; }
+    public string IngredientName { get; set; } = string.Empty;
+    public decimal? Quantity { get; set; }
+    public string QuantityText { get; set; } = string.Empty;
+    public string Unit { get; set; } = string.Empty;
+    public int Order { get; set; }
+
+    [NotMapped]
+    public string DisplayText => ToDisplayText(scale: 1);
+
+    public string ToDisplayText(decimal scale) => IngredientScaling.FormatStepIngredient(this, scale);
 }

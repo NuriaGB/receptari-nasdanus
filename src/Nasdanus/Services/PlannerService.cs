@@ -44,7 +44,7 @@ public sealed class PlannerService(IDbContextFactory<NasdanusDbContext> dbContex
             .SingleAsync(slot => slot.Date == date && slot.MealKind == mealKind);
     }
 
-    public async Task AddRecipeAsync(DateOnly date, MealKind mealKind, int recipeId)
+    public async Task AddRecipeAsync(DateOnly date, MealKind mealKind, int recipeId, int plannedServings)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await EnsureWeekSlotsAsync(db, WeekStart(date));
@@ -57,10 +57,20 @@ public sealed class PlannerService(IDbContextFactory<NasdanusDbContext> dbContex
         slot.PlannedRecipes.Add(new MealPlanRecipe
         {
             RecipeId = recipeId,
+            PlannedServings = plannedServings,
             Order = nextOrder
         });
 
         await db.SaveChangesAsync();
+    }
+
+    public async Task<MealPlanRecipe?> GetPlannedRecipeAsync(int plannedRecipeId)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db.MealPlanRecipes
+            .Include(plannedRecipe => plannedRecipe.Recipe)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(plannedRecipe => plannedRecipe.Id == plannedRecipeId);
     }
 
     public async Task RemoveRecipeAsync(int plannedRecipeId)

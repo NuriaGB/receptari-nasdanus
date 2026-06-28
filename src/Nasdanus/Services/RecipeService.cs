@@ -12,6 +12,8 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         return await db.Recipes
             .Include(recipe => recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
             .Include(recipe => recipe.Steps.OrderBy(step => step.Order))
+                .ThenInclude(step => step.IngredientReferences.OrderBy(reference => reference.Order))
+                    .ThenInclude(reference => reference.Ingredient)
             .OrderBy(recipe => recipe.Name)
             .AsNoTracking()
             .ToListAsync();
@@ -23,6 +25,8 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         return await db.Recipes
             .Include(recipe => recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
             .Include(recipe => recipe.Steps.OrderBy(step => step.Order))
+                .ThenInclude(step => step.IngredientReferences.OrderBy(reference => reference.Order))
+                    .ThenInclude(reference => reference.Ingredient)
             .AsNoTracking()
             .FirstOrDefaultAsync(recipe => recipe.Id == id);
     }

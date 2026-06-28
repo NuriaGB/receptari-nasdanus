@@ -119,9 +119,9 @@
             .ToHashSet();
     }
 
-    private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, int RecipeId) change)
+    private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, PlannedRecipeSelection Selection) change)
     {
-        await Planner.AddRecipeAsync(change.Date, change.MealKind, change.RecipeId);
+        await Planner.AddRecipeAsync(change.Date, change.MealKind, change.Selection.RecipeId, change.Selection.PlannedServings);
         _recipes = await Recipes.GetAllAsync();
         await LoadWeekAsync();
     }

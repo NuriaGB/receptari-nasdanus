@@ -199,6 +199,17 @@ h3:focus {
     padding: 1.25rem;
 }
 
+.serving-scale-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
 .ingredient-list .mud-list-item {
     padding-left: 0;
     padding-right: 0;
@@ -325,7 +336,7 @@ h3:focus {
 
 .planned-recipe-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     min-height: 2.4rem;
     gap: 0.35rem;
@@ -340,6 +351,11 @@ h3:focus {
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 650;
+}
+
+.planned-recipe-servings {
+    color: var(--nas-muted);
+    white-space: nowrap;
 }
 
 .planned-recipe-actions {
@@ -396,6 +412,10 @@ h3:focus {
     gap: 0.5rem;
 }
 
+.cook-serving-control {
+    max-width: 14rem;
+}
+
 .cook-progress {
     height: 0.7rem;
 }
@@ -415,6 +435,19 @@ h3:focus {
 .cook-instruction {
     font-size: 1.25rem;
     line-height: 1.55;
+}
+
+.cook-step-ingredients {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.85rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.cook-step-ingredient-list .mud-list-item {
+    padding-left: 0;
 }
 
 .cook-actions .mud-button-root,
@@ -561,6 +594,10 @@ h3:focus {
         padding: 1rem;
     }
 
+    .serving-scale-panel {
+        grid-template-columns: 1fr;
+    }
+
     .detail-step {
         padding: 0.85rem;
     }
@@ -575,6 +612,10 @@ h3:focus {
 
     .planned-recipe-actions {
         justify-content: space-between;
+    }
+
+    .cook-serving-control {
+        max-width: none;
     }
 
     .cook-step {

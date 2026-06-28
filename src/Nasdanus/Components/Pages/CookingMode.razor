@@ -1,5 +1,6 @@
 @page "/cook/{Id:int}"
 @inject RecipeService Recipes
+@inject PlannerService Planner
 @inject IJSRuntime JS
 
 <PageTitle>@(_recipe is null ? "Cuinar" : $"Cuinar - {_recipe.Name}")</PageTitle>
@@ -22,7 +23,7 @@
 
         <MudStack Spacing="3" Class="cook-stack">
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="cook-topbar">
-                <MudButton Href="@($"/recipes/{_recipe.Id}")"
+                <MudButton Href="@RecipeHref"
                            Variant="Variant.Text"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.ArrowBack">
@@ -34,6 +35,25 @@
             <div class="cook-heading">
                 <MudText Typo="Typo.h5">@_recipe.Name</MudText>
                 <MudText Typo="Typo.subtitle1">Pas @(_currentIndex + 1) de @OrderedSteps.Count</MudText>
+                <div class="cook-serving-control">
+                    @if (IsPlannedContext)
+                    {
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Groups">
+                            @_displayServings racions planificades
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudNumericField T="int"
+                                         Label="Racions"
+                                         @bind-Value="_displayServings"
+                                         Min="1"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Adornment="Adornment.Start"
+                                         AdornmentIcon="@Icons.Material.Filled.Groups" />
+                    }
+                </div>
                 <MudProgressLinear Value="@ProgressValue" Color="Color.Primary" Rounded="true" Class="cook-progress" />
             </div>
 
@@ -41,6 +61,20 @@
                 <MudStack Spacing="3">
                     <MudText Typo="Typo.h4">@step.Title</MudText>
                     <MudText Typo="Typo.body1" Class="cook-instruction">@step.Instruction</MudText>
+                    @if (step.IngredientReferences.Count > 0)
+                    {
+                        <div class="cook-step-ingredients">
+                            <MudText Typo="Typo.subtitle2">Ingredients per aquest pas</MudText>
+                            <MudList T="RecipeStepIngredientReference" Dense="true" Class="cook-step-ingredient-list">
+                                @foreach (var reference in step.IngredientReferences.OrderBy(reference => reference.Order))
+                                {
+                                    <MudListItem Icon="@Icons.Material.Filled.FiberManualRecord">
+                                        @reference.ToDisplayText(ScaleFactor)
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        </div>
+                    }
                     <StepTimer Minutes="@step.TimerMinutes" @key="step.Id" />
                     @if (_isFinished)
                     {
@@ -92,10 +126,18 @@
     [Parameter]
     public int Id { get; set; }
 
+    [SupplyParameterFromQuery(Name = "plannedMealId")]
+    public int? PlannedMealId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "servings")]
+    public int? QueryServings { get; set; }
+
     private Recipe? _recipe;
+    private MealPlanRecipe? _plannedRecipe;
     private bool _isLoading = true;
     private bool _isFinished;
     private int _currentIndex;
+    private int _displayServings = 1;
     private readonly HashSet<int> _completedStepIds = [];
 
     private List<RecipeStep> OrderedSteps => _recipe?.Steps.OrderBy(step => step.Order).ToList() ?? [];
@@ -104,6 +146,13 @@
     private bool IsFirstStep => _currentIndex == 0;
     private bool IsLastStep => _currentIndex == OrderedSteps.Count - 1;
     private bool IsCurrentStepCompleted => _completedStepIds.Contains(CurrentStep.Id);
+    private bool IsPlannedContext => _plannedRecipe is not null;
+    private decimal ScaleFactor => _recipe is null ? 1 : IngredientScaling.ScaleFactor(_recipe.Servings, _displayServings);
+    private string RecipeHref => _recipe is null
+        ? "/recipes"
+        : IsPlannedContext
+            ? $"/recipes/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
+            : $"/recipes/{_recipe.Id}?servings={_displayServings}";
     private bool HasUnfinishedSession => !_isLoading && !_isFinished && OrderedSteps.Count > 0 && CompletedCount < OrderedSteps.Count;
     private bool IsCompleteActionDisabled => _isFinished || (!IsLastStep && IsCurrentStepCompleted);
     private string CompleteActionLabel => _isFinished
@@ -119,7 +168,25 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _isLoading = true;
         _recipe = await Recipes.GetByIdAsync(Id);
+        _plannedRecipe = null;
+        if (_recipe is not null && PlannedMealId is int plannedMealId)
+        {
+            var plannedRecipe = await Planner.GetPlannedRecipeAsync(plannedMealId);
+            if (plannedRecipe?.RecipeId == _recipe.Id)
+            {
+                _plannedRecipe = plannedRecipe;
+            }
+        }
+
+        _displayServings = _plannedRecipe?.PlannedServings > 0
+            ? _plannedRecipe.PlannedServings
+            : QueryServings is > 0
+                ? QueryServings.Value
+                : _recipe?.Servings > 0
+                    ? _recipe.Servings
+                    : 1;
         _currentIndex = 0;
         _isFinished = false;
         _completedStepIds.Clear();

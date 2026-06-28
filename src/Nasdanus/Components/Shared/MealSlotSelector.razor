@@ -29,8 +29,11 @@
                     <MudText Typo="Typo.body2" Class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
                         @plannedRecipe.Recipe?.Name
                     </MudText>
+                    <MudText Typo="Typo.caption" Class="planned-recipe-servings">
+                        @PlannedServingsText(plannedRecipe)
+                    </MudText>
                     <div class="planned-recipe-actions">
-                        <MudIconButton Href="@($"/recipes/{plannedRecipe.RecipeId}")"
+                        <MudIconButton Href="@($"/recipes/{plannedRecipe.RecipeId}?plannedMealId={plannedRecipe.Id}")"
                                        Icon="@Icons.Material.Filled.OpenInNew"
                                        Color="Color.Primary"
                                        Size="Size.Small"
@@ -55,7 +58,7 @@
     public IReadOnlyList<Recipe> Recipes { get; set; } = [];
 
     [Parameter]
-    public EventCallback<(DateOnly Date, MealKind MealKind, int RecipeId)> AddRecipe { get; set; }
+    public EventCallback<(DateOnly Date, MealKind MealKind, PlannedRecipeSelection Selection)> AddRecipe { get; set; }
 
     [Parameter]
     public EventCallback<int> RemoveRecipe { get; set; }
@@ -66,6 +69,13 @@
     private string MealIcon => Slot.MealKind == MealKind.Lunch
         ? Icons.Material.Filled.Restaurant
         : Icons.Material.Filled.DarkMode;
+    private static string PlannedServingsText(MealPlanRecipe plannedRecipe)
+    {
+        var servings = plannedRecipe.PlannedServings > 0
+            ? plannedRecipe.PlannedServings
+            : plannedRecipe.Recipe?.Servings ?? 0;
+        return servings > 0 ? $"{servings} rac." : "Racions?";
+    }
 
     private async Task OpenPickerAsync()
     {
@@ -84,9 +94,9 @@
         var dialog = await DialogService.ShowAsync<MealRecipePickerDialog>("Afegir plat", parameters, options);
         var result = await dialog.Result;
 
-        if (result is not null && !result.Canceled && result.Data is int recipeId)
+        if (result is not null && !result.Canceled && result.Data is PlannedRecipeSelection selection)
         {
-            await AddRecipe.InvokeAsync((Slot.Date, Slot.MealKind, recipeId));
+            await AddRecipe.InvokeAsync((Slot.Date, Slot.MealKind, selection));
         }
     }
 }

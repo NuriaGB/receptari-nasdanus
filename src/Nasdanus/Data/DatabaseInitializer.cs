@@ -10,6 +10,8 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await using var db = await dbContextFactory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
         await EnsureRecipeStatusColumnAsync(db);
+        await EnsureRecipeIngredientScalingModeColumnAsync(db);
+        await EnsureRecipeStepIngredientReferenceTableAsync(db);
         await EnsureRecipePlanningMetadataTableAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
 
@@ -20,7 +22,9 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             await db.SaveChangesAsync();
         }
 
+        await ApplyIngredientScalingDefaultsAsync(db);
         await EnsureCurrentWeekSeedAsync(db);
+        await EnsureStepIngredientReferenceSeedAsync(db);
     }
 
     private static async Task EnsureRecipeStatusColumnAsync(NasdanusDbContext db)
@@ -33,6 +37,19 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await db.Database.ExecuteSqlRawAsync("""
             ALTER TABLE "Recipes"
             ADD COLUMN "Status" TEXT NOT NULL DEFAULT 'Active';
+        """);
+    }
+
+    private static async Task EnsureRecipeIngredientScalingModeColumnAsync(NasdanusDbContext db)
+    {
+        if (await TableHasColumnAsync(db, "RecipeIngredients", "ScalingMode"))
+        {
+            return;
+        }
+
+        await db.Database.ExecuteSqlRawAsync($"""
+            ALTER TABLE "RecipeIngredients"
+            ADD COLUMN "ScalingMode" TEXT NOT NULL DEFAULT '{IngredientScalingMode.Linear}';
             """);
     }
 
@@ -76,6 +93,34 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             """);
     }
 
+    private static async Task EnsureRecipeStepIngredientReferenceTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "RecipeStepIngredientReferences" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_RecipeStepIngredientReferences" PRIMARY KEY AUTOINCREMENT,
+                "RecipeStepId" INTEGER NOT NULL,
+                "RecipeIngredientId" INTEGER NULL,
+                "IngredientName" TEXT NOT NULL DEFAULT '',
+                "Quantity" TEXT NULL,
+                "QuantityText" TEXT NOT NULL DEFAULT '',
+                "Unit" TEXT NOT NULL DEFAULT '',
+                "Order" INTEGER NOT NULL,
+                CONSTRAINT "FK_RecipeStepIngredientReferences_RecipeSteps_RecipeStepId" FOREIGN KEY ("RecipeStepId") REFERENCES "RecipeSteps" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_RecipeStepIngredientReferences_RecipeIngredients_RecipeIngredientId" FOREIGN KEY ("RecipeIngredientId") REFERENCES "RecipeIngredients" ("Id") ON DELETE SET NULL
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_RecipeStepIngredientReferences_RecipeStepId_Order"
+            ON "RecipeStepIngredientReferences" ("RecipeStepId", "Order");
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_RecipeStepIngredientReferences_RecipeIngredientId"
+            ON "RecipeStepIngredientReferences" ("RecipeIngredientId");
+            """);
+    }
+
     private static async Task EnsurePlannerRecipeTableAsync(NasdanusDbContext db)
     {
         await db.Database.ExecuteSqlRawAsync("""
@@ -83,6 +128,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
                 "Id" INTEGER NOT NULL CONSTRAINT "PK_MealPlanRecipes" PRIMARY KEY AUTOINCREMENT,
                 "MealPlanSlotId" INTEGER NOT NULL,
                 "RecipeId" INTEGER NOT NULL,
+                "PlannedServings" INTEGER NOT NULL DEFAULT 0,
                 "Order" INTEGER NOT NULL,
                 CONSTRAINT "FK_MealPlanRecipes_MealPlanSlots_MealPlanSlotId" FOREIGN KEY ("MealPlanSlotId") REFERENCES "MealPlanSlots" ("Id") ON DELETE CASCADE,
                 CONSTRAINT "FK_MealPlanRecipes_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE CASCADE
@@ -99,11 +145,16 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             ON "MealPlanRecipes" ("RecipeId");
             """);
 
+        await EnsureMealPlanRecipePlannedServingsColumnAsync(db);
+
         if (await MealPlanSlotsHasLegacyRecipeIdAsync(db))
         {
             await db.Database.ExecuteSqlRawAsync("""
-                INSERT INTO "MealPlanRecipes" ("MealPlanSlotId", "RecipeId", "Order")
-                SELECT "Id", "RecipeId", 1
+                INSERT INTO "MealPlanRecipes" ("MealPlanSlotId", "RecipeId", "PlannedServings", "Order")
+                SELECT "Id",
+                       "RecipeId",
+                       COALESCE((SELECT "Servings" FROM "Recipes" WHERE "Recipes"."Id" = "MealPlanSlots"."RecipeId"), 0),
+                       1
                 FROM "MealPlanSlots"
                 WHERE "RecipeId" IS NOT NULL
                   AND NOT EXISTS (
@@ -113,6 +164,29 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
                   );
                 """);
         }
+
+        await db.Database.ExecuteSqlRawAsync("""
+            UPDATE "MealPlanRecipes"
+            SET "PlannedServings" = COALESCE((
+                SELECT "Servings"
+                FROM "Recipes"
+                WHERE "Recipes"."Id" = "MealPlanRecipes"."RecipeId"
+            ), 0)
+            WHERE "PlannedServings" <= 0;
+            """);
+    }
+
+    private static async Task EnsureMealPlanRecipePlannedServingsColumnAsync(NasdanusDbContext db)
+    {
+        if (await TableHasColumnAsync(db, "MealPlanRecipes", "PlannedServings"))
+        {
+            return;
+        }
+
+        await db.Database.ExecuteSqlRawAsync("""
+            ALTER TABLE "MealPlanRecipes"
+            ADD COLUMN "PlannedServings" INTEGER NOT NULL DEFAULT 0;
+            """);
     }
 
     private static async Task<bool> MealPlanSlotsHasLegacyRecipeIdAsync(NasdanusDbContext db)
@@ -133,6 +207,60 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         return false;
+    }
+
+    private static async Task<bool> TableHasColumnAsync(NasdanusDbContext db, string tableName, string columnName)
+    {
+        var connection = db.Database.GetDbConnection();
+        await db.Database.OpenConnectionAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info('{tableName}')";
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static async Task ApplyIngredientScalingDefaultsAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync($"""
+            UPDATE "RecipeIngredients"
+            SET "ScalingMode" = '{IngredientScalingMode.ToTaste}'
+            WHERE "ScalingMode" = '{IngredientScalingMode.Linear}'
+              AND (
+                lower("Name") = 'sal'
+                OR lower("Name") LIKE '%pebre%'
+                OR lower("Name") LIKE '%jalape%'
+                OR lower("Name") LIKE '%bitxo%'
+                OR lower("Name") LIKE '%xili%'
+              );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync($"""
+            UPDATE "RecipeIngredients"
+            SET "ScalingMode" = '{IngredientScalingMode.Approximate}'
+            WHERE "ScalingMode" = '{IngredientScalingMode.Linear}'
+              AND (
+                lower("Name") LIKE '%oli%'
+                OR lower("Name") LIKE '%all%'
+                OR lower("Name") LIKE '%gingebre%'
+                OR lower("Name") LIKE '%herba%'
+                OR lower("Name") LIKE '%julivert%'
+                OR lower("Name") LIKE '%llimona%'
+                OR lower("Name") LIKE '%taronja%'
+                OR lower("Name") LIKE '%cúrcuma%'
+                OR lower("Name") LIKE '%curcuma%'
+                OR lower("Name") LIKE '%garam masala%'
+              );
+            """);
     }
 
     private static async Task EnsureCurrentWeekSeedAsync(NasdanusDbContext db)
@@ -168,29 +296,93 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
 
         if (lunch.PlannedRecipes.Count == 0)
         {
+            var lunchRecipe = await db.Recipes
+                .Where(recipe => recipe.Name == "Samuses de vedella amb verduretes a l'airfryer")
+                .Select(recipe => new { recipe.Id, recipe.Servings })
+                .FirstAsync();
+
             lunch.PlannedRecipes.Add(new MealPlanRecipe
             {
-                RecipeId = await db.Recipes
-                    .Where(recipe => recipe.Name == "Samuses de vedella amb verduretes a l'airfryer")
-                    .Select(recipe => recipe.Id)
-                    .FirstAsync(),
+                RecipeId = lunchRecipe.Id,
+                PlannedServings = lunchRecipe.Servings,
                 Order = 1
             });
         }
 
         if (dinner.PlannedRecipes.Count == 0)
         {
+            var dinnerRecipe = await db.Recipes
+                .Where(recipe => recipe.Name == "Cassoleta de verdures, pollastre i patata bullida")
+                .Select(recipe => new { recipe.Id, recipe.Servings })
+                .FirstAsync();
+
             dinner.PlannedRecipes.Add(new MealPlanRecipe
             {
-                RecipeId = await db.Recipes
-                    .Where(recipe => recipe.Name == "Cassoleta de verdures, pollastre i patata bullida")
-                    .Select(recipe => recipe.Id)
-                    .FirstAsync(),
+                RecipeId = dinnerRecipe.Id,
+                PlannedServings = dinnerRecipe.Servings,
                 Order = 1
             });
         }
 
         await db.SaveChangesAsync();
+    }
+
+    private static async Task EnsureStepIngredientReferenceSeedAsync(NasdanusDbContext db)
+    {
+        var recipes = await db.Recipes
+            .Include(recipe => recipe.Ingredients)
+            .Include(recipe => recipe.Steps)
+                .ThenInclude(step => step.IngredientReferences)
+            .ToListAsync();
+
+        var changed = false;
+        foreach (var recipe in recipes)
+        {
+            foreach (var step in recipe.Steps)
+            {
+                if (step.IngredientReferences.Count > 0)
+                {
+                    continue;
+                }
+
+                var matchedIngredients = recipe.Ingredients
+                    .Where(ingredient => IngredientAppearsInStep(step, ingredient))
+                    .OrderBy(ingredient => ingredient.Order)
+                    .ToList();
+
+                for (var index = 0; index < matchedIngredients.Count; index++)
+                {
+                    var ingredient = matchedIngredients[index];
+                    step.IngredientReferences.Add(new RecipeStepIngredientReference
+                    {
+                        RecipeIngredientId = ingredient.Id,
+                        IngredientName = ingredient.Name,
+                        Quantity = IngredientScaling.ParseQuantity(ingredient.Quantity),
+                        QuantityText = ingredient.Quantity,
+                        Unit = ingredient.Unit,
+                        Order = index + 1
+                    });
+                }
+
+                changed = changed || matchedIngredients.Count > 0;
+            }
+        }
+
+        if (changed)
+        {
+            await db.SaveChangesAsync();
+        }
+    }
+
+    private static bool IngredientAppearsInStep(RecipeStep step, RecipeIngredient ingredient)
+    {
+        if (string.IsNullOrWhiteSpace(ingredient.Name))
+        {
+            return false;
+        }
+
+        var stepText = $"{step.Title} {step.Instruction}";
+        return stepText.Contains(ingredient.Name, StringComparison.OrdinalIgnoreCase);
     }
 
     private static DateOnly WeekStart(DateOnly date)
@@ -424,8 +616,34 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
     {
         Name = name,
         Quantity = quantity,
-        Unit = unit
+        Unit = unit,
+        ScalingMode = InferScalingMode(name)
     };
+
+    private static string InferScalingMode(string name)
+    {
+        var normalized = name.ToLowerInvariant();
+        if (normalized is "sal" || normalized.Contains("pebre") || normalized.Contains("jalape") || normalized.Contains("bitxo") || normalized.Contains("xili"))
+        {
+            return IngredientScalingMode.ToTaste;
+        }
+
+        if (normalized.Contains("oli")
+            || normalized.Contains("all")
+            || normalized.Contains("gingebre")
+            || normalized.Contains("herba")
+            || normalized.Contains("julivert")
+            || normalized.Contains("llimona")
+            || normalized.Contains("taronja")
+            || normalized.Contains("cúrcuma")
+            || normalized.Contains("curcuma")
+            || normalized.Contains("garam masala"))
+        {
+            return IngredientScalingMode.Approximate;
+        }
+
+        return IngredientScalingMode.Linear;
+    }
 
     private static RecipeStep Step(string title, string instruction, int? timerMinutes = null) => new()
     {

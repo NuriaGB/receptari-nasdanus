@@ -8,6 +8,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
     public DbSet<RecipeStep> RecipeSteps => Set<RecipeStep>();
+    public DbSet<RecipeStepIngredientReference> RecipeStepIngredientReferences => Set<RecipeStepIngredientReference>();
     public DbSet<RecipePlanningMetadata> RecipePlanningMetadata => Set<RecipePlanningMetadata>();
     public DbSet<MealPlanSlot> MealPlanSlots => Set<MealPlanSlot>();
     public DbSet<MealPlanRecipe> MealPlanRecipes => Set<MealPlanRecipe>();
@@ -42,6 +43,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
             entity.Property(ingredient => ingredient.Name).HasMaxLength(120).IsRequired();
             entity.Property(ingredient => ingredient.Quantity).HasMaxLength(32);
             entity.Property(ingredient => ingredient.Unit).HasMaxLength(48);
+            entity.Property(ingredient => ingredient.ScalingMode).HasMaxLength(24).IsRequired();
             entity.HasIndex(ingredient => new { ingredient.RecipeId, ingredient.Order });
         });
 
@@ -50,6 +52,25 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
             entity.Property(step => step.Title).HasMaxLength(120);
             entity.Property(step => step.Instruction).HasMaxLength(1200).IsRequired();
             entity.HasIndex(step => new { step.RecipeId, step.Order }).IsUnique();
+
+            entity.HasMany(step => step.IngredientReferences)
+                .WithOne(reference => reference.Step)
+                .HasForeignKey(reference => reference.RecipeStepId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RecipeStepIngredientReference>(entity =>
+        {
+            entity.Property(reference => reference.IngredientName).HasMaxLength(120);
+            entity.Property(reference => reference.QuantityText).HasMaxLength(32);
+            entity.Property(reference => reference.Unit).HasMaxLength(48);
+
+            entity.HasOne(reference => reference.Ingredient)
+                .WithMany()
+                .HasForeignKey(reference => reference.RecipeIngredientId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(reference => new { reference.RecipeStepId, reference.Order });
         });
 
         modelBuilder.Entity<RecipePlanningMetadata>(entity =>
@@ -77,6 +98,8 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
 
         modelBuilder.Entity<MealPlanRecipe>(entity =>
         {
+            entity.Property(plannedRecipe => plannedRecipe.PlannedServings).HasDefaultValue(0);
+
             entity.HasOne(plannedRecipe => plannedRecipe.Recipe)
                 .WithMany()
                 .HasForeignKey(plannedRecipe => plannedRecipe.RecipeId)

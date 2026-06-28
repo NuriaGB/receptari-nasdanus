@@ -1,5 +1,6 @@
 @page "/recipes/{Id:int}"
 @inject RecipeService Recipes
+@inject PlannerService Planner
 
 <PageTitle>@(_recipe is null ? "Recepta" : _recipe.Name)</PageTitle>
 
@@ -38,7 +39,7 @@
             </div>
 
             <MudStack Row Class="recipe-actions">
-                <MudButton Href="@($"/cook/{_recipe.Id}")"
+                <MudButton Href="@CookHref"
                            Class="recipe-primary-action"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
@@ -82,6 +83,24 @@
                 </MudItem>
             </MudGrid>
 
+            <MudPaper Class="serving-scale-panel" Elevation="0">
+                <div>
+                    <MudText Typo="Typo.subtitle1">Racions</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Base de la recepta: @_recipe.Servings racions
+                    </MudText>
+                </div>
+                <MudNumericField T="int"
+                                 Label="@ServingInputLabel"
+                                 @bind-Value="_displayServings"
+                                 Min="1"
+                                 Disabled="@IsPlannedContext"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Filled.Groups" />
+            </MudPaper>
+
             <MudPaper Class="detail-section ingredient-section" Elevation="0">
                 <MudText Typo="Typo.h5">Ingredients</MudText>
                 @if (_recipe.Ingredients.Count == 0)
@@ -94,7 +113,7 @@
                         @foreach (var ingredient in _recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
                         {
                             <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
-                                @ingredient.DisplayText
+                                @ingredient.ToDisplayText(ScaleFactor)
                             </MudListItem>
                         }
                     </MudList>
@@ -139,13 +158,56 @@
     [Parameter]
     public int Id { get; set; }
 
+    [SupplyParameterFromQuery(Name = "plannedMealId")]
+    public int? PlannedMealId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "servings")]
+    public int? QueryServings { get; set; }
+
     private Recipe? _recipe;
+    private MealPlanRecipe? _plannedRecipe;
     private bool _isLoading = true;
+    private int _displayServings = 1;
     private string CategoryText => string.IsNullOrWhiteSpace(_recipe?.Category) ? "Sense categoria" : _recipe.Category;
+    private bool IsPlannedContext => _plannedRecipe is not null;
+    private string ServingInputLabel => IsPlannedContext ? "Racions planificades" : "Racions temporals";
+    private decimal ScaleFactor => _recipe is null ? 1 : IngredientScaling.ScaleFactor(_recipe.Servings, _displayServings);
+    private string CookHref
+    {
+        get
+        {
+            if (_recipe is null)
+            {
+                return "/recipes";
+            }
+
+            return IsPlannedContext
+                ? $"/cook/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
+                : $"/cook/{_recipe.Id}?servings={_displayServings}";
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
+        _isLoading = true;
         _recipe = await Recipes.GetByIdAsync(Id);
+        _plannedRecipe = null;
+        if (_recipe is not null && PlannedMealId is int plannedMealId)
+        {
+            var plannedRecipe = await Planner.GetPlannedRecipeAsync(plannedMealId);
+            if (plannedRecipe?.RecipeId == _recipe.Id)
+            {
+                _plannedRecipe = plannedRecipe;
+            }
+        }
+
+        _displayServings = _plannedRecipe?.PlannedServings > 0
+            ? _plannedRecipe.PlannedServings
+            : QueryServings is > 0
+                ? QueryServings.Value
+                : _recipe?.Servings > 0
+                    ? _recipe.Servings
+                    : 1;
         _isLoading = false;
     }
 }
