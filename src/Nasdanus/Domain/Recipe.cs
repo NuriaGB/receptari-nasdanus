@@ -112,6 +112,8 @@ public sealed class RecipeIngredient
     public int Id { get; set; }
     public int RecipeId { get; set; }
     public Recipe? Recipe { get; set; }
+    public int? IngredientId { get; set; }
+    public Ingredient? Ingredient { get; set; }
     public int Order { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Quantity { get; set; } = string.Empty;
@@ -120,6 +122,9 @@ public sealed class RecipeIngredient
 
     [NotMapped]
     public string DisplayText => ToDisplayText(scale: 1);
+
+    [NotMapped]
+    public string DisplayName => Ingredient?.Name ?? Name;
 
     public string ToDisplayText(decimal scale) => IngredientScaling.FormatIngredient(this, scale);
 }

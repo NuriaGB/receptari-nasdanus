@@ -224,7 +224,7 @@ public sealed class ShoppingListService(BrowserAppStore store)
             return;
         }
 
-        var name = ingredient.Name.Trim();
+        var name = ingredient.DisplayName.Trim();
         if (IsInPantry(name, pantryIngredientKeys))
         {
             return;

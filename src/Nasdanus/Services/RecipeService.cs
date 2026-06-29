@@ -120,6 +120,8 @@ public sealed class RecipeService(BrowserAppStore store)
             {
                 Id = store.NextId(state),
                 RecipeId = variation.Id,
+                IngredientId = sourceIngredient.IngredientId,
+                Ingredient = sourceIngredient.Ingredient,
                 Order = sourceIngredient.Order,
                 Name = sourceIngredient.Name,
                 Quantity = sourceIngredient.Quantity,
@@ -156,7 +158,7 @@ public sealed class RecipeService(BrowserAppStore store)
                     RecipeStepId = step.Id,
                     RecipeIngredientId = ingredient?.Id,
                     Ingredient = ingredient,
-                    IngredientName = ingredient?.Name ?? sourceReference.IngredientName,
+                    IngredientName = ingredient?.DisplayName ?? sourceReference.IngredientName,
                     Quantity = sourceReference.Quantity,
                     QuantityText = sourceReference.QuantityText,
                     Unit = sourceReference.Unit,

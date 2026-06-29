@@ -124,6 +124,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     public Recipe? FindRecipe(LocalAppState appState, int recipeId) =>
         appState.Recipes.FirstOrDefault(recipe => recipe.Id == recipeId);
 
+    public Ingredient? FindIngredient(LocalAppState appState, int ingredientId) =>
+        appState.Ingredients.FirstOrDefault(ingredient => ingredient.Id == ingredientId);
+
     public Recipe CloneRecipe(Recipe recipe)
     {
         var ingredients = recipe.Ingredients
@@ -132,6 +135,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             {
                 Id = ingredient.Id,
                 RecipeId = recipe.Id,
+                IngredientId = ingredient.IngredientId,
+                Ingredient = ingredient.Ingredient is null ? null : CloneIngredient(ingredient.Ingredient),
                 Order = ingredient.Order,
                 Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
@@ -335,6 +340,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         SchemaVersion = source.SchemaVersion,
         NextId = source.NextId,
+        Ingredients = source.Ingredients.Select(CreateIngredientSnapshot).ToList(),
+        Products = source.Products.Select(CreateProductSnapshot).ToList(),
         Recipes = source.Recipes.Select(CreateRecipeSnapshot).ToList(),
         MealPlanSlots = source.MealPlanSlots
             .Select(slot => new MealPlanSlot
@@ -419,6 +426,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             {
                 Id = ingredient.Id,
                 RecipeId = recipe.Id,
+                IngredientId = ingredient.IngredientId,
                 Order = ingredient.Order,
                 Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
@@ -518,6 +526,23 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         EnsureCollections(appState);
         var maxId = 0;
+
+        foreach (var ingredient in appState.Ingredients)
+        {
+            AssignId(appState, ingredient.Id, value => ingredient.Id = value, ref maxId);
+            ingredient.Name = ingredient.Name.Trim();
+            ingredient.Category = NormalizeIngredientCategory(ingredient.Category);
+            ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
+        }
+
+        foreach (var product in appState.Products)
+        {
+            AssignId(appState, product.Id, value => product.Id = value, ref maxId);
+            product.Ingredient = product.IngredientId is int ingredientId
+                ? FindIngredient(appState, ingredientId)
+                : null;
+        }
+
         foreach (var recipe in appState.Recipes)
         {
             AssignId(appState, recipe.Id, value => recipe.Id = value, ref maxId);
@@ -577,6 +602,12 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             AssignId(appState, ingredient.Id, value => ingredient.Id = value, ref maxId);
             ingredient.RecipeId = recipe.Id;
             ingredient.Recipe = null;
+            ingredient.Ingredient = ResolveRecipeIngredient(appState, ingredient, ref maxId);
+            ingredient.IngredientId = ingredient.Ingredient?.Id;
+            if (string.IsNullOrWhiteSpace(ingredient.Name))
+            {
+                ingredient.Name = ingredient.Ingredient?.Name ?? string.Empty;
+            }
             ingredient.ScalingMode = NormalizeScalingMode(ingredient.ScalingMode);
         }
 
@@ -636,6 +667,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     private static void EnsureCollections(LocalAppState appState)
     {
         appState.Recipes ??= [];
+        appState.Ingredients ??= [];
+        appState.Products ??= [];
         appState.MealPlanSlots ??= [];
         appState.PantryItems ??= [];
         appState.RecipeIdeas ??= [];
@@ -687,6 +720,186 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IngredientScalingMode.ToTaste => IngredientScalingMode.ToTaste,
             _ => IngredientScalingMode.Linear
         };
+
+    private Ingredient ResolveRecipeIngredient(LocalAppState appState, RecipeIngredient recipeIngredient, ref int maxId)
+    {
+        if (recipeIngredient.IngredientId is int ingredientId)
+        {
+            var existingById = FindIngredient(appState, ingredientId);
+            if (existingById is not null)
+            {
+                return existingById;
+            }
+        }
+
+        var name = (recipeIngredient.Ingredient?.Name ?? recipeIngredient.Name).Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "Ingredient sense nom";
+        }
+
+        var normalizedName = IngredientNameNormalizer.Normalize(name);
+        var existing = appState.Ingredients.FirstOrDefault(ingredient =>
+            IngredientNameNormalizer.Normalize(ingredient.Name) == normalizedName);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        var ingredient = new Ingredient
+        {
+            Id = NextId(appState),
+            Name = name,
+            Category = GuessIngredientCategory(name),
+            DefaultUnit = DefaultUnitFor(recipeIngredient.Unit),
+            PantryCategory = GuessPantryCategory(name),
+            CanFreeze = GuessCanFreeze(name)
+        };
+
+        appState.Ingredients.Add(ingredient);
+        maxId = Math.Max(maxId, ingredient.Id);
+        return ingredient;
+    }
+
+    private static Ingredient CloneIngredient(Ingredient ingredient) => new()
+    {
+        Id = ingredient.Id,
+        Name = ingredient.Name,
+        Category = ingredient.Category,
+        DefaultUnit = ingredient.DefaultUnit,
+        PantryCategory = ingredient.PantryCategory,
+        CanFreeze = ingredient.CanFreeze,
+        Seasonality = ingredient.Seasonality,
+        NutritionPer100Grams = CloneNutrition(ingredient.NutritionPer100Grams),
+        NutritionSource = ingredient.NutritionSource
+    };
+
+    private static IngredientNutrition? CloneNutrition(IngredientNutrition? nutrition) => nutrition is null
+        ? null
+        : new IngredientNutrition
+        {
+            CaloriesKcal = nutrition.CaloriesKcal,
+            ProteinGrams = nutrition.ProteinGrams,
+            CarbohydrateGrams = nutrition.CarbohydrateGrams,
+            FatGrams = nutrition.FatGrams,
+            FibreGrams = nutrition.FibreGrams,
+            SugarGrams = nutrition.SugarGrams,
+            SaltGrams = nutrition.SaltGrams
+        };
+
+    private static Ingredient CreateIngredientSnapshot(Ingredient ingredient) => CloneIngredient(ingredient);
+
+    private static Product CreateProductSnapshot(Product product) => new()
+    {
+        Id = product.Id,
+        Name = product.Name,
+        Brand = product.Brand,
+        IngredientId = product.IngredientId,
+        Barcode = product.Barcode,
+        DefaultUnit = product.DefaultUnit,
+        NutritionPer100Grams = CloneNutrition(product.NutritionPer100Grams),
+        NutritionSource = product.NutritionSource
+    };
+
+    private static string NormalizeIngredientCategory(string category) =>
+        IngredientCategory.All.Contains(category)
+            ? category
+            : IngredientCategory.Other;
+
+    private static string NormalizeShoppingCategory(string category) =>
+        ShoppingCategory.DisplayOrder.Contains(category)
+            ? category
+            : ShoppingCategory.Other;
+
+    private static string DefaultUnitFor(string unit)
+    {
+        var normalized = unit.Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            "kg" => "g",
+            "grams" => "g",
+            "gram" => "g",
+            "gr" => "g",
+            "ml" => "ml",
+            "l" => "ml",
+            _ => string.IsNullOrWhiteSpace(normalized) ? "g" : normalized
+        };
+    }
+
+    private static string GuessIngredientCategory(string name)
+    {
+        var normalized = name.ToLowerInvariant();
+        if (ContainsAny(normalized, "tom", "ceba", "pastanaga", "carbass", "patata", "espinac", "pebrot", "enciam", "alberg"))
+        {
+            return IngredientCategory.Vegetables;
+        }
+
+        if (ContainsAny(normalized, "poma", "pera", "llimona", "taronja", "platan", "maduixa"))
+        {
+            return IngredientCategory.Fruit;
+        }
+
+        if (ContainsAny(normalized, "pollastre", "vedella", "porc", "gall dindi", "carn"))
+        {
+            return IngredientCategory.Meat;
+        }
+
+        if (ContainsAny(normalized, "salm", "tonyina", "bacall", "peix", "gamba", "muscl"))
+        {
+            return IngredientCategory.Fish;
+        }
+
+        if (ContainsAny(normalized, "ou", "llet", "iogurt", "formatge", "mantega", "nata"))
+        {
+            return IngredientCategory.DairyEggs;
+        }
+
+        if (ContainsAny(normalized, "cigr", "llent", "mongeta", "fesol"))
+        {
+            return IngredientCategory.Legumes;
+        }
+
+        if (ContainsAny(normalized, "arr", "pasta", "farina", "pa", "cous", "blat"))
+        {
+            return IngredientCategory.Grains;
+        }
+
+        if (ContainsAny(normalized, "sal", "pebre", "curc", "gingebre", "julivert", "herba", "xili", "bitxo"))
+        {
+            return IngredientCategory.Spices;
+        }
+
+        if (ContainsAny(normalized, "oli", "vinagre", "soja", "sucre", "mel", "llevat", "brou"))
+        {
+            return IngredientCategory.Pantry;
+        }
+
+        return IngredientCategory.Other;
+    }
+
+    private static string GuessPantryCategory(string name)
+    {
+        var category = GuessIngredientCategory(name);
+        return category switch
+        {
+            IngredientCategory.Vegetables => ShoppingCategory.Vegetables,
+            IngredientCategory.Meat => ShoppingCategory.Meat,
+            IngredientCategory.Fish => ShoppingCategory.Fish,
+            IngredientCategory.DairyEggs => ShoppingCategory.DairyEggs,
+            IngredientCategory.Spices => ShoppingCategory.Spices,
+            IngredientCategory.Grains or IngredientCategory.Pantry or IngredientCategory.Legumes => ShoppingCategory.Pantry,
+            _ => ShoppingCategory.Other
+        };
+    }
+
+    private static bool GuessCanFreeze(string name)
+    {
+        var normalized = name.ToLowerInvariant();
+        return ContainsAny(normalized, "pollastre", "vedella", "porc", "peix", "salm", "bacall", "gamba", "brou", "pa");
+    }
+
+    private static bool ContainsAny(string value, params string[] needles) =>
+        needles.Any(value.Contains);
 
     private static LocalAppState? DeserializeStoredState(string? json)
     {
@@ -755,6 +968,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
         var recipeIds = appState.Recipes.Select(recipe => recipe.Id).ToList();
         var recipeIdSet = recipeIds.ToHashSet();
+        var ingredientIds = appState.Ingredients.Select(ingredient => ingredient.Id).ToHashSet();
         if (recipeIds.Count != recipeIdSet.Count)
         {
             errors.Add("La copia conte receptes amb identificadors duplicats.");
@@ -770,6 +984,22 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             if (string.IsNullOrWhiteSpace(recipe.Name))
             {
                 errors.Add($"La recepta {recipe.Id} no te nom.");
+            }
+
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                if (ingredient.IngredientId is int ingredientId && !ingredientIds.Contains(ingredientId))
+                {
+                    errors.Add($"La recepta {recipe.Id} referencia un ingredient inexistent ({ingredientId}).");
+                }
+            }
+        }
+
+        foreach (var product in appState.Products)
+        {
+            if (product.IngredientId is int ingredientId && !ingredientIds.Contains(ingredientId))
+            {
+                errors.Add($"El producte {product.Id} referencia un ingredient inexistent ({ingredientId}).");
             }
         }
 
@@ -885,6 +1115,8 @@ public sealed class LocalAppState
 {
     public int SchemaVersion { get; set; } = 1;
     public int NextId { get; set; } = 1000;
+    public List<Ingredient> Ingredients { get; set; } = [];
+    public List<Product> Products { get; set; } = [];
     public List<Recipe> Recipes { get; set; } = [];
     public List<MealPlanSlot> MealPlanSlots { get; set; } = [];
     public List<PantryItem> PantryItems { get; set; } = [];
@@ -907,6 +1139,8 @@ public sealed class DataBackupSummary
 {
     public int Recipes { get; set; }
     public int DraftRecipes { get; set; }
+    public int Ingredients { get; set; }
+    public int Products { get; set; }
     public int MealPlanSlots { get; set; }
     public int PlannedRecipes { get; set; }
     public int ShoppingLists { get; set; }
@@ -919,6 +1153,8 @@ public sealed class DataBackupSummary
     {
         Recipes = state.Recipes.Count,
         DraftRecipes = state.Recipes.Count(recipe => recipe.IsDraft),
+        Ingredients = state.Ingredients.Count,
+        Products = state.Products.Count,
         MealPlanSlots = state.MealPlanSlots.Count,
         PlannedRecipes = state.MealPlanSlots.Sum(slot => slot.PlannedRecipes.Count),
         ShoppingLists = state.ShoppingLists.Count,

@@ -26,14 +26,14 @@ public static class IngredientScaling
         };
 
         return string.IsNullOrWhiteSpace(amount)
-            ? $"{suffix}{ingredient.Name}".Trim()
-            : $"{suffix}{amount} {ingredient.Name}".Trim();
+            ? $"{suffix}{ingredient.DisplayName}".Trim()
+            : $"{suffix}{amount} {ingredient.DisplayName}".Trim();
     }
 
     public static string FormatStepIngredient(RecipeStepIngredientReference reference, decimal scale)
     {
         var mode = reference.Ingredient?.ScalingMode ?? IngredientScalingMode.Linear;
-        var name = reference.Ingredient?.Name ?? reference.IngredientName;
+        var name = reference.Ingredient?.DisplayName ?? reference.IngredientName;
         var quantity = reference.Quantity is null
             ? ScaledQuantityText(reference.QuantityText, mode, scale)
             : ScaledQuantityText(reference.Quantity.Value, mode, scale);
@@ -82,11 +82,16 @@ public static class IngredientScaling
 
     private static string ScaledQuantityText(decimal quantity, string scalingMode, decimal scale)
     {
+        return FormatQuantity(ScaleQuantity(quantity, scalingMode, scale));
+    }
+
+    public static decimal ScaleQuantity(decimal quantity, string scalingMode, decimal scale)
+    {
         var effectiveScale = scalingMode is IngredientScalingMode.Fixed or IngredientScalingMode.ToTaste
             ? 1
             : scale;
 
-        return FormatQuantity(quantity * effectiveScale);
+        return quantity * effectiveScale;
     }
 
     private static string FormatQuantity(decimal quantity) =>
