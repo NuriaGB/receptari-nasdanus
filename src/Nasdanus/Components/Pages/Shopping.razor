@@ -44,6 +44,20 @@
                                    StartIcon="@Icons.Material.Filled.Sync">
                             Actualitzar del planner
                         </MudButton>
+                        <MudButton OnClick="MarkAllPurchasedAsync"
+                                   Variant="Variant.Text"
+                                   Color="Color.Primary"
+                                   Disabled="@(TotalItems == 0 || CheckedItems == TotalItems)"
+                                   StartIcon="@Icons.Material.Filled.DoneAll">
+                            Marcar tot
+                        </MudButton>
+                        <MudButton OnClick="ClearPurchasedItemsAsync"
+                                   Variant="Variant.Text"
+                                   Color="Color.Default"
+                                   Disabled="@(CheckedItems == 0)"
+                                   StartIcon="@Icons.Material.Filled.CleaningServices">
+                            Netejar comprats
+                        </MudButton>
                         <MudButton OnClick="AddItemAsync"
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
@@ -89,23 +103,24 @@
                                                  aria-label="@($"Marcar {item.Name}")" />
                                     <div class="shopping-item-main">
                                         <span class="shopping-item-name" title="@item.Name">@item.Name</span>
-                                        <span class="shopping-item-amount">@AmountText(item)</span>
-                                    </div>
-                                    <div class="shopping-item-meta">
-                                        @if (item.IsManual)
+                                        @if (!string.IsNullOrWhiteSpace(AmountText(item)))
                                         {
-                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@ManualSourceText(item)</MudChip>
+                                            <span class="shopping-item-amount">@AmountText(item)</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(SourceText(item)))
+                                        {
+                                            <span class="shopping-item-source">@SourceText(item)</span>
                                         }
                                     </div>
                                     <div class="shopping-item-actions">
                                         <MudIconButton OnClick="@(() => EditItemAsync(item))"
                                                        Icon="@Icons.Material.Filled.Edit"
-                                                       Color="Color.Primary"
+                                                       Color="Color.Default"
                                                        Size="Size.Small"
                                                        aria-label="Editar item" />
                                         <MudIconButton OnClick="@(() => DeleteItemAsync(item.Id))"
                                                        Icon="@Icons.Material.Filled.DeleteOutline"
-                                                       Color="Color.Secondary"
+                                                       Color="Color.Default"
                                                        Size="Size.Small"
                                                        aria-label="Eliminar item" />
                                     </div>
@@ -168,6 +183,18 @@
     {
         item.IsChecked = isChecked;
         await ShoppingLists.SetCheckedAsync(item.Id, isChecked);
+    }
+
+    private async Task MarkAllPurchasedAsync()
+    {
+        await ShoppingLists.MarkAllPurchasedAsync(_weekStart);
+        await LoadWeekAsync();
+    }
+
+    private async Task ClearPurchasedItemsAsync()
+    {
+        await ShoppingLists.ClearPurchasedItemsAsync(_weekStart);
+        await LoadWeekAsync();
     }
 
     private async Task AddItemAsync()
@@ -236,6 +263,23 @@
         }
 
         return item.Recipe is null ? "Manual" : item.Recipe.Name;
+    }
+
+    private static string SourceText(ShoppingListItem item)
+    {
+        if (item.SourceRecipeCount > 2)
+        {
+            return $"{item.SourceRecipeCount} receptes";
+        }
+
+        if (item.SourceRecipeCount > 0)
+        {
+            return string.IsNullOrWhiteSpace(item.SourceRecipeNames)
+                ? $"{item.SourceRecipeCount} receptes"
+                : item.SourceRecipeNames;
+        }
+
+        return item.IsManual ? ManualSourceText(item) : string.Empty;
     }
 
     private static string ShoppingItemRowClass(ShoppingListItem item) =>

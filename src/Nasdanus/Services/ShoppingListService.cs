@@ -47,6 +47,45 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         await db.SaveChangesAsync();
     }
 
+    public async Task MarkAllPurchasedAsync(DateOnly date)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var weekStart = PlannerService.WeekStart(date);
+        var list = await db.ShoppingLists
+            .Include(shoppingList => shoppingList.Items)
+            .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
+        if (list is null)
+        {
+            return;
+        }
+
+        foreach (var item in list.Items)
+        {
+            item.IsChecked = true;
+        }
+
+        list.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+    }
+
+    public async Task ClearPurchasedItemsAsync(DateOnly date)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var weekStart = PlannerService.WeekStart(date);
+        var list = await db.ShoppingLists
+            .Include(shoppingList => shoppingList.Items)
+            .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
+        if (list is null)
+        {
+            return;
+        }
+
+        var purchasedItems = list.Items.Where(item => item.IsChecked).ToList();
+        db.ShoppingListItems.RemoveRange(purchasedItems);
+        list.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+    }
+
     public async Task AddManualItemAsync(DateOnly date, ShoppingItemEditRequest request)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
@@ -60,6 +99,8 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             QuantityText = request.QuantityText.Trim(),
             Unit = NormalizeUnit(request.Unit.Trim()),
             Quantity = IngredientScaling.ParseQuantity(request.QuantityText),
+            SourceRecipeCount = 0,
+            SourceRecipeNames = string.Empty,
             RecipeId = request.IsHouseholdItem ? null : request.RecipeId,
             IsHouseholdItem = request.IsHouseholdItem,
             IsManual = true,
@@ -195,7 +236,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
 
             foreach (var ingredient in plannedRecipe.Recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
             {
-                AddIngredient(aggregates, ingredient, scale, pantryIngredientKeys);
+                AddIngredient(aggregates, ingredient, scale, pantryIngredientKeys, plannedRecipe.Recipe.Name);
             }
         }
 
@@ -210,7 +251,8 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         Dictionary<string, ShoppingItemAggregate> aggregates,
         RecipeIngredient ingredient,
         decimal scale,
-        IReadOnlySet<string> pantryIngredientKeys)
+        IReadOnlySet<string> pantryIngredientKeys,
+        string sourceRecipeName)
     {
         if (string.IsNullOrWhiteSpace(ingredient.Name))
         {
@@ -237,7 +279,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             aggregates.Add(key, aggregate);
         }
 
-        aggregate.Add(quantity, quantityText, unit);
+        aggregate.Add(quantity, quantityText, unit, sourceRecipeName);
     }
 
     private static decimal? ScaledQuantity(RecipeIngredient ingredient, decimal scale)
@@ -328,6 +370,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
     {
         private readonly Dictionary<string, decimal> quantitiesByUnit = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> quantityTexts = [];
+        private readonly SortedSet<string> sourceRecipeNames = new(StringComparer.OrdinalIgnoreCase);
 
         public string Name { get; } = name;
         public string Category { get; } = category;
@@ -336,8 +379,13 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             ? quantitiesByUnit.Values.Single()
             : null;
 
-        public void Add(decimal? quantity, string quantityText, string unit)
+        public void Add(decimal? quantity, string quantityText, string unit, string sourceRecipeName)
         {
+            if (!string.IsNullOrWhiteSpace(sourceRecipeName))
+            {
+                sourceRecipeNames.Add(sourceRecipeName.Trim());
+            }
+
             if (quantity is null)
             {
                 if (!string.IsNullOrWhiteSpace(quantityText))
@@ -369,6 +417,8 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
                 Quantity = quantity,
                 QuantityText = quantityText,
                 Unit = DisplayUnit(unit, quantity),
+                SourceRecipeCount = sourceRecipeNames.Count,
+                SourceRecipeNames = string.Join(" · ", sourceRecipeNames.Take(2)),
                 Order = order
             };
         }

@@ -19,6 +19,8 @@ public sealed class ShoppingListItem
     public string QuantityText { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
     public decimal? Quantity { get; set; }
+    public int SourceRecipeCount { get; set; }
+    public string SourceRecipeNames { get; set; } = string.Empty;
     public bool IsChecked { get; set; }
     public bool IsManual { get; set; }
     public bool IsHouseholdItem { get; set; }

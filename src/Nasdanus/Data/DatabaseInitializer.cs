@@ -290,6 +290,8 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
                 "QuantityText" TEXT NOT NULL DEFAULT '',
                 "Unit" TEXT NOT NULL DEFAULT '',
                 "Quantity" TEXT NULL,
+                "SourceRecipeCount" INTEGER NOT NULL DEFAULT 0,
+                "SourceRecipeNames" TEXT NOT NULL DEFAULT '',
                 "IsChecked" INTEGER NOT NULL DEFAULT 0,
                 "IsManual" INTEGER NOT NULL DEFAULT 0,
                 "IsHouseholdItem" INTEGER NOT NULL DEFAULT 0,
@@ -328,6 +330,22 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             await db.Database.ExecuteSqlRawAsync("""
                 ALTER TABLE "ShoppingListItems"
                 ADD COLUMN "RecipeId" INTEGER NULL;
+                """);
+        }
+
+        if (!await TableHasColumnAsync(db, "ShoppingListItems", "SourceRecipeCount"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "ShoppingListItems"
+                ADD COLUMN "SourceRecipeCount" INTEGER NOT NULL DEFAULT 0;
+                """);
+        }
+
+        if (!await TableHasColumnAsync(db, "ShoppingListItems", "SourceRecipeNames"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "ShoppingListItems"
+                ADD COLUMN "SourceRecipeNames" TEXT NOT NULL DEFAULT '';
                 """);
         }
     }
