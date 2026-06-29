@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject IDialogService DialogService
 
 <MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
@@ -34,6 +35,14 @@
             <MudIconButton Href="data" Icon="@Icons.Material.Filled.Storage" Color="Color.Primary" aria-label="Dades" />
         </nav>
     </MudHidden>
+
+    <MudButton OnClick="OpenFeedbackAsync"
+               Class="feedback-fab"
+               Variant="Variant.Filled"
+               Color="Color.Secondary"
+               StartIcon="@Icons.Material.Filled.Lightbulb">
+        Feedback
+    </MudButton>
 </MudLayout>
 
 <div id="blazor-error-ui" data-nosnippet>
@@ -62,4 +71,16 @@
             DefaultBorderRadius = "8px"
         }
     };
+
+    private async Task OpenFeedbackAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        await DialogService.ShowAsync<BacklogItemDialog>("Feedback", options);
+    }
 }

@@ -1,0 +1,284 @@
+@inject ProductBacklogService Backlog
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudStack Spacing="2" Class="backlog-dialog">
+                <div class="backlog-type-grid">
+                    @foreach (var type in ProductBacklogType.All)
+                    {
+                        <MudButton OnClick="@(() => SelectType(type))"
+                                   Class="@TypeButtonClass(type)"
+                                   Variant="@TypeVariant(type)"
+                                   Color="Color.Primary">
+                            <span class="backlog-type-icon">@ProductBacklogType.ToIcon(type)</span>
+                            <span>@ProductBacklogType.ToDisplayName(type)</span>
+                        </MudButton>
+                    }
+                </div>
+
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="string"
+                                   Label="Scope"
+                                   @bind-Value="_request.Scope"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true">
+                            @foreach (var scope in ProductBacklogScope.All)
+                            {
+                                <MudSelectItem T="string" Value="@scope">@scope</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="string"
+                                   Label="Priority"
+                                   @bind-Value="_request.Priority"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true">
+                            @foreach (var priority in ProductBacklogPriority.All)
+                            {
+                                <MudSelectItem T="string" Value="@priority">@priority</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+
+                <MudTextField T="string"
+                              Label="Title"
+                              @bind-Value="_request.Title"
+                              Required="true"
+                              Immediate="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+
+                <MudTextField T="string"
+                              Label="Description"
+                              @bind-Value="_request.Description"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="4" />
+
+                <MudExpansionPanels Elevation="0" Class="backlog-extra-panel">
+                    <MudExpansionPanel Text="Opcional">
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" sm="6">
+                                <MudSelect T="string"
+                                           Label="Status"
+                                           @bind-Value="_request.Status"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Dense="true">
+                                    @foreach (var status in ProductBacklogStatus.All)
+                                    {
+                                        <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudTextField T="string"
+                                              Label="Target Version"
+                                              Placeholder="v0.4, Future, Backlog"
+                                              @bind-Value="_request.TargetVersion"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudNumericField T="int?"
+                                                 Label="Duplicate Of"
+                                                 @bind-Value="_request.DuplicateOfId"
+                                                 Min="1"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense" />
+                            </MudItem>
+                            @if (ProductBacklogStatus.IsClosed(_request.Status))
+                            {
+                                <MudItem xs="12" sm="6">
+                                    <MudSelect T="string"
+                                               Label="Decision"
+                                               @bind-Value="_request.Decision"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense"
+                                               Dense="true">
+                                        <MudSelectItem T="string" Value="@string.Empty">Sense decisio</MudSelectItem>
+                                        @foreach (var decision in ProductBacklogDecision.All)
+                                        {
+                                            <MudSelectItem T="string" Value="@decision">@decision</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField T="string"
+                                                  Label="Resolution Notes"
+                                                  @bind-Value="_request.ResolutionNotes"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"
+                                                  Lines="3" />
+                                </MudItem>
+                            }
+                        </MudGrid>
+
+                        <MudText Typo="Typo.subtitle2">Labels</MudText>
+                        <div class="backlog-label-grid">
+                            @foreach (var label in ProductBacklogLabel.Suggestions)
+                            {
+                                <MudChip T="string"
+                                         OnClick="@(() => ToggleLabel(label))"
+                                         Color="@LabelColor(label)"
+                                         Variant="@LabelVariant(label)">
+                                    @label
+                                </MudChip>
+                            }
+                        </div>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+
+                <MudPaper Class="backlog-context-panel" Elevation="0">
+                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="backlog-context-heading">
+                        <div>
+                            <MudText Typo="Typo.subtitle2">Context automatic</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@_context.Page · @RelativeUrl</MudText>
+                        </div>
+                        <MudButton OnClick="CopyDiagnosticAsync"
+                                   Variant="Variant.Text"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.ContentCopy">
+                            Copy diagnostic information
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudStack>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Href="backlog" Variant="Variant.Text" Color="Color.Primary">Product Backlog</MudButton>
+        <MudSpacer />
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton OnClick="SaveAsync"
+                   Disabled="@IsSaveDisabled"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            @SaveLabel
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public ProductBacklogItem? Item { get; set; }
+
+    private ProductBacklogEditRequest _request = new();
+    private ProductBacklogContext _context = new();
+    private bool _isLoading = true;
+    private readonly HashSet<string> _labels = new(StringComparer.OrdinalIgnoreCase);
+
+    private bool IsEditing => Item is not null;
+    private bool IsSaveDisabled => _isLoading || string.IsNullOrWhiteSpace(_request.Title);
+    private string SaveLabel => IsEditing ? "Guardar" : "Crear";
+    private string RelativeUrl => ProductBacklogService.FormatDiagnostic(_context)
+        .Split(Environment.NewLine)
+        .FirstOrDefault(line => line.StartsWith("URL:", StringComparison.OrdinalIgnoreCase))
+        ?.Replace("URL:", string.Empty, StringComparison.OrdinalIgnoreCase)
+        .Trim() ?? "-";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Item is not null)
+        {
+            _request = ProductBacklogService.ToRequest(Item);
+            foreach (var label in _request.Labels)
+            {
+                _labels.Add(label);
+            }
+        }
+        else
+        {
+            _request.Status = ProductBacklogStatus.New;
+            _request.Priority = ProductBacklogPriority.Medium;
+        }
+
+        _context = await Backlog.CaptureContextAsync(Item);
+        if (Item is null && ProductBacklogScope.All.Contains(_context.Page))
+        {
+            _request.Scope = _context.Page;
+        }
+
+        _isLoading = false;
+    }
+
+    private void SelectType(string type)
+    {
+        _request.Type = type;
+    }
+
+    private Variant TypeVariant(string type) =>
+        string.Equals(_request.Type, type, StringComparison.OrdinalIgnoreCase)
+            ? Variant.Filled
+            : Variant.Outlined;
+
+    private string TypeButtonClass(string type) =>
+        string.Equals(_request.Type, type, StringComparison.OrdinalIgnoreCase)
+            ? "backlog-type-button is-selected"
+            : "backlog-type-button";
+
+    private void ToggleLabel(string label)
+    {
+        if (!_labels.Add(label))
+        {
+            _labels.Remove(label);
+        }
+
+        _request.Labels = _labels.OrderBy(value => value).ToList();
+    }
+
+    private Color LabelColor(string label) =>
+        _labels.Contains(label) ? Color.Primary : Color.Default;
+
+    private Variant LabelVariant(string label) =>
+        _labels.Contains(label) ? Variant.Filled : Variant.Outlined;
+
+    private async Task CopyDiagnosticAsync()
+    {
+        var diagnostic = Item is null
+            ? ProductBacklogService.FormatDiagnostic(_context, AppInfo.Version, _request.Title)
+            : ProductBacklogService.FormatDiagnostic(Item);
+
+        await Backlog.CopyToClipboardAsync(diagnostic);
+        Snackbar.Add("Diagnostic information copied.", Severity.Success);
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (IsSaveDisabled)
+        {
+            return;
+        }
+
+        _request.Labels = _labels.OrderBy(value => value).ToList();
+        if (Item is null)
+        {
+            var created = await Backlog.CreateAsync(_request, _context);
+            MudDialog.Close(DialogResult.Ok(created.Id));
+            return;
+        }
+
+        await Backlog.UpdateAsync(Item.Id, _request);
+        MudDialog.Close(DialogResult.Ok(Item.Id));
+    }
+}

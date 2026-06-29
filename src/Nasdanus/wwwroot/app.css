@@ -102,6 +102,15 @@ h3:focus {
     z-index: 20;
 }
 
+.feedback-fab {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 19;
+    min-height: 3rem;
+    box-shadow: 0 10px 28px rgba(31, 42, 37, 0.18);
+}
+
 .meal-card,
 .recipe-summary,
 .filter-bar,
@@ -733,6 +742,124 @@ h3:focus {
     max-width: 100%;
 }
 
+.backlog-shell {
+    max-width: 100%;
+}
+
+.backlog-dialog {
+    min-width: 0;
+}
+
+.backlog-type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: 0.55rem;
+}
+
+.backlog-type-button {
+    min-height: 4rem;
+}
+
+.backlog-type-button .mud-button-label {
+    display: grid;
+    gap: 0.2rem;
+    justify-items: center;
+}
+
+.backlog-type-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.backlog-extra-panel .mud-expand-panel {
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+}
+
+.backlog-label-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding-top: 0.5rem;
+}
+
+.backlog-context-panel {
+    padding: 0.85rem;
+    border: 1px dashed #bad8de;
+    border-radius: 8px;
+    background: #f4fafb;
+}
+
+.backlog-context-heading {
+    flex-wrap: wrap;
+}
+
+.backlog-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.backlog-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.backlog-row-main {
+    display: grid;
+    min-width: 0;
+    gap: 0.35rem;
+}
+
+.backlog-row-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.backlog-row-title .mud-typography {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.backlog-row-type {
+    flex: 0 0 auto;
+    font-size: 1.1rem;
+}
+
+.backlog-row-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.backlog-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.7rem;
+    color: var(--nas-muted);
+    font-size: 0.84rem;
+}
+
+.backlog-row-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.backlog-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
 .cooking-shell {
     max-width: 58rem;
 }
@@ -878,6 +1005,11 @@ h3:focus {
         flex-direction: column;
     }
 
+    .feedback-fab {
+        right: 1rem;
+        bottom: 5.4rem;
+    }
+
     .planner-heading {
         align-items: stretch;
         flex-direction: column;
@@ -1007,5 +1139,13 @@ h3:focus {
 
     .cook-instruction {
         font-size: 1.12rem;
+    }
+
+    .backlog-row {
+        grid-template-columns: 1fr;
+    }
+
+    .backlog-row-actions {
+        justify-content: space-between;
     }
 }

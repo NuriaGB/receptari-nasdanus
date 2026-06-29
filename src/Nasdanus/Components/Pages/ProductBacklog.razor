@@ -1,0 +1,319 @@
+@page "/backlog"
+@using System.Globalization
+@inject ProductBacklogService Backlog
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+
+<PageTitle>Nasdanus - Product Backlog</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="page-shell backlog-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading page-heading-actions">
+            <div>
+                <MudText Typo="Typo.overline">Internal</MudText>
+                <MudText Typo="Typo.h3">Product Backlog</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Bugs, ideas and usability notes captured while using Nasdanus.
+                </MudText>
+            </div>
+            <MudButton OnClick="OpenCreateDialogAsync"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.AddComment">
+                New feedback
+            </MudButton>
+        </div>
+
+        <MudPaper Class="filter-bar" Elevation="0">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" md="4">
+                    <MudTextField T="string"
+                                  @bind-Value="_search"
+                                  Immediate="true"
+                                  Placeholder="Search"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                </MudItem>
+                <MudItem xs="6" sm="3" md="2">
+                    <MudSelect T="string" Label="Status" @bind-Value="_status" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                        <MudSelectItem T="string" Value="@string.Empty">All</MudSelectItem>
+                        @foreach (var status in ProductBacklogStatus.All)
+                        {
+                            <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6" sm="3" md="2">
+                    <MudSelect T="string" Label="Type" @bind-Value="_type" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                        <MudSelectItem T="string" Value="@string.Empty">All</MudSelectItem>
+                        @foreach (var type in ProductBacklogType.All)
+                        {
+                            <MudSelectItem T="string" Value="@type">@ProductBacklogType.ToDisplayName(type)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6" sm="3" md="2">
+                    <MudSelect T="string" Label="Scope" @bind-Value="_scope" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                        <MudSelectItem T="string" Value="@string.Empty">All</MudSelectItem>
+                        @foreach (var scope in ProductBacklogScope.All)
+                        {
+                            <MudSelectItem T="string" Value="@scope">@scope</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6" sm="3" md="2">
+                    <MudSelect T="string" Label="Sort" @bind-Value="_sort" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                        <MudSelectItem T="string" Value="@SortCreatedDesc">Newest</MudSelectItem>
+                        <MudSelectItem T="string" Value="@SortPriority">Priority</MudSelectItem>
+                        <MudSelectItem T="string" Value="@SortStatus">Status</MudSelectItem>
+                        <MudSelectItem T="string" Value="@SortScope">Scope</MudSelectItem>
+                        <MudSelectItem T="string" Value="@SortTitle">Title</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (FilteredItems.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                No backlog items match the current filters.
+            </MudAlert>
+        }
+        else
+        {
+            <div class="backlog-list">
+                @foreach (var item in FilteredItems)
+                {
+                    <MudPaper Class="backlog-row" Elevation="0" @key="item.Id">
+                        <div class="backlog-row-main">
+                            <div class="backlog-row-title">
+                                <span class="backlog-row-type">@ProductBacklogType.ToIcon(item.Type)</span>
+                                <MudText Typo="Typo.subtitle1">@item.Title</MudText>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(item.Description))
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="backlog-row-description">@item.Description</MudText>
+                            }
+                            <div class="backlog-row-meta">
+                                <span>@item.Status</span>
+                                <span>@item.Priority</span>
+                                <span>@ProductBacklogType.ToDisplayName(item.Type)</span>
+                                <span>@item.Scope</span>
+                                <span>@item.ApplicationVersion</span>
+                                <span>@TargetVersionText(item)</span>
+                                <span>@item.CreatedAt.ToLocalTime().ToString("d/M/yyyy", CultureInfo.InvariantCulture)</span>
+                            </div>
+                            @if (item.Labels.Count > 0)
+                            {
+                                <div class="backlog-row-labels">
+                                    @foreach (var label in item.Labels)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@label</MudChip>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="backlog-row-actions">
+                            <MudIconButton OnClick="@(() => CopyMarkdownAsync(item))"
+                                           Icon="@Icons.Material.Filled.ContentCopy"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Copy Markdown" />
+                            <MudIconButton OnClick="@(() => OpenEditDialogAsync(item))"
+                                           Icon="@Icons.Material.Filled.Edit"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Edit" />
+                            <MudIconButton OnClick="@(() => MarkCompletedAsync(item))"
+                                           Disabled="@string.Equals(item.Status, ProductBacklogStatus.Completed, StringComparison.OrdinalIgnoreCase)"
+                                           Icon="@Icons.Material.Filled.CheckCircle"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Mark completed" />
+                            <MudIconButton OnClick="@(() => DeleteAsync(item))"
+                                           Icon="@Icons.Material.Filled.DeleteOutline"
+                                           Color="Color.Default"
+                                           Size="Size.Small"
+                                           aria-label="Delete" />
+                        </div>
+                    </MudPaper>
+                }
+            </div>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private const string SortCreatedDesc = "created-desc";
+    private const string SortPriority = "priority";
+    private const string SortStatus = "status";
+    private const string SortScope = "scope";
+    private const string SortTitle = "title";
+
+    private List<ProductBacklogItem> _items = [];
+    private bool _isLoading = true;
+    private string _search = string.Empty;
+    private string _status = string.Empty;
+    private string _type = string.Empty;
+    private string _scope = string.Empty;
+    private string _sort = SortCreatedDesc;
+
+    private IReadOnlyList<ProductBacklogItem> FilteredItems
+    {
+        get
+        {
+            var query = _items.Where(MatchesFilters);
+            query = _sort switch
+            {
+                SortPriority => query
+                    .OrderBy(item => PriorityRank(item.Priority))
+                    .ThenByDescending(item => item.CreatedAt),
+                SortStatus => query
+                    .OrderBy(item => StatusRank(item.Status))
+                    .ThenByDescending(item => item.CreatedAt),
+                SortScope => query
+                    .OrderBy(item => item.Scope)
+                    .ThenByDescending(item => item.CreatedAt),
+                SortTitle => query
+                    .OrderBy(item => item.Title)
+                    .ThenByDescending(item => item.CreatedAt),
+                _ => query.OrderByDescending(item => item.CreatedAt)
+            };
+
+            return query.ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadAsync()
+    {
+        _items = await Backlog.GetAllAsync();
+    }
+
+    private bool MatchesFilters(ProductBacklogItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(_status) && item.Status != _status)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_type) && item.Type != _type)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_scope) && item.Scope != _scope)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_search))
+        {
+            return true;
+        }
+
+        return item.Title.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || item.Description.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || item.Scope.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || item.Labels.Any(label => label.Contains(_search, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var result = await OpenDialogAsync("Feedback", null);
+        if (result)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task OpenEditDialogAsync(ProductBacklogItem item)
+    {
+        var result = await OpenDialogAsync($"Feedback #{item.Id}", item);
+        if (result)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task<bool> OpenDialogAsync(string title, ProductBacklogItem? item)
+    {
+        var parameters = new DialogParameters();
+        if (item is not null)
+        {
+            parameters.Add(nameof(BacklogItemDialog.Item), item);
+        }
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<BacklogItemDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        return result is not null && !result.Canceled;
+    }
+
+    private async Task MarkCompletedAsync(ProductBacklogItem item)
+    {
+        await Backlog.MarkCompletedAsync(item.Id);
+        await LoadAsync();
+        Snackbar.Add("Backlog item completed.", Severity.Success);
+    }
+
+    private async Task CopyMarkdownAsync(ProductBacklogItem item)
+    {
+        await Backlog.CopyToClipboardAsync(ProductBacklogService.FormatMarkdown(item));
+        Snackbar.Add("Markdown copied.", Severity.Success);
+    }
+
+    private async Task DeleteAsync(ProductBacklogItem item)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete backlog item #{item.Id}?");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        await Backlog.DeleteAsync(item.Id);
+        await LoadAsync();
+        Snackbar.Add("Backlog item deleted.", Severity.Success);
+    }
+
+    private static string TargetVersionText(ProductBacklogItem item) =>
+        string.IsNullOrWhiteSpace(item.TargetVersion) ? "Backlog" : item.TargetVersion;
+
+    private static int PriorityRank(string priority) => priority switch
+    {
+        ProductBacklogPriority.Critical => 0,
+        ProductBacklogPriority.High => 1,
+        ProductBacklogPriority.Medium => 2,
+        ProductBacklogPriority.Low => 3,
+        _ => 4
+    };
+
+    private static int StatusRank(string status) => status switch
+    {
+        ProductBacklogStatus.New => 0,
+        ProductBacklogStatus.InProgress => 1,
+        ProductBacklogStatus.Waiting => 2,
+        ProductBacklogStatus.Completed => 3,
+        ProductBacklogStatus.WontFix => 4,
+        _ => 5
+    };
+}
