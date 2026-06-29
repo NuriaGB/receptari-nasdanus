@@ -163,6 +163,28 @@ h3:focus {
     background: var(--nas-panel);
 }
 
+.weekly-nutrition-card {
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.nutrition-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem;
+}
+
+.nutrition-metric {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.nutrition-progress {
+    height: 0.55rem;
+}
+
 .future-reminders {
     padding: 1rem;
     border: 1px dashed #bad8de;
@@ -507,6 +529,11 @@ h3:focus {
     display: flex;
     align-items: center;
     gap: 0.1rem;
+}
+
+.meal-nutrition-summary {
+    color: var(--nas-muted);
+    padding-top: 0.1rem;
 }
 
 .quick-add-form {

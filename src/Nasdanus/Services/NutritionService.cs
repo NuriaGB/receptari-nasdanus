@@ -82,7 +82,7 @@ public sealed class NutritionService(BrowserAppStore store)
     {
         if (!totals.HasKnownNutrition)
         {
-            return "Nutricio pendent";
+            return "0 kcal · P 0 g · C 0 g · F 0 g · pendent";
         }
 
         return $"{Round(totals.CaloriesKcal)} kcal · P {Round(totals.ProteinGrams)} g · C {Round(totals.CarbohydrateGrams)} g · F {Round(totals.FatGrams)} g";

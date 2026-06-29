@@ -47,6 +47,9 @@
                 </div>
             }
         </MudStack>
+        <MudText Typo="Typo.caption" Class="meal-nutrition-summary">
+            @NutritionService.CompactNutritionText(MealNutrition.Totals)
+        </MudText>
     }
 </MudStack>
 
@@ -66,6 +69,7 @@
     private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
         .OrderBy(plannedRecipe => plannedRecipe.Order)
         .ToList();
+    private MealNutritionSummary MealNutrition => NutritionService.CalculateMeal(Slot);
     private string MealIcon => Slot.MealKind == MealKind.Lunch
         ? Icons.Material.Filled.Restaurant
         : Icons.Material.Filled.DarkMode;
