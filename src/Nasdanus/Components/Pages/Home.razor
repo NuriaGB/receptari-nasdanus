@@ -26,7 +26,7 @@
                 </MudItem>
             </MudGrid>
 
-            @if (_tomorrowReminders.Length > 0)
+            @if (_tomorrowReminders.Count > 0)
             {
                 <MudPaper Class="tomorrow-prep" Elevation="0">
                     <MudStack Spacing="2">
@@ -34,11 +34,14 @@
                             <MudIcon Icon="@Icons.Material.Filled.EventRepeat" Color="Color.Primary" />
                             <MudText Typo="Typo.h5">Preparar demà</MudText>
                         </MudStack>
-                        <MudList T="string" Dense="true" Class="prep-list">
+                        <MudList T="TomorrowPrepReminder" Dense="true" Class="prep-list">
                             @foreach (var reminder in _tomorrowReminders)
                             {
-                                <MudListItem Icon="@Icons.Material.Filled.CheckCircleOutline">
-                                    @reminder
+                                <MudListItem Icon="@reminder.Icon">
+                                    <div class="tomorrow-reminder">
+                                        <MudText Typo="Typo.subtitle2">@reminder.Title</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@reminder.Detail</MudText>
+                                    </div>
                                 </MudListItem>
                             }
                         </MudList>
@@ -128,16 +131,12 @@
     private MealPlanSlot? _lunch;
     private MealPlanSlot? _dinner;
     private WeekNutritionSummary? _weekNutrition;
+    private IReadOnlyList<TomorrowPrepReminder> _tomorrowReminders = [];
     private bool _isLoading = true;
     private const decimal WeeklyCaloriesDisplayCap = 14000;
     private const decimal WeeklyProteinDisplayCap = 420;
     private const decimal WeeklyCarbohydrateDisplayCap = 1750;
     private const decimal WeeklyFatDisplayCap = 540;
-    private readonly string[] _tomorrowReminders =
-    [
-        "Treu 2 pits de pollastre del congelador",
-        "Deixa l'arròs mesurat per al dinar"
-    ];
     private readonly string[] _futureReminders =
     [
         "Recorda treure pollastre del congelador demà.",
@@ -148,8 +147,12 @@
     protected override async Task OnInitializedAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
+        var tomorrow = today.AddDays(1);
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
+        var tomorrowLunch = await Planner.GetSlotAsync(tomorrow, MealKind.Lunch);
+        var tomorrowDinner = await Planner.GetSlotAsync(tomorrow, MealKind.Dinner);
+        _tomorrowReminders = BuildTomorrowReminders(tomorrowLunch, tomorrowDinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
         _isLoading = false;
     }
@@ -162,6 +165,87 @@
 
     private static string MealCardClass(MealPlanSlot? slot) =>
         slot?.PlannedRecipes.Count is not > 0 ? "meal-card is-empty" : "meal-card";
+
+    private static IReadOnlyList<TomorrowPrepReminder> BuildTomorrowReminders(params MealPlanSlot?[] slots)
+    {
+        var reminders = new List<TomorrowPrepReminder>();
+        var plannedSlots = slots
+            .Where(slot => slot?.PlannedRecipes.Count > 0)
+            .Select(slot => slot!)
+            .ToList();
+
+        foreach (var slot in plannedSlots)
+        {
+            var recipeNames = slot.PlannedRecipes
+                .OrderBy(plannedRecipe => plannedRecipe.Order)
+                .Select(plannedRecipe => plannedRecipe.Recipe?.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => name!)
+                .ToList();
+
+            if (recipeNames.Count == 0)
+            {
+                continue;
+            }
+
+            reminders.Add(new TomorrowPrepReminder(
+                $"{slot.MealKind.ToDisplayName()} de dema",
+                string.Join(" + ", recipeNames),
+                Icons.Material.Filled.Restaurant));
+        }
+
+        var freezerIngredients = plannedSlots
+            .SelectMany(slot => slot.PlannedRecipes)
+            .Select(plannedRecipe => plannedRecipe.Recipe)
+            .Where(recipe => recipe is not null)
+            .SelectMany(recipe => recipe!.Ingredients)
+            .Where(MightNeedDefrost)
+            .Select(ingredient => ingredient.DisplayName.Trim())
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.CurrentCultureIgnoreCase)
+            .Take(6)
+            .ToList();
+
+        if (freezerIngredients.Count > 0)
+        {
+            reminders.Add(new TomorrowPrepReminder(
+                "Possible descongelacio",
+                string.Join(", ", freezerIngredients),
+                Icons.Material.Filled.AcUnit));
+        }
+
+        if (plannedSlots.Count > 0)
+        {
+            reminders.Add(new TomorrowPrepReminder(
+                "Revisa compra",
+                "Comprova que tens els ingredients dels apats de dema.",
+                Icons.Material.Filled.ShoppingCart));
+        }
+
+        return reminders;
+    }
+
+    private static bool MightNeedDefrost(RecipeIngredient ingredient) =>
+        ingredient.Ingredient?.CanFreeze == true
+        || ContainsAny(
+            ingredient.DisplayName,
+            "pollastre",
+            "chicken",
+            "vedella",
+            "beef",
+            "porc",
+            "pork",
+            "peix",
+            "fish",
+            "salmo",
+            "bacalla",
+            "gamba",
+            "lluc",
+            "llagosti",
+            "marisc");
+
+    private static bool ContainsAny(string value, params string[] fragments) =>
+        fragments.Any(fragment => value.Contains(fragment, StringComparison.CurrentCultureIgnoreCase));
 
     private RenderFragment MealCard(string title, MealPlanSlot? slot) => @<MudPaper Class="@MealCardClass(slot)" Elevation="0">
         <MudStack Spacing="2">
@@ -213,4 +297,6 @@
 
     private static double ProgressValue(decimal value, decimal displayCap) =>
         displayCap <= 0 ? 0 : Math.Min(100, (double)(value / displayCap * 100));
+
+    private sealed record TomorrowPrepReminder(string Title, string Detail, string Icon);
 }
