@@ -1,0 +1,281 @@
+@page "/data"
+@using System.Globalization
+@inject BrowserAppStore Store
+@inject IJSRuntime JS
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Nasdanus - Dades</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell data-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading">
+            <MudText Typo="Typo.overline">Dades</MudText>
+            <MudText Typo="Typo.h3">Backup i restauracio</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Exporta una copia abans de fer canvis importants o importa una copia validada.
+            </MudText>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudPaper Class="detail-section data-section" Elevation="0">
+                <MudStack Spacing="2">
+                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="data-section-heading">
+                        <div>
+                            <MudText Typo="Typo.h5">Estat local</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@LastSavedText</MudText>
+                        </div>
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">localStorage</MudChip>
+                    </MudStack>
+
+                    @if (_summary is not null)
+                    {
+                        <div class="data-summary-grid">
+                            @SummaryMetric("Receptes", _summary.Recipes)
+                            @SummaryMetric("Drafts", _summary.DraftRecipes)
+                            @SummaryMetric("Planner", _summary.PlannedRecipes)
+                            @SummaryMetric("Compra", _summary.ShoppingItems)
+                            @SummaryMetric("Rebost", _summary.PantryItems)
+                            @SummaryMetric("Idees", _summary.RecipeIdeas)
+                        </div>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Class="detail-section data-section" Elevation="0">
+                <MudStack Spacing="2">
+                    <div>
+                        <MudText Typo="Typo.h5">Exportar</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Desa totes les dades de Nasdanus en un fitxer JSON.
+                        </MudText>
+                    </div>
+                    <MudButton OnClick="ExportAsync"
+                               Disabled="@_isExporting"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.FileDownload">
+                        Exportar JSON
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Class="detail-section data-section" Elevation="0">
+                <MudStack Spacing="2">
+                    <div>
+                        <MudText Typo="Typo.h5">Importar</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            El fitxer s'analitza abans de substituir les dades actuals.
+                        </MudText>
+                    </div>
+
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                        Importar substituira les dades locals d'aquest navegador.
+                    </MudAlert>
+
+                    <MudCheckBox T="bool"
+                                 @bind-Value="_backupBeforeImport"
+                                 Color="Color.Primary"
+                                 Label="Crear una copia abans d'importar" />
+
+                    <label class="data-file-picker">
+                        <span>Seleccionar fitxer JSON</span>
+                        <InputFile OnChange="OnFileSelectedAsync" accept=".json,application/json" />
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(_selectedFileName))
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Fitxer: @_selectedFileName</MudText>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_fileError))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_fileError</MudAlert>
+                    }
+
+                    @if (_validation is not null)
+                    {
+                        @if (_validation.IsValid && ImportSummary is not null)
+                        {
+                            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                                Fitxer valid. Pots importar-lo quan estiguis segura.
+                            </MudAlert>
+                            <div class="data-summary-grid">
+                                @SummaryMetric("Receptes", ImportSummary.Recipes)
+                                @SummaryMetric("Planner", ImportSummary.PlannedRecipes)
+                                @SummaryMetric("Compra", ImportSummary.ShoppingItems)
+                                @SummaryMetric("Rebost", ImportSummary.PantryItems)
+                                @SummaryMetric("Idees", ImportSummary.RecipeIdeas)
+                            </div>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                                El fitxer no es pot importar.
+                            </MudAlert>
+                            <MudList T="string" Dense="true">
+                                @foreach (var error in _validation.Errors)
+                                {
+                                    <MudListItem Icon="@Icons.Material.Filled.ErrorOutline">@error</MudListItem>
+                                }
+                            </MudList>
+                        }
+                    }
+
+                    <MudButton OnClick="ImportAsync"
+                               Disabled="@(!CanImport)"
+                               Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.UploadFile">
+                        Importar i substituir dades
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private const long MaxImportBytes = 25 * 1024 * 1024;
+
+    private DataBackupSummary? _summary;
+    private DateTime? _lastSavedAt;
+    private bool _isLoading = true;
+    private bool _isExporting;
+    private bool _isImporting;
+    private bool _backupBeforeImport = true;
+    private string? _selectedFileName;
+    private string? _pendingImportJson;
+    private string? _fileError;
+    private DataImportValidationResult? _validation;
+
+    private bool CanImport => !_isImporting && _validation?.IsValid == true && !string.IsNullOrWhiteSpace(_pendingImportJson);
+    private DataBackupSummary? ImportSummary => _validation?.Summary;
+    private string LastSavedText => _lastSavedAt is null
+        ? "Encara no hi ha cap desat local registrat."
+        : $"Ultim desat: {_lastSavedAt.Value.ToLocalTime().ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSummaryAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadSummaryAsync()
+    {
+        _summary = await Store.GetSummaryAsync();
+        _lastSavedAt = await Store.GetLastSavedAtAsync();
+    }
+
+    private async Task ExportAsync()
+    {
+        _isExporting = true;
+        try
+        {
+            var json = await Store.ExportJsonAsync();
+            await DownloadAsync(json, BackupFileName());
+            Snackbar.Add("Backup exportat.", Severity.Success);
+        }
+        finally
+        {
+            _isExporting = false;
+        }
+    }
+
+    private async Task OnFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        _selectedFileName = null;
+        _pendingImportJson = null;
+        _validation = null;
+        _fileError = null;
+
+        var file = args.File;
+        _selectedFileName = file.Name;
+        if (file.Size > MaxImportBytes)
+        {
+            _fileError = "El fitxer es massa gran per importar-lo.";
+            return;
+        }
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxImportBytes);
+            using var reader = new StreamReader(stream);
+            _pendingImportJson = await reader.ReadToEndAsync();
+            _validation = await Store.ValidateImportJsonAsync(_pendingImportJson);
+        }
+        catch (Exception ex)
+        {
+            _fileError = $"No s'ha pogut llegir el fitxer: {ex.Message}";
+        }
+    }
+
+    private async Task ImportAsync()
+    {
+        if (!CanImport || _pendingImportJson is null)
+        {
+            return;
+        }
+
+        var confirmed = await JS.InvokeAsync<bool>(
+            "confirm",
+            "Aquesta accio substituira les dades locals de Nasdanus en aquest navegador. Vols continuar?");
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        _isImporting = true;
+        try
+        {
+            if (_backupBeforeImport)
+            {
+                var currentJson = await Store.ExportJsonAsync();
+                await DownloadAsync(currentJson, BackupFileName("-abans-importar"));
+            }
+
+            var result = await Store.ReplaceStateFromJsonAsync(_pendingImportJson);
+            if (!result.IsValid)
+            {
+                _validation = result;
+                Snackbar.Add("Import cancel.lat: el fitxer no es valid.", Severity.Error);
+                return;
+            }
+
+            Snackbar.Add("Dades importades correctament.", Severity.Success);
+            Navigation.NavigateTo("data", forceLoad: true);
+        }
+        finally
+        {
+            _isImporting = false;
+        }
+    }
+
+    private async Task DownloadAsync(string json, string fileName)
+    {
+        await JS.InvokeVoidAsync(
+            "nasdanusData.downloadTextFile",
+            fileName,
+            json,
+            "application/json;charset=utf-8");
+    }
+
+    private static string BackupFileName(string suffix = "")
+    {
+        var stamp = DateTime.Now.ToString("yyyyMMdd-HHmm", CultureInfo.InvariantCulture);
+        return $"nasdanus-backup-{stamp}{suffix}.json";
+    }
+
+    private static RenderFragment SummaryMetric(string label, int value) => @<MudPaper Class="data-metric" Elevation="0">
+        <MudText Typo="Typo.overline">@label</MudText>
+        <MudText Typo="Typo.h6">@value</MudText>
+    </MudPaper>;
+}

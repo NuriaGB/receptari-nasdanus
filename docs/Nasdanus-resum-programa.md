@@ -25,6 +25,7 @@ L'aplicacio ja te una vertical slice funcional:
 - Planner setmanal
 - Llista de la compra
 - Rebost basic
+- Dades, backup i restauracio
 - PWA / desplegament static a GitHub Pages
 
 El seed actual inclou:
@@ -69,6 +70,7 @@ La navegacio principal inclou:
 - Planner
 - Compra
 - Rebost
+- Dades
 
 En desktop es mostra a la barra superior. En mobil es mostra com a navegacio inferior fixa.
 
@@ -339,10 +341,11 @@ Actualment:
 - Es mostra com a xips compactes.
 - Inclou receptes no assignades a la setmana visible.
 - Es poden descartar visualment de la llista.
+- Les idees descartades es desen per setmana i formen part del backup.
 
 Limitacio actual:
 
-- Les idees descartades no estan pensades encara com una llista persistent de llarg termini.
+- Recipe Ideas encara no es una safata editorial completa; continua sent una ajuda lleugera dins del planner setmanal.
 
 ## 14. Llista de la compra
 
@@ -448,6 +451,22 @@ Flux:
 Clau de `localStorage`:
 
 `nasdanus.static.state.v1`
+
+Per seguretat, abans de cada desat tambe es conserva una copia interna de l'estat anterior:
+
+`nasdanus.static.state.backup.v1`
+
+L'ultim desat queda registrat a:
+
+`nasdanus.static.lastSavedAt.v1`
+
+La pagina "Dades" permet:
+
+- Exportar totes les dades a un fitxer JSON.
+- Importar una copia exportada anteriorment.
+- Validar el fitxer abans de substituir dades locals.
+- Crear una copia abans d'importar.
+- Veure un resum de receptes, planner, compra, rebost i Recipe Ideas.
 
 Aquest enfocament permet GitHub Pages i us offline/PWA basic, pero implica:
 
@@ -568,16 +587,15 @@ Algunes parts son encara heuristiques o placeholders:
 - Categoritzacio d'ingredients a la compra.
 - Recordatoris de Home.
 - Resum setmanal de Home.
-- Recipe Ideas com a llista temporal.
+- Recipe Ideas com a ajuda setmanal lleugera, no com a inbox completa.
 
 ## 22. Properes passes recomanades
 
 Prioritat alta:
 
-- Afegir export/import de dades locals per no perdre canvis.
-- Millorar persistencia de Recipe Ideas.
 - Afegir tests de serveis per planner, shopping i escalat.
 - Revisar textos amb accents i encoding.
+- Provar export/import amb dades reals abans d'usar-ho com a sistema principal.
 
 Prioritat mitjana:
 
@@ -607,6 +625,7 @@ Nasdanus ja permet:
 - Cuinar pas a pas amb quantitats escalades.
 - Generar una llista de la compra setmanal.
 - Excloure ingredients habituals gracies al rebost "Sempre tinc".
+- Exportar i restaurar totes les dades locals amb validacio previa.
 - Funcionar com a Blazor WebAssembly/PWA estatica preparada per GitHub Pages.
 
 El producte esta en bon estat per us personal i familiar setmanal, amb limitacions conscients al voltant de sincronitzacio, imports, inventari i automatitzacions avançades.

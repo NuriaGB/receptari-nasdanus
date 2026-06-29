@@ -31,6 +31,20 @@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
+        window.nasdanusData = {
+            downloadTextFile: (fileName, content, contentType) => {
+                const blob = new Blob([content], { type: contentType || "application/json;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            }
+        };
+
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
