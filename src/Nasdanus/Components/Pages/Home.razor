@@ -52,6 +52,23 @@
                 </MudStack>
             </MudPaper>
 
+            <MudPaper Class="future-reminders" Elevation="0">
+                <MudStack Spacing="2">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Filled.NotificationsActive" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.h6">Recordatoris</MudText>
+                    </MudStack>
+                    <MudList T="string" Dense="true" Class="future-reminder-list">
+                        @foreach (var reminder in _futureReminders)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.Circle">
+                                @reminder
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudStack>
+            </MudPaper>
+
             <MudStack Row Class="home-actions">
                 <MudButton Href="/planner"
                            Variant="Variant.Filled"
@@ -80,6 +97,12 @@
     [
         "Treu 2 pits de pollastre del congelador",
         "Deixa l'arròs mesurat per al dinar"
+    ];
+    private readonly string[] _futureReminders =
+    [
+        "Recorda treure pollastre del congelador demà.",
+        "Posa cigrons en remull aquesta nit.",
+        "Objectiu de peix de la setmana encara pendent."
     ];
 
     protected override async Task OnInitializedAsync()

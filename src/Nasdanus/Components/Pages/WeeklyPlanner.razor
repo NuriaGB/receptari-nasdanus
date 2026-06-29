@@ -52,11 +52,11 @@
                         {
                             <div class="recipe-idea-chip">
                                 <span class="recipe-idea-name" title="@recipe.Name">@recipe.Name</span>
-                                <MudIconButton Href="@($"/recipes/{recipe.Id}")"
-                                               Icon="@Icons.Material.Filled.OpenInNew"
-                                               Color="Color.Primary"
+                                <MudIconButton OnClick="@(() => DismissRecipeIdea(recipe.Id))"
+                                               Icon="@Icons.Material.Filled.Close"
+                                               Color="Color.Secondary"
                                                Size="Size.Small"
-                                               aria-label="Obrir recepta" />
+                                               aria-label="Treure idea" />
                             </div>
                         }
                     </div>
@@ -92,12 +92,14 @@
     private List<DayPlan> _days = [];
     private List<Recipe> _recipes = [];
     private HashSet<int> _plannedRecipeIds = [];
+    private readonly HashSet<int> _dismissedRecipeIdeaIds = [];
     private bool _isLoading = true;
 
     private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
     private string WeekRangeText => $"{_weekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_weekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
     private IReadOnlyList<Recipe> RecipeIdeas => _recipes
         .Where(recipe => !_plannedRecipeIds.Contains(recipe.Id))
+        .Where(recipe => !_dismissedRecipeIdeaIds.Contains(recipe.Id))
         .OrderBy(recipe => recipe.Name)
         .ToList();
 
@@ -130,6 +132,11 @@
     {
         await Planner.RemoveRecipeAsync(plannedRecipeId);
         await LoadWeekAsync();
+    }
+
+    private void DismissRecipeIdea(int recipeId)
+    {
+        _dismissedRecipeIdeaIds.Add(recipeId);
     }
 
     private async Task PreviousWeekAsync()
