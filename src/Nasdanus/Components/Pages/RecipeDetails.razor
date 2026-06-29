@@ -1,6 +1,8 @@
 @page "/recipes/{Id:int}"
 @inject RecipeService Recipes
 @inject PlannerService Planner
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
 <PageTitle>@(_recipe is null ? "Recepta" : _recipe.Name)</PageTitle>
 
@@ -30,11 +32,21 @@
                     {
                         <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">Draft</MudChip>
                     }
+                    @if (_recipe.VariationOfRecipeId is not null)
+                    {
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">Variacio</MudChip>
+                    }
                 </MudStack>
                 <MudText Typo="Typo.h3">@_recipe.Name</MudText>
                 @if (!string.IsNullOrWhiteSpace(_recipe.Description))
                 {
                     <MudText Typo="Typo.body1" Color="Color.Secondary">@_recipe.Description</MudText>
+                }
+                @if (_sourceRecipe is not null)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Variacio de <MudLink Href="@($"recipes/{_sourceRecipe.Id}")">@_sourceRecipe.Name</MudLink>
+                    </MudText>
                 }
             </div>
 
@@ -54,6 +66,25 @@
                            StartIcon="@Icons.Material.Filled.Edit">
                     Editar
                 </MudButton>
+                <MudButton OnClick="CreateVariationAsync"
+                           Disabled="@_isMutating"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.ContentCopy">
+                    Fer variacio
+                </MudButton>
+                @if (_recipe.IsDraft)
+                {
+                    <MudButton OnClick="ConsolidateAsync"
+                               Disabled="@_isMutating"
+                               Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.CheckCircle">
+                        Consolidar
+                    </MudButton>
+                }
             </MudStack>
 
             <MudGrid Spacing="2" Class="recipe-meta-grid">
@@ -193,8 +224,10 @@
     public int? QueryServings { get; set; }
 
     private Recipe? _recipe;
+    private Recipe? _sourceRecipe;
     private MealPlanRecipe? _plannedRecipe;
     private bool _isLoading = true;
+    private bool _isMutating;
     private int _displayServings = 1;
     private string CategoryText => string.IsNullOrWhiteSpace(_recipe?.Category) ? "Sense categoria" : _recipe.Category;
     private bool IsPlannedContext => _plannedRecipe is not null;
@@ -225,6 +258,9 @@
     {
         _isLoading = true;
         _recipe = await Recipes.GetByIdAsync(Id);
+        _sourceRecipe = _recipe?.VariationOfRecipeId is int sourceId && sourceId != _recipe.Id
+            ? await Recipes.GetByIdAsync(sourceId)
+            : null;
         _plannedRecipe = null;
         if (_recipe is not null && PlannedMealId is int plannedMealId)
         {
@@ -243,5 +279,38 @@
                     ? _recipe.Servings
                     : 1;
         _isLoading = false;
+    }
+
+    private async Task ConsolidateAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        _isMutating = true;
+        await Recipes.ConsolidateAsync(_recipe.Id);
+        _recipe = await Recipes.GetByIdAsync(_recipe.Id);
+        _sourceRecipe = _recipe?.VariationOfRecipeId is int sourceId && sourceId != _recipe.Id
+            ? await Recipes.GetByIdAsync(sourceId)
+            : null;
+        _isMutating = false;
+        Snackbar.Add("Recepta consolidada.", Severity.Success);
+    }
+
+    private async Task CreateVariationAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        _isMutating = true;
+        var variation = await Recipes.CreateVariationAsync(_recipe.Id);
+        _isMutating = false;
+        if (variation is not null)
+        {
+            Navigation.NavigateTo($"recipes/{variation.Id}/edit");
+        }
     }
 }

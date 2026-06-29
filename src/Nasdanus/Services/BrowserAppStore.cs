@@ -127,6 +127,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IsFavourite = recipe.IsFavourite,
             Rating = recipe.Rating,
             SeasonalRecommendation = recipe.SeasonalRecommendation,
+            VariationOfRecipeId = recipe.VariationOfRecipeId,
             Ingredients = ingredients,
             Steps = steps,
             Notes = recipe.Notes
@@ -340,6 +341,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IsFavourite = recipe.IsFavourite,
             Rating = recipe.Rating,
             SeasonalRecommendation = recipe.SeasonalRecommendation,
+            VariationOfRecipeId = recipe.VariationOfRecipeId,
             Ingredients = ingredientSnapshots,
             Steps = recipe.Steps
                 .OrderBy(step => step.Order)

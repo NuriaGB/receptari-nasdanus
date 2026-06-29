@@ -215,6 +215,11 @@ h3:focus {
     gap: 0.35rem;
 }
 
+.summary-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .recipe-heading {
     max-width: 46rem;
 }
@@ -869,7 +874,7 @@ h3:focus {
         bottom: 4.7rem;
         z-index: 12;
         display: grid;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         padding: 0.55rem;
         border: 1px solid var(--nas-border);
         border-radius: 8px;
@@ -878,6 +883,7 @@ h3:focus {
     }
 
     .recipe-primary-action {
+        grid-column: 1 / -1;
         min-height: 3.35rem;
     }
 

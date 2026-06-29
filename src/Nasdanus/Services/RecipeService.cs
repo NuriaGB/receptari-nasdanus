@@ -77,6 +77,124 @@ public sealed class RecipeService(BrowserAppStore store)
         return store.CloneRecipe(recipe);
     }
 
+    public async Task ConsolidateAsync(int id)
+    {
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
+        if (recipe is null)
+        {
+            return;
+        }
+
+        recipe.Status = RecipeStatus.Active;
+        await store.SaveAsync();
+    }
+
+    public async Task<Recipe?> CreateVariationAsync(int id)
+    {
+        var state = await store.GetStateAsync();
+        var source = store.FindRecipe(state, id);
+        if (source is null)
+        {
+            return null;
+        }
+
+        var variation = new Recipe
+        {
+            Id = store.NextId(state),
+            Name = $"{source.Name} (variacio)",
+            Description = source.Description,
+            Category = source.Category,
+            Status = RecipeStatus.Draft,
+            PreparationTimeMinutes = source.PreparationTimeMinutes,
+            CookingTimeMinutes = source.CookingTimeMinutes,
+            Difficulty = source.Difficulty,
+            Servings = source.Servings,
+            VariationOfRecipeId = source.Id
+        };
+
+        var ingredientMap = new Dictionary<int, RecipeIngredient>();
+        foreach (var sourceIngredient in source.Ingredients.OrderBy(ingredient => ingredient.Order))
+        {
+            var ingredient = new RecipeIngredient
+            {
+                Id = store.NextId(state),
+                RecipeId = variation.Id,
+                Order = sourceIngredient.Order,
+                Name = sourceIngredient.Name,
+                Quantity = sourceIngredient.Quantity,
+                Unit = sourceIngredient.Unit,
+                ScalingMode = sourceIngredient.ScalingMode
+            };
+
+            variation.Ingredients.Add(ingredient);
+            ingredientMap[sourceIngredient.Id] = ingredient;
+        }
+
+        foreach (var sourceStep in source.Steps.OrderBy(step => step.Order))
+        {
+            var step = new RecipeStep
+            {
+                Id = store.NextId(state),
+                RecipeId = variation.Id,
+                Order = sourceStep.Order,
+                Title = sourceStep.Title,
+                Instruction = sourceStep.Instruction,
+                TimerMinutes = sourceStep.TimerMinutes
+            };
+
+            foreach (var sourceReference in sourceStep.IngredientReferences.OrderBy(reference => reference.Order))
+            {
+                var sourceIngredientId = sourceReference.RecipeIngredientId ?? sourceReference.Ingredient?.Id;
+                var ingredient = sourceIngredientId is int ingredientId && ingredientMap.TryGetValue(ingredientId, out var mapped)
+                    ? mapped
+                    : null;
+
+                step.IngredientReferences.Add(new RecipeStepIngredientReference
+                {
+                    Id = store.NextId(state),
+                    RecipeStepId = step.Id,
+                    RecipeIngredientId = ingredient?.Id,
+                    Ingredient = ingredient,
+                    IngredientName = ingredient?.Name ?? sourceReference.IngredientName,
+                    Quantity = sourceReference.Quantity,
+                    QuantityText = sourceReference.QuantityText,
+                    Unit = sourceReference.Unit,
+                    Order = sourceReference.Order
+                });
+            }
+
+            variation.Steps.Add(step);
+        }
+
+        variation.Notes = source.Notes
+            .OrderBy(note => note.Section)
+            .ThenBy(note => note.Order)
+            .Select(note => new RecipeNote
+            {
+                Id = store.NextId(state),
+                RecipeId = variation.Id,
+                Section = note.Section,
+                Content = note.Content,
+                Order = note.Order
+            })
+            .ToList();
+
+        variation.Tags = source.Tags
+            .Select(tag => new RecipeTag
+            {
+                Id = store.NextId(state),
+                RecipeId = variation.Id,
+                Name = tag.Name
+            })
+            .ToList();
+
+        state.Recipes.Add(variation);
+        await store.SaveAsync();
+
+        return store.CloneRecipe(variation);
+    }
+
     public async Task UpdateRecipeAsync(int id, RecipeEditRequest request)
     {
         var state = await store.GetStateAsync();
@@ -167,9 +285,12 @@ public sealed class RecipeService(BrowserAppStore store)
             });
         }
 
-        recipe.Status = IsIncomplete(recipe)
-            ? RecipeStatus.Draft
-            : RecipeStatus.Active;
+        if (!IsKnownStatus(recipe.Status))
+        {
+            recipe.Status = IsIncomplete(recipe)
+                ? RecipeStatus.Draft
+                : RecipeStatus.Active;
+        }
 
         await store.SaveAsync();
     }
@@ -189,6 +310,10 @@ public sealed class RecipeService(BrowserAppStore store)
         || recipe.PreparationTimeMinutes <= 0
         || recipe.CookingTimeMinutes <= 0
         || recipe.Servings <= 0;
+
+    private static bool IsKnownStatus(string status) =>
+        string.Equals(status, RecipeStatus.Active, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(status, RecipeStatus.Draft, StringComparison.OrdinalIgnoreCase);
 
     private static string NormalizeScalingMode(string scalingMode) =>
         scalingMode switch

@@ -12,6 +12,10 @@
                 {
                     <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined" Size="Size.Small">Draft</MudChip>
                 }
+                @if (Recipe.VariationOfRecipeId is not null)
+                {
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">Variacio</MudChip>
+                }
                 <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Servings racions</MudChip>
             </MudStack>
         </MudStack>
@@ -27,7 +31,16 @@
             <span><MudIcon Icon="@Icons.Material.Filled.SignalCellularAlt" Size="Size.Small" /> Dificultat @Recipe.Difficulty</span>
         </div>
 
-        <MudStack Row Justify="Justify.FlexEnd">
+        <MudStack Row Justify="Justify.FlexEnd" Class="summary-actions">
+            @if (Recipe.IsDraft && OnConsolidate.HasDelegate)
+            {
+                <MudButton OnClick="ConsolidateAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Warning"
+                           StartIcon="@Icons.Material.Filled.CheckCircle">
+                    Consolidar
+                </MudButton>
+            }
             <MudButton Href="@($"recipes/{Recipe.Id}")"
                        Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -42,5 +55,16 @@
     [Parameter, EditorRequired]
     public Recipe Recipe { get; set; } = default!;
 
+    [Parameter]
+    public EventCallback<Recipe> OnConsolidate { get; set; }
+
     private string CategoryText => string.IsNullOrWhiteSpace(Recipe.Category) ? "Sense categoria" : Recipe.Category;
+
+    private async Task ConsolidateAsync()
+    {
+        if (OnConsolidate.HasDelegate)
+        {
+            await OnConsolidate.InvokeAsync(Recipe);
+        }
+    }
 }

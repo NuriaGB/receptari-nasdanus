@@ -16,6 +16,7 @@ public sealed class Recipe
     public bool IsFavourite { get; set; }
     public int? Rating { get; set; }
     public string SeasonalRecommendation { get; set; } = string.Empty;
+    public int? VariationOfRecipeId { get; set; }
 
     public List<RecipeIngredient> Ingredients { get; set; } = [];
     public List<RecipeStep> Steps { get; set; } = [];
