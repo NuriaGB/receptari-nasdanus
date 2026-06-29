@@ -470,8 +470,8 @@ El projecte esta preparat per GitHub Pages.
 Configuracio:
 
 - Blazor WebAssembly static.
-- Base path: `/nasdanus/`.
-- `StaticWebAssetBasePath`: `nasdanus`.
+- Base path: `/receptari-nasdanus/`.
+- `StaticWebAssetBasePath`: `receptari-nasdanus`.
 - `404.html` generat a partir d'`index.html` per suportar routing client-side.
 - `.nojekyll`.
 - Service worker PWA.
@@ -502,7 +502,7 @@ dotnet run --project src\Nasdanus\Nasdanus.csproj --urls http://localhost:5088
 
 URL prevista:
 
-`http://localhost:5088/nasdanus/`
+`http://localhost:5088/receptari-nasdanus/`
 
 ## 20. Decisions arquitectoniques importants
 
