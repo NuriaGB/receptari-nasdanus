@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using Nasdanus.Components;
+using Nasdanus.Domain;
 using Nasdanus.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -21,5 +22,7 @@ builder.Services.AddScoped<PlannerService>();
 builder.Services.AddScoped<ShoppingListService>();
 builder.Services.AddScoped<PantryService>();
 builder.Services.AddScoped<ProductBacklogService>();
+builder.Services.AddScoped<NutritionService>();
+builder.Services.AddScoped<IIngredientNutritionImportService, IngredientNutritionImportService>();
 
 await builder.Build().RunAsync();
