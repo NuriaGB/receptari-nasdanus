@@ -289,7 +289,10 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
                 "Quantity" TEXT NULL,
                 "IsChecked" INTEGER NOT NULL DEFAULT 0,
                 "IsManual" INTEGER NOT NULL DEFAULT 0,
+                "IsHouseholdItem" INTEGER NOT NULL DEFAULT 0,
+                "RecipeId" INTEGER NULL,
                 "Order" INTEGER NOT NULL,
+                CONSTRAINT "FK_ShoppingListItems_Recipes_RecipeId" FOREIGN KEY ("RecipeId") REFERENCES "Recipes" ("Id") ON DELETE SET NULL,
                 CONSTRAINT "FK_ShoppingListItems_ShoppingLists_ShoppingListId" FOREIGN KEY ("ShoppingListId") REFERENCES "ShoppingLists" ("Id") ON DELETE CASCADE
             );
             """);
@@ -298,6 +301,32 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
             CREATE INDEX IF NOT EXISTS "IX_ShoppingListItems_ShoppingListId_Order"
             ON "ShoppingListItems" ("ShoppingListId", "Order");
             """);
+
+        await EnsureShoppingListItemColumnsAsync(db);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_ShoppingListItems_RecipeId"
+            ON "ShoppingListItems" ("RecipeId");
+            """);
+    }
+
+    private static async Task EnsureShoppingListItemColumnsAsync(NasdanusDbContext db)
+    {
+        if (!await TableHasColumnAsync(db, "ShoppingListItems", "IsHouseholdItem"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "ShoppingListItems"
+                ADD COLUMN "IsHouseholdItem" INTEGER NOT NULL DEFAULT 0;
+                """);
+        }
+
+        if (!await TableHasColumnAsync(db, "ShoppingListItems", "RecipeId"))
+        {
+            await db.Database.ExecuteSqlRawAsync("""
+                ALTER TABLE "ShoppingListItems"
+                ADD COLUMN "RecipeId" INTEGER NULL;
+                """);
+        }
     }
 
     private static async Task EnsureMealPlanRecipePlannedServingsColumnAsync(NasdanusDbContext db)

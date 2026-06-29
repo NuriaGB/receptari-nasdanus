@@ -37,6 +37,27 @@
                     <MudSelectItem T="string" Value="@category">@ShoppingCategory.ToDisplayName(category)</MudSelectItem>
                 }
             </MudSelect>
+
+            <MudCheckBox T="bool"
+                         Label="Item general de la llar"
+                         @bind-Value="_request.IsHouseholdItem"
+                         Color="Color.Primary" />
+
+            @if (!_request.IsHouseholdItem)
+            {
+                <MudSelect T="int?"
+                           Label="Recepta vinculada (opcional)"
+                           @bind-Value="_request.RecipeId"
+                           Variant="Variant.Outlined"
+                           Margin="Margin.Dense"
+                           Dense="true">
+                    <MudSelectItem T="int?" Value="@NoRecipe">Sense recepta vinculada</MudSelectItem>
+                    @foreach (var recipe in Recipes)
+                    {
+                        <MudSelectItem T="int?" Value="@recipe.Id">@recipe.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            }
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -57,7 +78,11 @@
     [Parameter]
     public ShoppingListItem? Item { get; set; }
 
+    [Parameter]
+    public IReadOnlyList<Recipe> Recipes { get; set; } = [];
+
     private readonly ShoppingItemEditRequest _request = new();
+    private static int? NoRecipe => null;
 
     protected override void OnParametersSet()
     {
@@ -71,6 +96,8 @@
         _request.Category = Item.Category;
         _request.QuantityText = Item.QuantityText;
         _request.Unit = Item.Unit;
+        _request.IsHouseholdItem = Item.IsHouseholdItem;
+        _request.RecipeId = Item.RecipeId;
     }
 
     private void Save()

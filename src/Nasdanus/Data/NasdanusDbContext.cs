@@ -163,8 +163,14 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
         {
             entity.Property(item => item.Name).HasMaxLength(160).IsRequired();
             entity.Property(item => item.Category).HasMaxLength(48).IsRequired();
-            entity.Property(item => item.QuantityText).HasMaxLength(48);
+            entity.Property(item => item.QuantityText).HasMaxLength(160);
             entity.Property(item => item.Unit).HasMaxLength(48);
+
+            entity.HasOne(item => item.Recipe)
+                .WithMany()
+                .HasForeignKey(item => item.RecipeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             entity.HasIndex(item => new { item.ShoppingListId, item.Order });
         });
     }

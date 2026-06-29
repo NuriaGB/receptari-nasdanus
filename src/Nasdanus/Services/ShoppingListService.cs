@@ -58,8 +58,10 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             Name = request.Name.Trim(),
             Category = NormalizeCategory(request.Category),
             QuantityText = request.QuantityText.Trim(),
-            Unit = request.Unit.Trim(),
+            Unit = NormalizeUnit(request.Unit.Trim()),
             Quantity = IngredientScaling.ParseQuantity(request.QuantityText),
+            RecipeId = request.IsHouseholdItem ? null : request.RecipeId,
+            IsHouseholdItem = request.IsHouseholdItem,
             IsManual = true,
             Order = NextOrder(list)
         });
@@ -81,8 +83,10 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         item.Name = request.Name.Trim();
         item.Category = NormalizeCategory(request.Category);
         item.QuantityText = request.QuantityText.Trim();
-        item.Unit = request.Unit.Trim();
+        item.Unit = NormalizeUnit(request.Unit.Trim());
         item.Quantity = IngredientScaling.ParseQuantity(request.QuantityText);
+        item.RecipeId = request.IsHouseholdItem ? null : request.RecipeId;
+        item.IsHouseholdItem = request.IsHouseholdItem;
         item.ShoppingList!.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
     }
@@ -107,6 +111,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
     {
         var list = await db.ShoppingLists
             .Include(shoppingList => shoppingList.Items.OrderBy(item => item.Order))
+                .ThenInclude(item => item.Recipe)
             .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
 
         if (list is not null)
@@ -126,6 +131,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
     private static async Task<ShoppingList> LoadListAsync(NasdanusDbContext db, DateOnly weekStart) =>
         await db.ShoppingLists
             .Include(shoppingList => shoppingList.Items.OrderBy(item => item.Order))
+                .ThenInclude(item => item.Recipe)
             .AsNoTracking()
             .SingleAsync(shoppingList => shoppingList.WeekStart == weekStart);
 
@@ -202,7 +208,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         var name = ingredient.Name.Trim();
         var unit = NormalizeUnit(ingredient.Unit.Trim());
         var category = Categorize(name);
-        var key = $"{NormalizeName(name)}|{unit.ToLowerInvariant()}|{category}";
+        var key = $"{NormalizeName(name)}|{category}";
         var quantity = ScaledQuantity(ingredient, scale);
         var quantityText = quantity is null
             ? ingredient.Quantity.Trim()
@@ -214,7 +220,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             aggregates.Add(key, aggregate);
         }
 
-        aggregate.Add(quantity, quantityText);
+        aggregate.Add(quantity, quantityText, unit);
     }
 
     private static decimal? ScaledQuantity(RecipeIngredient ingredient, decimal scale)
@@ -290,60 +296,70 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
     private static bool ContainsAny(string value, params string[] needles) =>
         needles.Any(value.Contains);
 
-    private sealed class ShoppingItemAggregate(string name, string category, string unit)
+    private sealed class ShoppingItemAggregate(string name, string category, string firstUnit)
     {
+        private readonly Dictionary<string, decimal> quantitiesByUnit = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> quantityTexts = [];
 
         public string Name { get; } = name;
         public string Category { get; } = category;
-        public string Unit { get; } = unit;
-        public decimal? Quantity { get; private set; }
-        private bool HasOnlyNumericQuantities { get; set; } = true;
+        public string FirstUnit { get; } = firstUnit;
+        private decimal? SingleQuantity => quantitiesByUnit.Count == 1 && quantityTexts.Count == 0
+            ? quantitiesByUnit.Values.Single()
+            : null;
 
-        public void Add(decimal? quantity, string quantityText)
+        public void Add(decimal? quantity, string quantityText, string unit)
         {
             if (quantity is null)
             {
                 if (!string.IsNullOrWhiteSpace(quantityText))
                 {
-                    if (HasOnlyNumericQuantities && Quantity is not null)
-                    {
-                        quantityTexts.Add(FormatQuantity(Quantity.Value));
-                    }
-
-                    HasOnlyNumericQuantities = false;
-                    quantityTexts.Add(quantityText);
+                    quantityTexts.Add(AmountText(quantityText, unit));
                 }
 
                 return;
             }
 
-            if (!HasOnlyNumericQuantities)
-            {
-                quantityTexts.Add(FormatQuantity(quantity.Value));
-                return;
-            }
-
-            Quantity = (Quantity ?? 0) + quantity.Value;
+            var key = string.IsNullOrWhiteSpace(unit) ? FirstUnit : unit;
+            quantitiesByUnit[key] = quantitiesByUnit.TryGetValue(key, out var existing)
+                ? existing + quantity.Value
+                : quantity.Value;
         }
 
         public ShoppingListItem ToShoppingListItem(int order)
         {
-            var quantityText = HasOnlyNumericQuantities && Quantity is not null
-                ? FormatQuantity(Quantity.Value)
-                : string.Join(" + ", quantityTexts.Distinct(StringComparer.OrdinalIgnoreCase));
+            var quantity = SingleQuantity;
+            var unit = quantity is null ? string.Empty : quantitiesByUnit.Keys.Single();
+            var quantityText = quantity is null
+                ? CombinedQuantityText()
+                : FormatQuantity(quantity.Value);
 
             return new ShoppingListItem
             {
                 Name = Name,
                 Category = Category,
-                Quantity = HasOnlyNumericQuantities ? Quantity : null,
+                Quantity = quantity,
                 QuantityText = quantityText,
-                Unit = DisplayUnit(Unit, Quantity),
+                Unit = DisplayUnit(unit, quantity),
                 Order = order
             };
         }
+
+        private string CombinedQuantityText()
+        {
+            var texts = quantitiesByUnit
+                .OrderBy(pair => pair.Key)
+                .Select(pair => AmountText(FormatQuantity(pair.Value), DisplayUnit(pair.Key, pair.Value)))
+                .Concat(quantityTexts)
+                .Where(text => !string.IsNullOrWhiteSpace(text))
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+
+            return string.Join(" + ", texts);
+        }
     }
+
+    private static string AmountText(string quantityText, string unit) =>
+        string.Join(" ", new[] { quantityText, unit }.Where(value => !string.IsNullOrWhiteSpace(value)));
 
     private static string NormalizeUnit(string unit)
     {

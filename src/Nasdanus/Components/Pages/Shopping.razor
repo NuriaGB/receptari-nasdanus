@@ -1,6 +1,7 @@
 @page "/shopping"
 @using System.Globalization
 @inject ShoppingListService ShoppingLists
+@inject RecipeService Recipes
 @inject IDialogService DialogService
 
 <PageTitle>Nasdanus - Llista de compra</PageTitle>
@@ -30,25 +31,28 @@
         </div>
 
         <MudPaper Class="shopping-toolbar" Elevation="0">
-            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2" Class="shopping-toolbar-content">
-                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@TotalItems items</MudChip>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">@CheckedItems marcats</MudText>
+            <MudStack Spacing="2">
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2" Class="shopping-toolbar-content">
+                    <div>
+                        <MudText Typo="Typo.h6">@TotalItems items</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@CheckedItems comprats</MudText>
+                    </div>
+                    <MudStack Row Spacing="1" Class="shopping-toolbar-actions">
+                        <MudButton OnClick="RegenerateAsync"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Sync">
+                            Actualitzar del planner
+                        </MudButton>
+                        <MudButton OnClick="AddItemAsync"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Add">
+                            Afegir manualment
+                        </MudButton>
+                    </MudStack>
                 </MudStack>
-                <MudStack Row Spacing="1" Class="shopping-toolbar-actions">
-                    <MudButton OnClick="RegenerateAsync"
-                               Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Sync">
-                        Actualitzar del planner
-                    </MudButton>
-                    <MudButton OnClick="AddItemAsync"
-                               Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Add">
-                        Afegir manualment
-                    </MudButton>
-                </MudStack>
+                <MudProgressLinear Value="@ProgressPercent" Color="Color.Primary" Class="shopping-progress" />
             </MudStack>
         </MudPaper>
 
@@ -87,10 +91,12 @@
                                         <span class="shopping-item-name" title="@item.Name">@item.Name</span>
                                         <span class="shopping-item-amount">@AmountText(item)</span>
                                     </div>
-                                    @if (item.IsManual)
-                                    {
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">Manual</MudChip>
-                                    }
+                                    <div class="shopping-item-meta">
+                                        @if (item.IsManual)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@ManualSourceText(item)</MudChip>
+                                        }
+                                    </div>
                                     <div class="shopping-item-actions">
                                         <MudIconButton OnClick="@(() => EditItemAsync(item))"
                                                        Icon="@Icons.Material.Filled.Edit"
@@ -116,6 +122,7 @@
 @code {
     private DateOnly _weekStart;
     private Nasdanus.Domain.ShoppingList? _shoppingList;
+    private List<Recipe> _recipes = [];
     private bool _isLoading = true;
 
     private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
@@ -123,12 +130,14 @@
     private IReadOnlyList<ShoppingListItem> Items => _shoppingList?.Items.OrderBy(item => item.Order).ToList() ?? [];
     private int TotalItems => Items.Count;
     private int CheckedItems => Items.Count(item => item.IsChecked);
+    private double ProgressPercent => TotalItems == 0 ? 0 : CheckedItems * 100d / TotalItems;
     private IEnumerable<string> VisibleCategories => ShoppingCategory.DisplayOrder
         .Where(category => Items.Any(item => item.Category == category));
 
     protected override async Task OnInitializedAsync()
     {
         _weekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
+        _recipes = await Recipes.GetAllAsync();
         await LoadWeekAsync();
         _isLoading = false;
     }
@@ -194,6 +203,7 @@
     private async Task<ShoppingItemEditRequest?> OpenItemDialogAsync(string title, ShoppingListItem? item)
     {
         var parameters = new DialogParameters<ShoppingItemDialog>();
+        parameters.Add(dialog => dialog.Recipes, _recipes);
         if (item is not null)
         {
             parameters.Add(dialog => dialog.Item, item);
@@ -217,6 +227,16 @@
 
     private static string AmountText(ShoppingListItem item) =>
         string.Join(" ", new[] { item.QuantityText, item.Unit }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static string ManualSourceText(ShoppingListItem item)
+    {
+        if (item.IsHouseholdItem)
+        {
+            return "Llar";
+        }
+
+        return item.Recipe is null ? "Manual" : item.Recipe.Name;
+    }
 
     private static string ShoppingItemRowClass(ShoppingListItem item) =>
         item.IsChecked ? "shopping-item-row is-checked" : "shopping-item-row";

@@ -21,6 +21,9 @@ public sealed class ShoppingListItem
     public decimal? Quantity { get; set; }
     public bool IsChecked { get; set; }
     public bool IsManual { get; set; }
+    public bool IsHouseholdItem { get; set; }
+    public int? RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
     public int Order { get; set; }
 }
 
@@ -30,6 +33,8 @@ public sealed class ShoppingItemEditRequest
     public string Category { get; set; } = ShoppingCategory.Other;
     public string QuantityText { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
+    public bool IsHouseholdItem { get; set; }
+    public int? RecipeId { get; set; }
 }
 
 public static class ShoppingCategory
