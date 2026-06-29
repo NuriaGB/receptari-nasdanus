@@ -26,6 +26,7 @@ L'aplicacio ja te una vertical slice funcional:
 - Llista de la compra
 - Rebost basic
 - Dades, backup i restauracio
+- Product Backlog intern
 - PWA / desplegament static a GitHub Pages
 
 El seed actual inclou:
@@ -467,6 +468,48 @@ La pagina "Dades" permet:
 - Validar el fitxer abans de substituir dades locals.
 - Crear una copia abans d'importar.
 - Veure un resum de receptes, planner, compra, rebost i Recipe Ideas.
+- Incloure Product Backlog en export/import.
+
+## 18. Product Backlog intern
+
+Nasdanus inclou un modul intern de Product Backlog per capturar bugs, idees i observacions mentre s'utilitza l'app.
+
+Objectiu:
+
+- Registrar feedback en menys de 30 segons.
+- Minimitzar escriptura.
+- Capturar automaticament context tecnic i funcional.
+- No dependre de notes externes.
+
+Entrada rapida:
+
+- Boto flotant global "Feedback".
+- Dialeg amb cinc tipus d'entrada: Bug, Improvement, Idea, Question i Task.
+- Scope, title, description, priority, status, labels i target version.
+
+Context automatic:
+
+- Versio de l'app.
+- Pagina actual.
+- URL actual.
+- Data i hora.
+- Browser information.
+- Recepta, si la pagina permet deduir-la.
+- Context de planner quan ve d'un apat planificat.
+- Setmana de compra en Shopping.
+
+Pagina dedicada:
+
+- `Product Backlog`
+- Cerca.
+- Filtres.
+- Ordenacio.
+- Edicio.
+- Eliminacio.
+- Marcar com completat.
+- Copia a Markdown.
+
+Aquest modul es per desenvolupament intern del producte i no esta pensat com a funcionalitat final per usuaris externs.
 
 Aquest enfocament permet GitHub Pages i us offline/PWA basic, pero implica:
 
@@ -482,7 +525,7 @@ L'arquitectura esta separada en:
 - Components reutilitzables.
 - Seed JSON.
 
-## 18. Desplegament
+## 19. Desplegament
 
 El projecte esta preparat per GitHub Pages.
 
@@ -511,7 +554,7 @@ Comanda principal:
 dotnet publish src/Nasdanus/Nasdanus.csproj -c Release -o publish
 ```
 
-## 19. Execucio local
+## 20. Execucio local
 
 Per provar localment:
 
@@ -523,7 +566,7 @@ URL prevista:
 
 `http://localhost:5088/receptari-nasdanus/`
 
-## 20. Decisions arquitectoniques importants
+## 21. Decisions arquitectoniques importants
 
 ### Mobile-first
 
@@ -563,7 +606,7 @@ El rebost no intenta gestionar stock. Només indica que un ingredient no hauria 
 
 Per facilitar GitHub Pages, l'app actual evita backend. Aixo redueix complexitat de desplegament, pero deixa la sync com a feina futura.
 
-## 21. Limitacions conegudes
+## 22. Limitacions conegudes
 
 Encara no hi ha:
 
@@ -589,7 +632,7 @@ Algunes parts son encara heuristiques o placeholders:
 - Resum setmanal de Home.
 - Recipe Ideas com a ajuda setmanal lleugera, no com a inbox completa.
 
-## 22. Properes passes recomanades
+## 23. Properes passes recomanades
 
 Prioritat alta:
 
@@ -612,7 +655,7 @@ Prioritat futura:
 - Recordatoris intelligents.
 - Objectius nutricionals o setmanals calculats.
 
-## 23. Resum curt
+## 24. Resum curt
 
 Nasdanus ja permet:
 
@@ -626,6 +669,7 @@ Nasdanus ja permet:
 - Generar una llista de la compra setmanal.
 - Excloure ingredients habituals gracies al rebost "Sempre tinc".
 - Exportar i restaurar totes les dades locals amb validacio previa.
+- Capturar feedback intern amb Product Backlog i exportar-lo amb la resta de dades.
 - Funcionar com a Blazor WebAssembly/PWA estatica preparada per GitHub Pages.
 
 El producte esta en bon estat per us personal i familiar setmanal, amb limitacions conscients al voltant de sincronitzacio, imports, inventari i automatitzacions avançades.
