@@ -32,6 +32,7 @@ builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<PlannerService>();
 builder.Services.AddScoped<ShoppingListService>();
 builder.Services.AddScoped<PantryService>();
+builder.Services.AddScoped<RecipeCatalogImportService>();
 
 var app = builder.Build();
 
@@ -39,6 +40,9 @@ await using (var scope = app.Services.CreateAsyncScope())
 {
     var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
     await initializer.InitializeAsync();
+
+    var recipeImporter = scope.ServiceProvider.GetRequiredService<RecipeCatalogImportService>();
+    await recipeImporter.ImportPreparedCatalogsAsync();
 }
 
 // Configure the HTTP request pipeline.
