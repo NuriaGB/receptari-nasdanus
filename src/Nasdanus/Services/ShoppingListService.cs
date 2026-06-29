@@ -171,6 +171,14 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             .Where(slot => slot.Date >= weekStart && slot.Date <= weekEnd)
             .AsNoTracking()
             .ToListAsync();
+        var pantryIngredientNames = await db.PantryItems
+            .Select(item => item.Name)
+            .AsNoTracking()
+            .ToListAsync();
+        var pantryIngredientKeys = pantryIngredientNames
+            .Select(IngredientNameNormalizer.Normalize)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var aggregates = new Dictionary<string, ShoppingItemAggregate>(StringComparer.OrdinalIgnoreCase);
         foreach (var plannedRecipe in slots.SelectMany(slot => slot.PlannedRecipes))
@@ -187,7 +195,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
 
             foreach (var ingredient in plannedRecipe.Recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
             {
-                AddIngredient(aggregates, ingredient, scale);
+                AddIngredient(aggregates, ingredient, scale, pantryIngredientKeys);
             }
         }
 
@@ -198,7 +206,11 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             .ToList();
     }
 
-    private static void AddIngredient(Dictionary<string, ShoppingItemAggregate> aggregates, RecipeIngredient ingredient, decimal scale)
+    private static void AddIngredient(
+        Dictionary<string, ShoppingItemAggregate> aggregates,
+        RecipeIngredient ingredient,
+        decimal scale,
+        IReadOnlySet<string> pantryIngredientKeys)
     {
         if (string.IsNullOrWhiteSpace(ingredient.Name))
         {
@@ -206,9 +218,14 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         var name = ingredient.Name.Trim();
+        if (IsInPantry(name, pantryIngredientKeys))
+        {
+            return;
+        }
+
         var unit = NormalizeUnit(ingredient.Unit.Trim());
         var category = Categorize(name);
-        var key = $"{NormalizeName(name)}|{category}";
+        var key = $"{IngredientNameNormalizer.Normalize(name)}|{category}";
         var quantity = ScaledQuantity(ingredient, scale);
         var quantityText = quantity is null
             ? ingredient.Quantity.Trim()
@@ -254,8 +271,19 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         return index < 0 ? ShoppingCategory.DisplayOrder.Length : index;
     }
 
-    private static string NormalizeName(string name) =>
-        string.Join(" ", name.Trim().ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    private static bool IsInPantry(string ingredientName, IReadOnlySet<string> pantryIngredientKeys)
+    {
+        var normalized = IngredientNameNormalizer.Normalize(ingredientName);
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return false;
+        }
+
+        return pantryIngredientKeys.Contains(normalized)
+            || pantryIngredientKeys.Any(pantryName =>
+                normalized.StartsWith($"{pantryName} ", StringComparison.OrdinalIgnoreCase)
+                || pantryName.StartsWith($"{normalized} ", StringComparison.OrdinalIgnoreCase));
+    }
 
     private static string Categorize(string name)
     {
