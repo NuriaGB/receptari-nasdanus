@@ -7,7 +7,7 @@
         "launchBrowser": true,
         "launchUrl": "receptari-nasdanus/",
         "applicationUrl": "http://localhost:5088",
-        "commandLineArgs": "--pathbase /receptari-nasdanus",
+        "commandLineArgs": "--pathbase=/receptari-nasdanus",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
