@@ -18,6 +18,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
     public DbSet<ShoppingList> ShoppingLists => Set<ShoppingList>();
     public DbSet<ShoppingListItem> ShoppingListItems => Set<ShoppingListItem>();
     public DbSet<PantryItem> PantryItems => Set<PantryItem>();
+    public DbSet<FreezerItem> FreezerItems => Set<FreezerItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -180,6 +181,15 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
             entity.Property(item => item.Name).HasMaxLength(160).IsRequired();
             entity.Property(item => item.Category).HasMaxLength(48).IsRequired();
             entity.HasIndex(item => item.Name).IsUnique();
+        });
+
+        modelBuilder.Entity<FreezerItem>(entity =>
+        {
+            entity.Property(item => item.Ingredient).HasMaxLength(160).IsRequired();
+            entity.Property(item => item.Quantity).HasMaxLength(48);
+            entity.Property(item => item.Unit).HasMaxLength(48);
+            entity.Property(item => item.Notes).HasMaxLength(600);
+            entity.HasIndex(item => item.Ingredient);
         });
     }
 }

@@ -19,6 +19,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await EnsurePlannerRecipeTableAsync(db);
         await EnsureShoppingListTablesAsync(db);
         await EnsurePantryTableAsync(db);
+        await EnsureFreezerTableAsync(db);
 
         if (!await db.Recipes.AnyAsync())
         {
@@ -346,6 +347,28 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await db.Database.ExecuteSqlRawAsync("""
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_PantryItems_Name"
             ON "PantryItems" ("Name");
+            """);
+    }
+
+    private static async Task EnsureFreezerTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "FreezerItems" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_FreezerItems" PRIMARY KEY AUTOINCREMENT,
+                "Ingredient" TEXT NOT NULL,
+                "Quantity" TEXT NOT NULL DEFAULT '',
+                "Unit" TEXT NOT NULL DEFAULT '',
+                "FrozenDate" TEXT NULL,
+                "BestBefore" TEXT NULL,
+                "Notes" TEXT NOT NULL DEFAULT '',
+                "CreatedAt" TEXT NOT NULL,
+                "UpdatedAt" TEXT NOT NULL
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE INDEX IF NOT EXISTS "IX_FreezerItems_Ingredient"
+            ON "FreezerItems" ("Ingredient");
             """);
     }
 
