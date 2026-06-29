@@ -1,19 +1,24 @@
-using Microsoft.EntityFrameworkCore;
-using Nasdanus.Data;
 using Nasdanus.Domain;
 
 namespace Nasdanus.Services;
 
-public sealed class PantryService(IDbContextFactory<NasdanusDbContext> dbContextFactory)
+public sealed class PantryService(BrowserAppStore store)
 {
     public async Task<List<PantryItem>> GetAllAsync()
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        return await db.PantryItems
+        var state = await store.GetStateAsync();
+        return state.PantryItems
             .OrderBy(item => item.Category)
             .ThenBy(item => item.Name)
-            .AsNoTracking()
-            .ToListAsync();
+            .Select(item => new PantryItem
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Category = item.Category,
+                CreatedAt = item.CreatedAt,
+                UpdatedAt = item.UpdatedAt
+            })
+            .ToList();
     }
 
     public async Task AddAsync(PantryItemEditRequest request)
@@ -24,23 +29,20 @@ public sealed class PantryService(IDbContextFactory<NasdanusDbContext> dbContext
             return;
         }
 
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var state = await store.GetStateAsync();
         var normalized = IngredientNameNormalizer.Normalize(name);
-        var existingNames = await db.PantryItems
-            .AsNoTracking()
-            .Select(item => item.Name)
-            .ToListAsync();
-        if (existingNames.Any(existingName => IngredientNameNormalizer.Normalize(existingName) == normalized))
+        if (state.PantryItems.Any(item => IngredientNameNormalizer.Normalize(item.Name) == normalized))
         {
             return;
         }
 
-        db.PantryItems.Add(new PantryItem
+        state.PantryItems.Add(new PantryItem
         {
+            Id = store.NextId(state),
             Name = name,
             Category = NormalizeCategory(request.Category)
         });
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     public async Task UpdateAsync(int id, PantryItemEditRequest request)
@@ -51,8 +53,8 @@ public sealed class PantryService(IDbContextFactory<NasdanusDbContext> dbContext
             return;
         }
 
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var item = await db.PantryItems.FindAsync(id);
+        var state = await store.GetStateAsync();
+        var item = state.PantryItems.FirstOrDefault(pantryItem => pantryItem.Id == id);
         if (item is null)
         {
             return;
@@ -61,20 +63,20 @@ public sealed class PantryService(IDbContextFactory<NasdanusDbContext> dbContext
         item.Name = name;
         item.Category = NormalizeCategory(request.Category);
         item.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var item = await db.PantryItems.FindAsync(id);
+        var state = await store.GetStateAsync();
+        var item = state.PantryItems.FirstOrDefault(pantryItem => pantryItem.Id == id);
         if (item is null)
         {
             return;
         }
 
-        db.PantryItems.Remove(item);
-        await db.SaveChangesAsync();
+        state.PantryItems.Remove(item);
+        await store.SaveAsync();
     }
 
     private static string NormalizeCategory(string category) =>

@@ -19,6 +19,28 @@ body {
     font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
+.app-loading {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    align-content: center;
+    gap: 1rem;
+    color: var(--nas-ink);
+    font-weight: 650;
+}
+
+.app-loading-mark {
+    display: grid;
+    width: 4rem;
+    height: 4rem;
+    place-items: center;
+    border-radius: 1rem;
+    background: var(--nas-green);
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
 h1:focus,
 h2:focus,
 h3:focus {

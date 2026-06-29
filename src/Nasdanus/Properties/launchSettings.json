@@ -5,7 +5,9 @@
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
-        "applicationUrl": "http://localhost:5261",
+        "launchUrl": "nasdanus/",
+        "applicationUrl": "http://localhost:5088",
+        "commandLineArgs": "--pathbase /nasdanus",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }

@@ -16,7 +16,7 @@
     else
     {
         <MudStack Spacing="3">
-            <MudButton Href="@($"/recipes/{Id}")"
+            <MudButton Href="@($"recipes/{Id}")"
                        Variant="Variant.Text"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.ArrowBack">
@@ -258,7 +258,7 @@
                            StartIcon="@Icons.Material.Filled.Save">
                     Guardar
                 </MudButton>
-                <MudButton Href="@($"/recipes/{Id}")"
+                <MudButton Href="@($"recipes/{Id}")"
                            Variant="Variant.Outlined"
                            Color="Color.Primary"
                            Size="Size.Large">
@@ -427,7 +427,7 @@
         _isSaving = true;
         var request = BuildRequest();
         await Recipes.UpdateRecipeAsync(Id, request);
-        Navigation.NavigateTo($"/recipes/{Id}");
+        Navigation.NavigateTo($"recipes/{Id}");
     }
 
     private RecipeEditRequest BuildRequest() => new()

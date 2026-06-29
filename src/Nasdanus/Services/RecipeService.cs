@@ -1,114 +1,90 @@
-using Microsoft.EntityFrameworkCore;
-using Nasdanus.Data;
 using Nasdanus.Domain;
 
 namespace Nasdanus.Services;
 
-public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContextFactory)
+public sealed class RecipeService(BrowserAppStore store)
 {
     public async Task<List<Recipe>> GetAllAsync()
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        return await db.Recipes
-            .Include(recipe => recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
-            .Include(recipe => recipe.Steps.OrderBy(step => step.Order))
-                .ThenInclude(step => step.IngredientReferences.OrderBy(reference => reference.Order))
-                    .ThenInclude(reference => reference.Ingredient)
-            .Include(recipe => recipe.Notes.OrderBy(note => note.Section).ThenBy(note => note.Order))
-            .Include(recipe => recipe.Tags.OrderBy(tag => tag.Name))
+        var state = await store.GetStateAsync();
+        return state.Recipes
             .OrderBy(recipe => recipe.Name)
-            .AsNoTracking()
-            .ToListAsync();
+            .Select(store.CloneRecipe)
+            .ToList();
     }
 
     public async Task<Recipe?> GetByIdAsync(int id)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        return await db.Recipes
-            .Include(recipe => recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
-            .Include(recipe => recipe.Steps.OrderBy(step => step.Order))
-                .ThenInclude(step => step.IngredientReferences.OrderBy(reference => reference.Order))
-                    .ThenInclude(reference => reference.Ingredient)
-            .Include(recipe => recipe.Notes.OrderBy(note => note.Section).ThenBy(note => note.Order))
-            .Include(recipe => recipe.Tags.OrderBy(tag => tag.Name))
-            .AsNoTracking()
-            .FirstOrDefaultAsync(recipe => recipe.Id == id);
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
+        return recipe is null ? null : store.CloneRecipe(recipe);
     }
 
     public async Task<List<string>> GetCategoriesAsync()
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        return await db.Recipes
+        var state = await store.GetStateAsync();
+        return state.Recipes
             .Select(recipe => recipe.Category)
-            .Where(category => category != string.Empty)
-            .Distinct()
+            .Where(category => !string.IsNullOrWhiteSpace(category))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(category => category)
-            .AsNoTracking()
-            .ToListAsync();
+            .ToList();
     }
 
     public async Task<Recipe> CreateQuickDraftAsync(QuickAddRecipeRequest request)
     {
-        var ingredients = ParseLines(request.IngredientsText)
-            .Select((line, index) => new RecipeIngredient
-            {
-                Name = line,
-                Order = index + 1
-            })
-            .ToList();
-
-        var steps = ParseLines(request.StepsText)
-            .Select((line, index) => new RecipeStep
-            {
-                Title = $"Pas {index + 1}",
-                Instruction = line,
-                Order = index + 1
-            })
-            .ToList();
-
+        var state = await store.GetStateAsync();
         var recipe = new Recipe
         {
+            Id = store.NextId(state),
             Name = request.Name.Trim(),
             Description = request.Description.Trim(),
             Category = request.Category.Trim(),
             PreparationTimeMinutes = request.PreparationTimeMinutes ?? 0,
             CookingTimeMinutes = request.CookingTimeMinutes ?? 0,
             Difficulty = 1,
-            Servings = request.Servings ?? 0,
-            Ingredients = ingredients,
-            Steps = steps,
-            Status = IsIncomplete(request, ingredients.Count, steps.Count)
-                ? RecipeStatus.Draft
-                : RecipeStatus.Active
+            Servings = request.Servings ?? 0
         };
 
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        db.Recipes.Add(recipe);
-        await db.SaveChangesAsync();
+        recipe.Ingredients = ParseLines(request.IngredientsText)
+            .Select((line, index) => new RecipeIngredient
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Name = line,
+                Order = index + 1
+            })
+            .ToList();
 
-        return recipe;
+        recipe.Steps = ParseLines(request.StepsText)
+            .Select((line, index) => new RecipeStep
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Title = $"Pas {index + 1}",
+                Instruction = line,
+                Order = index + 1
+            })
+            .ToList();
+
+        recipe.Status = IsIncomplete(request, recipe.Ingredients.Count, recipe.Steps.Count)
+            ? RecipeStatus.Draft
+            : RecipeStatus.Active;
+
+        state.Recipes.Add(recipe);
+        await store.SaveAsync();
+
+        return store.CloneRecipe(recipe);
     }
 
     public async Task UpdateRecipeAsync(int id, RecipeEditRequest request)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var recipe = await db.Recipes
-            .Include(recipe => recipe.Ingredients)
-            .Include(recipe => recipe.Steps)
-                .ThenInclude(step => step.IngredientReferences)
-            .Include(recipe => recipe.Notes)
-            .FirstOrDefaultAsync(recipe => recipe.Id == id);
-
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
         if (recipe is null)
         {
             return;
         }
-
-        db.RecipeStepIngredientReferences.RemoveRange(recipe.Steps.SelectMany(step => step.IngredientReferences));
-        db.RecipeSteps.RemoveRange(recipe.Steps);
-        db.RecipeIngredients.RemoveRange(recipe.Ingredients);
-        db.RecipeNotes.RemoveRange(recipe.Notes);
-        await db.SaveChangesAsync();
 
         recipe.Name = request.Name.Trim();
         recipe.Description = request.Description.Trim();
@@ -129,6 +105,8 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         {
             var ingredient = new RecipeIngredient
             {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
                 Name = ingredientRequest.Ingredient.Name.Trim(),
                 Quantity = ingredientRequest.Ingredient.Quantity.Trim(),
                 Unit = ingredientRequest.Ingredient.Unit.Trim(),
@@ -145,6 +123,8 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         {
             var step = new RecipeStep
             {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
                 Title = stepRequest.Step.Title.Trim(),
                 Instruction = stepRequest.Step.Instruction.Trim(),
                 TimerMinutes = stepRequest.Step.TimerMinutes,
@@ -158,6 +138,9 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
                 var ingredient = ingredientMap[referenceRequest.Reference.IngredientKey];
                 step.IngredientReferences.Add(new RecipeStepIngredientReference
                 {
+                    Id = store.NextId(state),
+                    RecipeStepId = step.Id,
+                    RecipeIngredientId = ingredient.Id,
                     Ingredient = ingredient,
                     IngredientName = ingredient.Name,
                     Quantity = IngredientScaling.ParseQuantity(referenceRequest.Reference.QuantityText),
@@ -176,6 +159,8 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
         {
             recipe.Notes.Add(new RecipeNote
             {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
                 Section = NormalizeNoteSection(noteRequest.Note.Section),
                 Content = noteRequest.Note.Content.Trim(),
                 Order = noteRequest.Order
@@ -186,7 +171,7 @@ public sealed class RecipeService(IDbContextFactory<NasdanusDbContext> dbContext
             ? RecipeStatus.Draft
             : RecipeStatus.Active;
 
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     private static bool IsIncomplete(QuickAddRecipeRequest request, int ingredientCount, int stepCount) =>

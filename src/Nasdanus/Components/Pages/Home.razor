@@ -70,14 +70,14 @@
             </MudPaper>
 
             <MudStack Row Class="home-actions">
-                <MudButton Href="/planner"
+                <MudButton Href="planner"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Large"
                            StartIcon="@Icons.Material.Filled.CalendarMonth">
                     Obrir planner
                 </MudButton>
-                <MudButton Href="/recipes"
+                <MudButton Href="recipes"
                            Variant="Variant.Outlined"
                            Color="Color.Primary"
                            Size="Size.Large"
@@ -132,7 +132,7 @@
             @if (slot?.PlannedRecipes.Count is not > 0)
             {
                 <MudText Typo="Typo.h6">Sense recepta assignada</MudText>
-                <MudButton Href="/planner"
+                <MudButton Href="planner"
                            Variant="Variant.Outlined"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.CalendarMonth">
@@ -148,7 +148,7 @@
                         <div class="home-planned-recipe">
                             <MudText Typo="Typo.h5" Class="meal-title">@plannedRecipe.Recipe.Name</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary">@TimeText(plannedRecipe.Recipe)</MudText>
-                            <MudButton Href="@($"/recipes/{plannedRecipe.Recipe.Id}")"
+                            <MudButton Href="@($"recipes/{plannedRecipe.Recipe.Id}")"
                                        Variant="Variant.Filled"
                                        Color="Color.Primary"
                                        Size="Size.Medium"

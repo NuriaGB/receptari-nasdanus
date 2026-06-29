@@ -16,7 +16,7 @@
     else
     {
         <MudStack Spacing="3">
-            <MudButton Href="/recipes"
+            <MudButton Href="recipes"
                        Variant="Variant.Text"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.ArrowBack">
@@ -47,7 +47,7 @@
                            StartIcon="@Icons.Material.Filled.Restaurant">
                     Cuinar
                 </MudButton>
-                <MudButton Href="@($"/recipes/{_recipe.Id}/edit")"
+                <MudButton Href="@($"recipes/{_recipe.Id}/edit")"
                            Variant="Variant.Outlined"
                            Color="Color.Primary"
                            Size="Size.Large"
@@ -206,12 +206,12 @@
         {
             if (_recipe is null)
             {
-                return "/recipes";
+                return "recipes";
             }
 
             return IsPlannedContext
-                ? $"/cook/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
-                : $"/cook/{_recipe.Id}?servings={_displayServings}";
+                ? $"cook/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
+                : $"cook/{_recipe.Id}?servings={_displayServings}";
         }
     }
 

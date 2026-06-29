@@ -149,10 +149,10 @@
     private bool IsPlannedContext => _plannedRecipe is not null;
     private decimal ScaleFactor => _recipe is null ? 1 : IngredientScaling.ScaleFactor(_recipe.Servings, _displayServings);
     private string RecipeHref => _recipe is null
-        ? "/recipes"
+        ? "recipes"
         : IsPlannedContext
-            ? $"/recipes/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
-            : $"/recipes/{_recipe.Id}?servings={_displayServings}";
+            ? $"recipes/{_recipe.Id}?plannedMealId={_plannedRecipe!.Id}"
+            : $"recipes/{_recipe.Id}?servings={_displayServings}";
     private bool HasUnfinishedSession => !_isLoading && !_isFinished && OrderedSteps.Count > 0 && CompletedCount < OrderedSteps.Count;
     private bool IsCompleteActionDisabled => _isFinished || (!IsLastStep && IsCurrentStepCompleted);
     private string CompleteActionLabel => _isFinished

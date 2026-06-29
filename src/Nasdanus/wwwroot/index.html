@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3891a6" />
+    <base href="/nasdanus/" />
+    <title>Nasdanus</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="icon-512.svg" />
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="Nasdanus.styles.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="app-loading">
+            <div class="app-loading-mark">N</div>
+            <div>Carregant Nasdanus...</div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <span class="dismiss">x</span>
+    </div>
+
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
+</body>
+
+</html>

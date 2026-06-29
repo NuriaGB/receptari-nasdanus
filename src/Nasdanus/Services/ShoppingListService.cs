@@ -1,99 +1,80 @@
 using System.Globalization;
-using Microsoft.EntityFrameworkCore;
-using Nasdanus.Data;
 using Nasdanus.Domain;
 
 namespace Nasdanus.Services;
 
-public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbContextFactory)
+public sealed class ShoppingListService(BrowserAppStore store)
 {
     public async Task<ShoppingList> GetWeekAsync(DateOnly date)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var state = await store.GetStateAsync();
         var weekStart = PlannerService.WeekStart(date);
-        var list = await GetOrCreateListAsync(db, weekStart);
+        var list = GetOrCreateList(state, weekStart);
 
         if (list.Items.Count == 0)
         {
-            await RegenerateItemsAsync(db, list, keepManualItems: true);
-            list = await LoadListAsync(db, weekStart);
+            RegenerateItems(state, list, keepManualItems: true);
+            await store.SaveAsync();
         }
 
-        return list;
+        return store.CloneShoppingList(state, list);
     }
 
     public async Task<ShoppingList> RegenerateWeekAsync(DateOnly date)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var state = await store.GetStateAsync();
         var weekStart = PlannerService.WeekStart(date);
-        var list = await GetOrCreateListAsync(db, weekStart);
-        await RegenerateItemsAsync(db, list, keepManualItems: true);
-        return await LoadListAsync(db, weekStart);
+        var list = GetOrCreateList(state, weekStart);
+        RegenerateItems(state, list, keepManualItems: true);
+        await store.SaveAsync();
+        return store.CloneShoppingList(state, list);
     }
 
     public async Task SetCheckedAsync(int itemId, bool isChecked)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var item = await db.ShoppingListItems
-            .Include(shoppingItem => shoppingItem.ShoppingList)
-            .FirstOrDefaultAsync(shoppingItem => shoppingItem.Id == itemId);
+        var state = await store.GetStateAsync();
+        var item = state.ShoppingLists.SelectMany(list => list.Items).FirstOrDefault(item => item.Id == itemId);
         if (item is null)
         {
             return;
         }
 
         item.IsChecked = isChecked;
-        item.ShoppingList!.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        TouchList(state, item.ShoppingListId);
+        await store.SaveAsync();
     }
 
     public async Task MarkAllPurchasedAsync(DateOnly date)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var weekStart = PlannerService.WeekStart(date);
-        var list = await db.ShoppingLists
-            .Include(shoppingList => shoppingList.Items)
-            .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
-        if (list is null)
-        {
-            return;
-        }
-
+        var state = await store.GetStateAsync();
+        var list = GetOrCreateList(state, PlannerService.WeekStart(date));
         foreach (var item in list.Items)
         {
             item.IsChecked = true;
         }
 
         list.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     public async Task ClearPurchasedItemsAsync(DateOnly date)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var weekStart = PlannerService.WeekStart(date);
-        var list = await db.ShoppingLists
-            .Include(shoppingList => shoppingList.Items)
-            .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
-        if (list is null)
-        {
-            return;
-        }
-
-        var purchasedItems = list.Items.Where(item => item.IsChecked).ToList();
-        db.ShoppingListItems.RemoveRange(purchasedItems);
+        var state = await store.GetStateAsync();
+        var list = GetOrCreateList(state, PlannerService.WeekStart(date));
+        list.Items.RemoveAll(item => item.IsChecked);
         list.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     public async Task AddManualItemAsync(DateOnly date, ShoppingItemEditRequest request)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var weekStart = PlannerService.WeekStart(date);
-        var list = await GetOrCreateListAsync(db, weekStart);
+        var state = await store.GetStateAsync();
+        var list = GetOrCreateList(state, PlannerService.WeekStart(date));
 
         list.Items.Add(new ShoppingListItem
         {
+            Id = store.NextId(state),
+            ShoppingListId = list.Id,
             Name = request.Name.Trim(),
             Category = NormalizeCategory(request.Category),
             QuantityText = request.QuantityText.Trim(),
@@ -102,20 +83,21 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             SourceRecipeCount = 0,
             SourceRecipeNames = string.Empty,
             RecipeId = request.IsHouseholdItem ? null : request.RecipeId,
+            Recipe = request.IsHouseholdItem || request.RecipeId is null
+                ? null
+                : store.FindRecipe(state, request.RecipeId.Value),
             IsHouseholdItem = request.IsHouseholdItem,
             IsManual = true,
             Order = NextOrder(list)
         });
         list.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        await store.SaveAsync();
     }
 
     public async Task UpdateItemAsync(int itemId, ShoppingItemEditRequest request)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var item = await db.ShoppingListItems
-            .Include(shoppingItem => shoppingItem.ShoppingList)
-            .FirstOrDefaultAsync(shoppingItem => shoppingItem.Id == itemId);
+        var state = await store.GetStateAsync();
+        var item = state.ShoppingLists.SelectMany(list => list.Items).FirstOrDefault(item => item.Id == itemId);
         if (item is null)
         {
             return;
@@ -127,34 +109,33 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         item.Unit = NormalizeUnit(request.Unit.Trim());
         item.Quantity = IngredientScaling.ParseQuantity(request.QuantityText);
         item.RecipeId = request.IsHouseholdItem ? null : request.RecipeId;
+        item.Recipe = item.RecipeId is int recipeId ? store.FindRecipe(state, recipeId) : null;
         item.IsHouseholdItem = request.IsHouseholdItem;
-        item.ShoppingList!.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
+        TouchList(state, item.ShoppingListId);
+        await store.SaveAsync();
     }
 
     public async Task DeleteItemAsync(int itemId)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
-        var item = await db.ShoppingListItems
-            .Include(shoppingItem => shoppingItem.ShoppingList)
-            .FirstOrDefaultAsync(shoppingItem => shoppingItem.Id == itemId);
-        if (item is null)
+        var state = await store.GetStateAsync();
+        foreach (var list in state.ShoppingLists)
         {
+            var item = list.Items.FirstOrDefault(item => item.Id == itemId);
+            if (item is null)
+            {
+                continue;
+            }
+
+            list.Items.Remove(item);
+            list.UpdatedAt = DateTime.UtcNow;
+            await store.SaveAsync();
             return;
         }
-
-        item.ShoppingList!.UpdatedAt = DateTime.UtcNow;
-        db.ShoppingListItems.Remove(item);
-        await db.SaveChangesAsync();
     }
 
-    private static async Task<ShoppingList> GetOrCreateListAsync(NasdanusDbContext db, DateOnly weekStart)
+    private ShoppingList GetOrCreateList(LocalAppState state, DateOnly weekStart)
     {
-        var list = await db.ShoppingLists
-            .Include(shoppingList => shoppingList.Items.OrderBy(item => item.Order))
-                .ThenInclude(item => item.Recipe)
-            .FirstOrDefaultAsync(shoppingList => shoppingList.WeekStart == weekStart);
-
+        var list = state.ShoppingLists.FirstOrDefault(shoppingList => shoppingList.WeekStart == weekStart);
         if (list is not null)
         {
             return list;
@@ -162,29 +143,20 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
 
         list = new ShoppingList
         {
+            Id = store.NextId(state),
             WeekStart = weekStart
         };
-        db.ShoppingLists.Add(list);
-        await db.SaveChangesAsync();
+        state.ShoppingLists.Add(list);
         return list;
     }
 
-    private static async Task<ShoppingList> LoadListAsync(NasdanusDbContext db, DateOnly weekStart) =>
-        await db.ShoppingLists
-            .Include(shoppingList => shoppingList.Items.OrderBy(item => item.Order))
-                .ThenInclude(item => item.Recipe)
-            .AsNoTracking()
-            .SingleAsync(shoppingList => shoppingList.WeekStart == weekStart);
-
-    private static async Task RegenerateItemsAsync(NasdanusDbContext db, ShoppingList list, bool keepManualItems)
+    private void RegenerateItems(LocalAppState state, ShoppingList list, bool keepManualItems)
     {
-        var generatedItems = await GenerateFromPlannerAsync(db, list.WeekStart);
-        var generatedExistingItems = list.Items.Where(item => !item.IsManual).ToList();
-        db.ShoppingListItems.RemoveRange(generatedExistingItems);
+        var generatedItems = GenerateFromPlanner(state, list.WeekStart);
+        list.Items.RemoveAll(item => !item.IsManual);
 
         if (!keepManualItems)
         {
-            db.ShoppingListItems.RemoveRange(list.Items.Where(item => item.IsManual));
             list.Items.Clear();
         }
 
@@ -193,50 +165,43 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             : 0;
         for (var index = 0; index < generatedItems.Count; index++)
         {
+            generatedItems[index].Id = store.NextId(state);
             generatedItems[index].ShoppingListId = list.Id;
             generatedItems[index].Order = manualCount + index + 1;
             list.Items.Add(generatedItems[index]);
         }
 
         list.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
     }
 
-    private static async Task<List<ShoppingListItem>> GenerateFromPlannerAsync(NasdanusDbContext db, DateOnly weekStart)
+    private List<ShoppingListItem> GenerateFromPlanner(LocalAppState state, DateOnly weekStart)
     {
         var weekEnd = weekStart.AddDays(6);
-        var slots = await db.MealPlanSlots
-            .Include(slot => slot.PlannedRecipes)
-                .ThenInclude(plannedRecipe => plannedRecipe.Recipe)
-                    .ThenInclude(recipe => recipe!.Ingredients)
+        var slots = state.MealPlanSlots
             .Where(slot => slot.Date >= weekStart && slot.Date <= weekEnd)
-            .AsNoTracking()
-            .ToListAsync();
-        var pantryIngredientNames = await db.PantryItems
-            .Select(item => item.Name)
-            .AsNoTracking()
-            .ToListAsync();
-        var pantryIngredientKeys = pantryIngredientNames
-            .Select(IngredientNameNormalizer.Normalize)
+            .ToList();
+        var pantryIngredientKeys = state.PantryItems
+            .Select(item => IngredientNameNormalizer.Normalize(item.Name))
             .Where(name => !string.IsNullOrWhiteSpace(name))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var aggregates = new Dictionary<string, ShoppingItemAggregate>(StringComparer.OrdinalIgnoreCase);
         foreach (var plannedRecipe in slots.SelectMany(slot => slot.PlannedRecipes))
         {
-            if (plannedRecipe.Recipe is null)
+            var recipe = store.FindRecipe(state, plannedRecipe.RecipeId);
+            if (recipe is null)
             {
                 continue;
             }
 
             var plannedServings = plannedRecipe.PlannedServings > 0
                 ? plannedRecipe.PlannedServings
-                : plannedRecipe.Recipe.Servings;
-            var scale = IngredientScaling.ScaleFactor(plannedRecipe.Recipe.Servings, plannedServings);
+                : recipe.Servings;
+            var scale = IngredientScaling.ScaleFactor(recipe.Servings, plannedServings);
 
-            foreach (var ingredient in plannedRecipe.Recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
+            foreach (var ingredient in recipe.Ingredients.OrderBy(ingredient => ingredient.Order))
             {
-                AddIngredient(aggregates, ingredient, scale, pantryIngredientKeys, plannedRecipe.Recipe.Name);
+                AddIngredient(aggregates, ingredient, scale, pantryIngredientKeys, recipe.Name);
             }
         }
 
@@ -296,6 +261,15 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
         return quantity.Value * effectiveScale;
     }
 
+    private static void TouchList(LocalAppState state, int listId)
+    {
+        var list = state.ShoppingLists.FirstOrDefault(list => list.Id == listId);
+        if (list is not null)
+        {
+            list.UpdatedAt = DateTime.UtcNow;
+        }
+    }
+
     private static int NextOrder(ShoppingList list) =>
         list.Items.Count == 0 ? 1 : list.Items.Max(item => item.Order) + 1;
 
@@ -350,7 +324,7 @@ public sealed class ShoppingListService(IDbContextFactory<NasdanusDbContext> dbC
             return ShoppingCategory.DairyEggs;
         }
 
-        if (ContainsAny(normalized, "sal", "pebre", "curc", "cÃºrc", "garam", "gingebre", "julivert", "herba", "jalape", "bitxo", "xili", "safra"))
+        if (ContainsAny(normalized, "sal", "pebre", "curc", "cúrc", "garam", "gingebre", "julivert", "herba", "jalape", "bitxo", "xili", "safra"))
         {
             return ShoppingCategory.Spices;
         }
