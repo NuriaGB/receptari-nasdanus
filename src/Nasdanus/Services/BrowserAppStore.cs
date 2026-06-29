@@ -376,6 +376,10 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 UpdatedAt = idea.UpdatedAt
             })
             .ToList(),
+        ProductBacklogItems = source.ProductBacklogItems
+            .OrderBy(item => item.CreatedAt)
+            .Select(CreateProductBacklogSnapshot)
+            .ToList(),
         ShoppingLists = source.ShoppingLists
             .Select(list => new ShoppingList
             {
@@ -542,6 +546,14 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             AssignId(appState, idea.Id, value => idea.Id = value, ref maxId);
         }
 
+        foreach (var item in appState.ProductBacklogItems)
+        {
+            AssignId(appState, item.Id, value => item.Id = value, ref maxId);
+            item.Labels ??= [];
+            item.Context ??= new ProductBacklogContext();
+            item.Context.FeedbackId ??= item.Id;
+        }
+
         foreach (var list in appState.ShoppingLists)
         {
             AssignId(appState, list.Id, value => list.Id = value, ref maxId);
@@ -627,6 +639,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         appState.MealPlanSlots ??= [];
         appState.PantryItems ??= [];
         appState.RecipeIdeas ??= [];
+        appState.ProductBacklogItems ??= [];
         appState.ShoppingLists ??= [];
 
         foreach (var slot in appState.MealPlanSlots)
@@ -787,6 +800,48 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         return errors.Distinct(StringComparer.OrdinalIgnoreCase);
     }
 
+    private static ProductBacklogItem CreateProductBacklogSnapshot(ProductBacklogItem item) => new()
+    {
+        Id = item.Id,
+        Type = item.Type,
+        Scope = item.Scope,
+        Title = item.Title,
+        Description = item.Description,
+        Priority = item.Priority,
+        Status = item.Status,
+        DuplicateOfId = item.DuplicateOfId,
+        Labels = item.Labels
+            .Where(label => !string.IsNullOrWhiteSpace(label))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(label => label)
+            .ToList(),
+        ApplicationVersion = item.ApplicationVersion,
+        TargetVersion = item.TargetVersion,
+        Decision = item.Decision,
+        ResolutionNotes = item.ResolutionNotes,
+        Context = new ProductBacklogContext
+        {
+            FeedbackId = item.Context?.FeedbackId ?? item.Id,
+            Page = item.Context?.Page ?? string.Empty,
+            CurrentUrl = item.Context?.CurrentUrl ?? string.Empty,
+            CapturedAt = item.Context?.CapturedAt ?? item.CreatedAt,
+            BrowserInformation = item.Context?.BrowserInformation ?? string.Empty,
+            RecipeId = item.Context?.RecipeId,
+            RecipeName = item.Context?.RecipeName ?? string.Empty,
+            PlannerWeek = item.Context?.PlannerWeek,
+            PlannerDay = item.Context?.PlannerDay,
+            Meal = item.Context?.Meal ?? string.Empty,
+            CookingStepNumber = item.Context?.CookingStepNumber,
+            ShoppingWeek = item.Context?.ShoppingWeek,
+            ShoppingCategory = item.Context?.ShoppingCategory ?? string.Empty,
+            PantryItemId = item.Context?.PantryItemId,
+            PantryItemName = item.Context?.PantryItemName ?? string.Empty
+        },
+        CreatedAt = item.CreatedAt,
+        UpdatedAt = item.UpdatedAt,
+        ClosedAt = item.ClosedAt
+    };
+
     private static LocalAppState CreateFallbackState()
     {
         var recipe = new Recipe
@@ -834,6 +889,7 @@ public sealed class LocalAppState
     public List<MealPlanSlot> MealPlanSlots { get; set; } = [];
     public List<PantryItem> PantryItems { get; set; } = [];
     public List<RecipeIdea> RecipeIdeas { get; set; } = [];
+    public List<ProductBacklogItem> ProductBacklogItems { get; set; } = [];
     public List<ShoppingList> ShoppingLists { get; set; } = [];
 }
 
@@ -857,6 +913,7 @@ public sealed class DataBackupSummary
     public int ShoppingItems { get; set; }
     public int PantryItems { get; set; }
     public int RecipeIdeas { get; set; }
+    public int ProductBacklogItems { get; set; }
 
     public static DataBackupSummary From(LocalAppState state) => new()
     {
@@ -867,7 +924,8 @@ public sealed class DataBackupSummary
         ShoppingLists = state.ShoppingLists.Count,
         ShoppingItems = state.ShoppingLists.Sum(list => list.Items.Count),
         PantryItems = state.PantryItems.Count,
-        RecipeIdeas = state.RecipeIdeas.Count
+        RecipeIdeas = state.RecipeIdeas.Count,
+        ProductBacklogItems = state.ProductBacklogItems.Count
     };
 }
 

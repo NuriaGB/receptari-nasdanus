@@ -20,5 +20,6 @@ builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<PlannerService>();
 builder.Services.AddScoped<ShoppingListService>();
 builder.Services.AddScoped<PantryService>();
+builder.Services.AddScoped<ProductBacklogService>();
 
 await builder.Build().RunAsync();
