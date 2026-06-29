@@ -90,6 +90,40 @@ public sealed class PlannerService(BrowserAppStore store)
         }
     }
 
+    public async Task<HashSet<int>> GetDismissedRecipeIdeaIdsAsync(DateOnly date)
+    {
+        var state = await store.GetStateAsync();
+        var weekStart = WeekStart(date);
+        return state.RecipeIdeas
+            .Where(idea => idea.WeekStart == weekStart && idea.IsDismissed)
+            .Select(idea => idea.RecipeId)
+            .ToHashSet();
+    }
+
+    public async Task DismissRecipeIdeaAsync(DateOnly date, int recipeId)
+    {
+        var state = await store.GetStateAsync();
+        var weekStart = WeekStart(date);
+        var idea = state.RecipeIdeas.FirstOrDefault(idea => idea.WeekStart == weekStart && idea.RecipeId == recipeId);
+        if (idea is null)
+        {
+            state.RecipeIdeas.Add(new RecipeIdea
+            {
+                Id = store.NextId(state),
+                WeekStart = weekStart,
+                RecipeId = recipeId,
+                IsDismissed = true
+            });
+        }
+        else
+        {
+            idea.IsDismissed = true;
+            idea.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await store.SaveAsync();
+    }
+
     public static DateOnly WeekStart(DateOnly date)
     {
         var offset = date.DayOfWeek == DayOfWeek.Sunday ? -6 : DayOfWeek.Monday - date.DayOfWeek;

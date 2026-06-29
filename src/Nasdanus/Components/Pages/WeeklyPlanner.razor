@@ -52,7 +52,7 @@
                         {
                             <div class="recipe-idea-chip">
                                 <span class="recipe-idea-name" title="@recipe.Name">@recipe.Name</span>
-                                <MudIconButton OnClick="@(() => DismissRecipeIdea(recipe.Id))"
+                                <MudIconButton OnClick="@(() => DismissRecipeIdeaAsync(recipe.Id))"
                                                Icon="@Icons.Material.Filled.Close"
                                                Color="Color.Secondary"
                                                Size="Size.Small"
@@ -92,7 +92,7 @@
     private List<DayPlan> _days = [];
     private List<Recipe> _recipes = [];
     private HashSet<int> _plannedRecipeIds = [];
-    private readonly HashSet<int> _dismissedRecipeIdeaIds = [];
+    private HashSet<int> _dismissedRecipeIdeaIds = [];
     private bool _isLoading = true;
 
     private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
@@ -119,6 +119,7 @@
             .SelectMany(day => day.Lunch.PlannedRecipes.Concat(day.Dinner.PlannedRecipes))
             .Select(plannedRecipe => plannedRecipe.RecipeId)
             .ToHashSet();
+        _dismissedRecipeIdeaIds = await Planner.GetDismissedRecipeIdeaIdsAsync(_weekStart);
     }
 
     private async Task AddRecipeAsync((DateOnly Date, MealKind MealKind, PlannedRecipeSelection Selection) change)
@@ -134,9 +135,10 @@
         await LoadWeekAsync();
     }
 
-    private void DismissRecipeIdea(int recipeId)
+    private async Task DismissRecipeIdeaAsync(int recipeId)
     {
-        _dismissedRecipeIdeaIds.Add(recipeId);
+        await Planner.DismissRecipeIdeaAsync(_weekStart, recipeId);
+        _dismissedRecipeIdeaIds = await Planner.GetDismissedRecipeIdeaIdsAsync(_weekStart);
     }
 
     private async Task PreviousWeekAsync()

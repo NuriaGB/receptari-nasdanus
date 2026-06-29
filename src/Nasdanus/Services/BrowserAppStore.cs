@@ -9,12 +9,20 @@ namespace Nasdanus.Services;
 public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 {
     private const string StorageKey = "nasdanus.static.state.v1";
+    private const string BackupStorageKey = "nasdanus.static.state.backup.v1";
+    private const string LastSavedAtStorageKey = "nasdanus.static.lastSavedAt.v1";
+    private const string BackupApplicationName = "Nasdanus";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
         WriteIndented = false
+    };
+
+    private static readonly JsonSerializerOptions ExportJsonOptions = new(JsonOptions)
+    {
+        WriteIndented = true
     };
 
     private LocalAppState? state;
@@ -26,10 +34,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             return state;
         }
 
-        var storedState = await jsRuntime.InvokeAsync<string?>("localStorage.getItem", StorageKey);
-        state = string.IsNullOrWhiteSpace(storedState)
-            ? await LoadSeedAsync()
-            : JsonSerializer.Deserialize<LocalAppState>(storedState, JsonOptions) ?? await LoadSeedAsync();
+        state = await LoadStoredStateAsync();
 
         Normalize(state);
         return state;
@@ -45,7 +50,73 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         Normalize(state);
         var snapshot = CreateSnapshot(state);
         var json = JsonSerializer.Serialize(snapshot, JsonOptions);
+        var currentJson = await jsRuntime.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+        if (!string.IsNullOrWhiteSpace(currentJson))
+        {
+            await jsRuntime.InvokeVoidAsync("localStorage.setItem", BackupStorageKey, currentJson);
+        }
+
         await jsRuntime.InvokeVoidAsync("localStorage.setItem", StorageKey, json);
+        await jsRuntime.InvokeVoidAsync("localStorage.setItem", LastSavedAtStorageKey, DateTime.UtcNow.ToString("O"));
+    }
+
+    public async Task<string> ExportJsonAsync()
+    {
+        var appState = await GetStateAsync();
+        var snapshot = CreateSnapshot(appState);
+        var backup = new NasdanusBackupFile
+        {
+            ExportedAt = DateTime.UtcNow,
+            SchemaVersion = snapshot.SchemaVersion,
+            Data = snapshot,
+            Summary = DataBackupSummary.From(snapshot)
+        };
+
+        return JsonSerializer.Serialize(backup, ExportJsonOptions);
+    }
+
+    public async Task<DataBackupSummary> GetSummaryAsync()
+    {
+        var appState = await GetStateAsync();
+        return DataBackupSummary.From(appState);
+    }
+
+    public async Task<DateTime?> GetLastSavedAtAsync()
+    {
+        var stored = await jsRuntime.InvokeAsync<string?>("localStorage.getItem", LastSavedAtStorageKey);
+        return DateTime.TryParse(stored, out var savedAt)
+            ? savedAt
+            : null;
+    }
+
+    public Task<DataImportValidationResult> ValidateImportJsonAsync(string json)
+    {
+        var errors = new List<string>();
+        var importedState = DeserializeImportState(json, errors);
+        if (importedState is null)
+        {
+            errors.Add("El fitxer no sembla una copia valida de Nasdanus.");
+            return Task.FromResult(DataImportValidationResult.Invalid(errors));
+        }
+
+        Normalize(importedState);
+        errors.AddRange(ValidateState(importedState));
+        return Task.FromResult(errors.Count == 0
+            ? DataImportValidationResult.Valid(importedState, DataBackupSummary.From(importedState))
+            : DataImportValidationResult.Invalid(errors));
+    }
+
+    public async Task<DataImportValidationResult> ReplaceStateFromJsonAsync(string json)
+    {
+        var validation = await ValidateImportJsonAsync(json);
+        if (!validation.IsValid || validation.State is null)
+        {
+            return validation;
+        }
+
+        state = validation.State;
+        await SaveAsync();
+        return validation;
     }
 
     public int NextId(LocalAppState appState) => appState.NextId++;
@@ -246,6 +317,20 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         }
     }
 
+    private async Task<LocalAppState> LoadStoredStateAsync()
+    {
+        var storedState = await jsRuntime.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+        var parsedState = DeserializeStoredState(storedState);
+        if (parsedState is not null)
+        {
+            return parsedState;
+        }
+
+        var backupState = await jsRuntime.InvokeAsync<string?>("localStorage.getItem", BackupStorageKey);
+        parsedState = DeserializeStoredState(backupState);
+        return parsedState ?? await LoadSeedAsync();
+    }
+
     private static LocalAppState CreateSnapshot(LocalAppState source) => new()
     {
         SchemaVersion = source.SchemaVersion,
@@ -278,6 +363,17 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 Category = item.Category,
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
+            })
+            .ToList(),
+        RecipeIdeas = source.RecipeIdeas
+            .Select(idea => new RecipeIdea
+            {
+                Id = idea.Id,
+                WeekStart = idea.WeekStart,
+                RecipeId = idea.RecipeId,
+                IsDismissed = idea.IsDismissed,
+                CreatedAt = idea.CreatedAt,
+                UpdatedAt = idea.UpdatedAt
             })
             .ToList(),
         ShoppingLists = source.ShoppingLists
@@ -416,6 +512,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private void Normalize(LocalAppState appState)
     {
+        EnsureCollections(appState);
         var maxId = 0;
         foreach (var recipe in appState.Recipes)
         {
@@ -440,6 +537,11 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             AssignId(appState, pantryItem.Id, value => pantryItem.Id = value, ref maxId);
         }
 
+        foreach (var idea in appState.RecipeIdeas)
+        {
+            AssignId(appState, idea.Id, value => idea.Id = value, ref maxId);
+        }
+
         foreach (var list in appState.ShoppingLists)
         {
             AssignId(appState, list.Id, value => list.Id = value, ref maxId);
@@ -457,6 +559,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private void NormalizeRecipe(LocalAppState appState, Recipe recipe, ref int maxId)
     {
+        EnsureRecipeCollections(recipe);
         foreach (var ingredient in recipe.Ingredients)
         {
             AssignId(appState, ingredient.Id, value => ingredient.Id = value, ref maxId);
@@ -518,6 +621,40 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         }
     }
 
+    private static void EnsureCollections(LocalAppState appState)
+    {
+        appState.Recipes ??= [];
+        appState.MealPlanSlots ??= [];
+        appState.PantryItems ??= [];
+        appState.RecipeIdeas ??= [];
+        appState.ShoppingLists ??= [];
+
+        foreach (var slot in appState.MealPlanSlots)
+        {
+            slot.PlannedRecipes ??= [];
+        }
+
+        foreach (var list in appState.ShoppingLists)
+        {
+            list.Items ??= [];
+        }
+    }
+
+    private static void EnsureRecipeCollections(Recipe recipe)
+    {
+        recipe.Ingredients ??= [];
+        recipe.Steps ??= [];
+        recipe.Notes ??= [];
+        recipe.PlanningMetadata ??= [];
+        recipe.Tags ??= [];
+        recipe.CookingHistory ??= [];
+
+        foreach (var step in recipe.Steps)
+        {
+            step.IngredientReferences ??= [];
+        }
+    }
+
     private void AssignId(LocalAppState appState, int currentId, Action<int> assign, ref int maxId)
     {
         if (currentId <= 0)
@@ -537,6 +674,118 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IngredientScalingMode.ToTaste => IngredientScalingMode.ToTaste,
             _ => IngredientScalingMode.Linear
         };
+
+    private static LocalAppState? DeserializeStoredState(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<LocalAppState>(json, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static LocalAppState? DeserializeImportState(string json, List<string> errors)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            var backup = JsonSerializer.Deserialize<NasdanusBackupFile>(json, JsonOptions);
+            if (backup?.Data is not null)
+            {
+                if (!string.Equals(backup.Application, BackupApplicationName, StringComparison.OrdinalIgnoreCase))
+                {
+                    errors.Add("La copia no identifica correctament l'aplicacio Nasdanus.");
+                }
+
+                return backup.Data;
+            }
+        }
+        catch (JsonException)
+        {
+            // Try the legacy raw state shape below.
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<LocalAppState>(json, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static IEnumerable<string> ValidateState(LocalAppState appState)
+    {
+        var errors = new List<string>();
+        if (appState.SchemaVersion <= 0)
+        {
+            errors.Add("La versio de dades no es valida.");
+        }
+
+        if (appState.Recipes.Count == 0)
+        {
+            errors.Add("La copia no conte cap recepta.");
+        }
+
+        var recipeIds = appState.Recipes.Select(recipe => recipe.Id).ToList();
+        var recipeIdSet = recipeIds.ToHashSet();
+        if (recipeIds.Count != recipeIdSet.Count)
+        {
+            errors.Add("La copia conte receptes amb identificadors duplicats.");
+        }
+
+        foreach (var recipe in appState.Recipes)
+        {
+            if (recipe.Id <= 0)
+            {
+                errors.Add("Hi ha una recepta sense identificador valid.");
+            }
+
+            if (string.IsNullOrWhiteSpace(recipe.Name))
+            {
+                errors.Add($"La recepta {recipe.Id} no te nom.");
+            }
+        }
+
+        foreach (var plannedRecipe in appState.MealPlanSlots.SelectMany(slot => slot.PlannedRecipes))
+        {
+            if (!recipeIdSet.Contains(plannedRecipe.RecipeId))
+            {
+                errors.Add($"El planner referencia una recepta inexistent ({plannedRecipe.RecipeId}).");
+            }
+        }
+
+        foreach (var idea in appState.RecipeIdeas)
+        {
+            if (!recipeIdSet.Contains(idea.RecipeId))
+            {
+                errors.Add($"Recipe Ideas referencia una recepta inexistent ({idea.RecipeId}).");
+            }
+        }
+
+        foreach (var item in appState.ShoppingLists.SelectMany(list => list.Items))
+        {
+            if (item.RecipeId is int recipeId && !recipeIdSet.Contains(recipeId))
+            {
+                errors.Add($"La llista de la compra referencia una recepta inexistent ({recipeId}).");
+            }
+        }
+
+        return errors.Distinct(StringComparer.OrdinalIgnoreCase);
+    }
 
     private static LocalAppState CreateFallbackState()
     {
@@ -584,5 +833,61 @@ public sealed class LocalAppState
     public List<Recipe> Recipes { get; set; } = [];
     public List<MealPlanSlot> MealPlanSlots { get; set; } = [];
     public List<PantryItem> PantryItems { get; set; } = [];
+    public List<RecipeIdea> RecipeIdeas { get; set; } = [];
     public List<ShoppingList> ShoppingLists { get; set; } = [];
+}
+
+public sealed class NasdanusBackupFile
+{
+    public string Application { get; set; } = "Nasdanus";
+    public int BackupFormatVersion { get; set; } = 1;
+    public int SchemaVersion { get; set; } = 1;
+    public DateTime ExportedAt { get; set; } = DateTime.UtcNow;
+    public DataBackupSummary Summary { get; set; } = new();
+    public LocalAppState? Data { get; set; }
+}
+
+public sealed class DataBackupSummary
+{
+    public int Recipes { get; set; }
+    public int DraftRecipes { get; set; }
+    public int MealPlanSlots { get; set; }
+    public int PlannedRecipes { get; set; }
+    public int ShoppingLists { get; set; }
+    public int ShoppingItems { get; set; }
+    public int PantryItems { get; set; }
+    public int RecipeIdeas { get; set; }
+
+    public static DataBackupSummary From(LocalAppState state) => new()
+    {
+        Recipes = state.Recipes.Count,
+        DraftRecipes = state.Recipes.Count(recipe => recipe.IsDraft),
+        MealPlanSlots = state.MealPlanSlots.Count,
+        PlannedRecipes = state.MealPlanSlots.Sum(slot => slot.PlannedRecipes.Count),
+        ShoppingLists = state.ShoppingLists.Count,
+        ShoppingItems = state.ShoppingLists.Sum(list => list.Items.Count),
+        PantryItems = state.PantryItems.Count,
+        RecipeIdeas = state.RecipeIdeas.Count
+    };
+}
+
+public sealed class DataImportValidationResult
+{
+    public bool IsValid { get; init; }
+    public DataBackupSummary? Summary { get; init; }
+    public List<string> Errors { get; init; } = [];
+    public LocalAppState? State { get; init; }
+
+    public static DataImportValidationResult Valid(LocalAppState state, DataBackupSummary summary) => new()
+    {
+        IsValid = true,
+        Summary = summary,
+        State = state
+    };
+
+    public static DataImportValidationResult Invalid(IEnumerable<string> errors) => new()
+    {
+        IsValid = false,
+        Errors = errors.ToList()
+    };
 }
