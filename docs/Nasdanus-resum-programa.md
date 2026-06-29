@@ -27,6 +27,7 @@ L'aplicacio ja te una vertical slice funcional:
 - Rebost basic
 - Dades, backup i restauracio
 - Product Backlog intern
+- Ingredient Knowledge i motor nutricional local
 - PWA / desplegament static a GitHub Pages
 
 El seed actual inclou:
@@ -104,7 +105,7 @@ També inclou placeholders MVP:
 - Resum setmanal mock: peix, llegums, verdures i proteina.
 - Recordatoris futurs mock, pensats per preparacio, congelador i objectius setmanals.
 
-Encara no hi ha logica real d'intelligencia, nutricio o recordatoris calculats.
+Tambe mostra una targeta de nutricio setmanal calculada a partir dels ingredients del planner. Quan els ingredients encara no tenen dades nutricionals, els valors es mostren com a pendents o zero.
 
 ## 6. Receptari
 
@@ -439,7 +440,48 @@ El model esta preparat per:
 
 Encara no hi ha UI de congelador.
 
-## 17. Dades i persistencia
+## 17. Ingredient Knowledge i nutricio
+
+Nasdanus ja te el fonament per calcular nutricio a partir dels ingredients.
+
+Principis:
+
+- Les receptes no guarden valors nutricionals directament.
+- Cada `RecipeIngredient` referencia un `Ingredient` quan es pot resoldre.
+- Les quantitats es calculen segons racions base o racions planificades.
+- Els modes d'escalat continuen sent `linear`, `fixed`, `approximate` i `to_taste`.
+
+El model `Ingredient` inclou:
+
+- Nom.
+- Categoria.
+- Unitat per defecte.
+- Categoria de rebost.
+- Si es pot congelar.
+- Estacionalitat opcional.
+- Nutricio opcional per 100 g: calories, proteina, hidrats, greix, fibra, sucre i sal.
+
+Ingredients i productes estan separats:
+
+- Ingredient: `Chicken breast`, `Tomato`, `Olive oil`.
+- Producte: `BonArea Chicken Breast`, `SOS Rice`, `Kikkoman Soy Sauce`.
+
+Les receptes sempre referencien ingredients, mai productes comercials. Un producte futur podra referenciar un ingredient per reaprofitar nutricio o categories.
+
+El motor nutricional calcula:
+
+- Recepta.
+- Apat planificat.
+- Dia.
+- Setmana.
+
+El calcul usa sempre:
+
+`nutricio ingredient x quantitat ingredient`
+
+No hi ha dependencia d'APIs online. L'arquitectura defineix interficies per poder afegir proveidors futurs de dades nutricionals sense acoblar el domini a BEDCA, CIQUAL, Open Food Facts o qualsevol altra font.
+
+## 18. Dades i persistencia
 
 L'estat de l'app es gestiona amb `BrowserAppStore`.
 
@@ -467,10 +509,10 @@ La pagina "Dades" permet:
 - Importar una copia exportada anteriorment.
 - Validar el fitxer abans de substituir dades locals.
 - Crear una copia abans d'importar.
-- Veure un resum de receptes, planner, compra, rebost i Recipe Ideas.
-- Incloure Product Backlog en export/import.
+- Veure un resum de receptes, planner, compra, rebost, ingredients, productes i Recipe Ideas.
+- Incloure Product Backlog, Ingredients i Productes en export/import.
 
-## 18. Product Backlog intern
+## 19. Product Backlog intern
 
 Nasdanus inclou un modul intern de Product Backlog per capturar bugs, idees i observacions mentre s'utilitza l'app.
 
@@ -525,7 +567,7 @@ L'arquitectura esta separada en:
 - Components reutilitzables.
 - Seed JSON.
 
-## 19. Desplegament
+## 20. Desplegament
 
 El projecte esta preparat per GitHub Pages.
 
@@ -554,7 +596,7 @@ Comanda principal:
 dotnet publish src/Nasdanus/Nasdanus.csproj -c Release -o publish
 ```
 
-## 20. Execucio local
+## 21. Execucio local
 
 Per provar localment:
 
@@ -566,7 +608,7 @@ URL prevista:
 
 `http://localhost:5088/receptari-nasdanus/`
 
-## 21. Decisions arquitectoniques importants
+## 22. Decisions arquitectoniques importants
 
 ### Mobile-first
 
@@ -606,7 +648,7 @@ El rebost no intenta gestionar stock. Només indica que un ingredient no hauria 
 
 Per facilitar GitHub Pages, l'app actual evita backend. Aixo redueix complexitat de desplegament, pero deixa la sync com a feina futura.
 
-## 22. Limitacions conegudes
+## 23. Limitacions conegudes
 
 Encara no hi ha:
 
@@ -618,7 +660,7 @@ Encara no hi ha:
 - Inventari real de rebost.
 - UI de congelador.
 - Compra amb deduccio de congelador.
-- Nutricio.
+- Dades nutricionals completes per a tots els ingredients.
 - Objectius setmanals calculats de forma real.
 - Recordatoris reals.
 - Historial de cuina funcional a UI.
@@ -632,7 +674,7 @@ Algunes parts son encara heuristiques o placeholders:
 - Resum setmanal de Home.
 - Recipe Ideas com a ajuda setmanal lleugera, no com a inbox completa.
 
-## 23. Properes passes recomanades
+## 24. Properes passes recomanades
 
 Prioritat alta:
 
@@ -643,6 +685,7 @@ Prioritat alta:
 Prioritat mitjana:
 
 - Millorar unitats i conversions.
+- Completar dades nutricionals locals dels ingredients mes habituals.
 - Afegir UI de tags/favorits/rating.
 - Fer historial de cuina.
 - Preparar sincronitzacio futura amb backend opcional.
@@ -655,7 +698,7 @@ Prioritat futura:
 - Recordatoris intelligents.
 - Objectius nutricionals o setmanals calculats.
 
-## 24. Resum curt
+## 25. Resum curt
 
 Nasdanus ja permet:
 
@@ -668,6 +711,7 @@ Nasdanus ja permet:
 - Cuinar pas a pas amb quantitats escalades.
 - Generar una llista de la compra setmanal.
 - Excloure ingredients habituals gracies al rebost "Sempre tinc".
+- Calcular nutricio localment a partir d'ingredients, racions i planner.
 - Exportar i restaurar totes les dades locals amb validacio previa.
 - Capturar feedback intern amb Product Backlog i exportar-lo amb la resta de dades.
 - Funcionar com a Blazor WebAssembly/PWA estatica preparada per GitHub Pages.
