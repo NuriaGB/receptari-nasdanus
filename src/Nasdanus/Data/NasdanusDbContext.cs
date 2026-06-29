@@ -17,6 +17,7 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
     public DbSet<MealPlanRecipe> MealPlanRecipes => Set<MealPlanRecipe>();
     public DbSet<ShoppingList> ShoppingLists => Set<ShoppingList>();
     public DbSet<ShoppingListItem> ShoppingListItems => Set<ShoppingListItem>();
+    public DbSet<PantryItem> PantryItems => Set<PantryItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -172,6 +173,13 @@ public sealed class NasdanusDbContext(DbContextOptions<NasdanusDbContext> option
                 .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(item => new { item.ShoppingListId, item.Order });
+        });
+
+        modelBuilder.Entity<PantryItem>(entity =>
+        {
+            entity.Property(item => item.Name).HasMaxLength(160).IsRequired();
+            entity.Property(item => item.Category).HasMaxLength(48).IsRequired();
+            entity.HasIndex(item => item.Name).IsUnique();
         });
     }
 }

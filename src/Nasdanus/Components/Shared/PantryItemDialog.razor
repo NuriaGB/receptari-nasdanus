@@ -1,0 +1,66 @@
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2" Class="pantry-item-dialog">
+            <MudTextField T="string"
+                          Label="Ingredient"
+                          @bind-Value="_request.Name"
+                          Required="true"
+                          Immediate="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+
+            <MudSelect T="string"
+                       Label="Categoria"
+                       @bind-Value="_request.Category"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Dense="true">
+                @foreach (var category in ShoppingCategory.DisplayOrder)
+                {
+                    <MudSelectItem T="string" Value="@category">@ShoppingCategory.ToDisplayName(category)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel·lar</MudButton>
+        <MudButton OnClick="Save"
+                   Disabled="@string.IsNullOrWhiteSpace(_request.Name)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public PantryItem? Item { get; set; }
+
+    private readonly PantryItemEditRequest _request = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Item is null)
+        {
+            _request.Category = ShoppingCategory.Pantry;
+            return;
+        }
+
+        _request.Name = Item.Name;
+        _request.Category = Item.Category;
+    }
+
+    private void Save()
+    {
+        MudDialog.Close(DialogResult.Ok(_request));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

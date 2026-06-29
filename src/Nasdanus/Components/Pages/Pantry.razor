@@ -1,0 +1,127 @@
+@page "/pantry"
+@inject PantryService PantryItems
+@inject IDialogService DialogService
+
+<PageTitle>Nasdanus - Rebost</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="page-shell pantry-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading page-heading-actions">
+            <div>
+                <MudText Typo="Typo.overline">Rebost</MudText>
+                <MudText Typo="Typo.h3">Sempre disponible</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Ingredients que normalment no cal comprar.</MudText>
+            </div>
+            <MudButton OnClick="AddItemAsync"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Add">
+                Afegir
+            </MudButton>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (_items.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">Encara no hi ha ingredients al rebost.</MudAlert>
+        }
+        else
+        {
+            <MudPaper Class="pantry-list" Elevation="0">
+                @foreach (var item in _items)
+                {
+                    <div class="pantry-item-row">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+                        <div class="pantry-item-main">
+                            <span class="pantry-item-name">@item.Name</span>
+                            <span class="pantry-item-category">@ShoppingCategory.ToDisplayName(item.Category)</span>
+                        </div>
+                        <div class="pantry-item-actions">
+                            <MudIconButton OnClick="@(() => EditItemAsync(item))"
+                                           Icon="@Icons.Material.Filled.Edit"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Editar ingredient de rebost" />
+                            <MudIconButton OnClick="@(() => DeleteItemAsync(item.Id))"
+                                           Icon="@Icons.Material.Filled.DeleteOutline"
+                                           Color="Color.Secondary"
+                                           Size="Size.Small"
+                                           aria-label="Eliminar ingredient de rebost" />
+                        </div>
+                    </div>
+                }
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<PantryItem> _items = [];
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadAsync()
+    {
+        _items = await PantryItems.GetAllAsync();
+    }
+
+    private async Task AddItemAsync()
+    {
+        var request = await OpenDialogAsync("Afegir al rebost", null);
+        if (request is null)
+        {
+            return;
+        }
+
+        await PantryItems.AddAsync(request);
+        await LoadAsync();
+    }
+
+    private async Task EditItemAsync(PantryItem item)
+    {
+        var request = await OpenDialogAsync("Editar rebost", item);
+        if (request is null)
+        {
+            return;
+        }
+
+        await PantryItems.UpdateAsync(item.Id, request);
+        await LoadAsync();
+    }
+
+    private async Task DeleteItemAsync(int id)
+    {
+        await PantryItems.DeleteAsync(id);
+        await LoadAsync();
+    }
+
+    private async Task<PantryItemEditRequest?> OpenDialogAsync(string title, PantryItem? item)
+    {
+        var parameters = new DialogParameters<PantryItemDialog>();
+        if (item is not null)
+        {
+            parameters.Add(dialog => dialog.Item, item);
+        }
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+        var dialog = await DialogService.ShowAsync<PantryItemDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        return result is not null && !result.Canceled && result.Data is PantryItemEditRequest request
+            ? request
+            : null;
+    }
+}

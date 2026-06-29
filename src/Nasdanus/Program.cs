@@ -31,6 +31,7 @@ builder.Services.AddScoped<DatabaseInitializer>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<PlannerService>();
 builder.Services.AddScoped<ShoppingListService>();
+builder.Services.AddScoped<PantryService>();
 
 var app = builder.Build();
 

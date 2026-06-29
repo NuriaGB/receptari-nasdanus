@@ -18,6 +18,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         await EnsureRecipeFutureTablesAsync(db);
         await EnsurePlannerRecipeTableAsync(db);
         await EnsureShoppingListTablesAsync(db);
+        await EnsurePantryTableAsync(db);
 
         if (!await db.Recipes.AnyAsync())
         {
@@ -27,6 +28,7 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
 
         await ApplyIngredientScalingDefaultsAsync(db);
+        await EnsurePantrySeedAsync(db);
         await EnsureCurrentWeekSeedAsync(db);
         await EnsureStepIngredientReferenceSeedAsync(db);
     }
@@ -329,6 +331,24 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
         }
     }
 
+    private static async Task EnsurePantryTableAsync(NasdanusDbContext db)
+    {
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "PantryItems" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_PantryItems" PRIMARY KEY AUTOINCREMENT,
+                "Name" TEXT NOT NULL,
+                "Category" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                "UpdatedAt" TEXT NOT NULL
+            );
+            """);
+
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_PantryItems_Name"
+            ON "PantryItems" ("Name");
+            """);
+    }
+
     private static async Task EnsureMealPlanRecipePlannedServingsColumnAsync(NasdanusDbContext db)
     {
         if (await TableHasColumnAsync(db, "MealPlanRecipes", "PlannedServings"))
@@ -415,6 +435,32 @@ public sealed class DatabaseInitializer(IDbContextFactory<NasdanusDbContext> dbC
               );
             """);
     }
+
+    private static async Task EnsurePantrySeedAsync(NasdanusDbContext db)
+    {
+        if (await db.PantryItems.AnyAsync())
+        {
+            return;
+        }
+
+        db.PantryItems.AddRange(
+            Pantry("Oli d'oliva", ShoppingCategory.Pantry),
+            Pantry("Sal", ShoppingCategory.Spices),
+            Pantry("Pebre", ShoppingCategory.Spices),
+            Pantry("Arros", ShoppingCategory.Pantry),
+            Pantry("Pasta", ShoppingCategory.Pantry),
+            Pantry("Farina", ShoppingCategory.Pantry),
+            Pantry("Sucre", ShoppingCategory.Pantry),
+            Pantry("Pure de tomaquet", ShoppingCategory.Pantry));
+
+        await db.SaveChangesAsync();
+    }
+
+    private static PantryItem Pantry(string name, string category) => new()
+    {
+        Name = name,
+        Category = category
+    };
 
     private static async Task EnsureCurrentWeekSeedAsync(NasdanusDbContext db)
     {

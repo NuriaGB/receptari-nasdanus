@@ -597,6 +597,58 @@ h3:focus {
     min-width: 0;
 }
 
+.pantry-list {
+    overflow: hidden;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.pantry-item-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 3.25rem;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--nas-border);
+}
+
+.pantry-item-row:last-child {
+    border-bottom: 0;
+}
+
+.pantry-item-main {
+    display: grid;
+    min-width: 0;
+    gap: 0.1rem;
+}
+
+.pantry-item-name {
+    overflow: hidden;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pantry-item-category {
+    overflow: hidden;
+    color: var(--nas-muted);
+    font-size: 0.86rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pantry-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.pantry-item-dialog {
+    min-width: 0;
+}
+
 .cooking-shell {
     max-width: 58rem;
 }
