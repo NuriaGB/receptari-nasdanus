@@ -1,6 +1,6 @@
 # Nasdanus - Resum del programa
 
-Data del resum: 29 de juny de 2026
+Data del resum: 1 de juliol de 2026
 
 ## 1. Visio general
 
@@ -28,6 +28,7 @@ L'aplicacio ja te una vertical slice funcional:
 - Dades, backup i restauracio
 - Product Backlog intern
 - Ingredient Knowledge i motor nutricional local
+- Knowledge Importer per generar fitxers locals de coneixement
 - PWA / desplegament static a GitHub Pages
 
 El seed actual inclou:
@@ -50,6 +51,8 @@ Stack actual:
 - GitHub Pages
 - Persistencia local amb `localStorage`
 - Seed inicial en JSON: `wwwroot/data/nasdanus-seed.json`
+- Eina de desenvolupament `Nasdanus.KnowledgeImporter`
+- Fitxers de coneixement generats a `Knowledge/`
 
 No hi ha:
 
@@ -60,6 +63,8 @@ No hi ha:
 - IA
 - Sincronitzacio entre dispositius
 - SQLite/EF Core en runtime static
+
+Important: `Nasdanus.KnowledgeImporter` no forma part de l'app publicada. Es una eina manual de desenvolupament per preparar dades locals de coneixement.
 
 Inicialment el producte apuntava a SQLite i EF Core, pero per preparar el desplegament a GitHub Pages es va convertir a una arquitectura estatica Blazor WebAssembly. Les dades es carreguen del seed JSON i els canvis es desen al navegador.
 
@@ -95,17 +100,25 @@ La pagina d'inici mostra el que cal cuinar avui:
 - Sopar d'avui.
 - Receptes planificades per cada apat.
 - Boto per obrir la recepta.
+- Boto per substituir una recepta planificada d'avui.
 - Boto per obrir el planner.
 
 Si no hi ha cap recepta assignada, la targeta queda mes compacta i mostra "Sense recepta assignada" com a estat buit.
 
-També inclou placeholders MVP:
+Tambe inclou:
 
-- "Preparar dema" amb recordatoris mock.
+- "Preparar dema" calculat a partir dels apats planificats de dema.
+- Possible avis de descongelacio si detecta ingredients congelables o habituals de congelador.
+- Recordatori de revisar compra per als apats de dema.
 - Resum setmanal mock: peix, llegums, verdures i proteina.
 - Recordatoris futurs mock, pensats per preparacio, congelador i objectius setmanals.
 
-Tambe mostra una targeta de nutricio setmanal calculada a partir dels ingredients del planner. Quan els ingredients encara no tenen dades nutricionals, els valors es mostren com a pendents o zero.
+Tambe mostra nutricio aproximada:
+
+- Today: dinar + sopar d'avui.
+- Week average: mitjana diaria de la setmana planificada.
+
+Quan alguns ingredients encara no tenen dades nutricionals, es calcula el que es pot i es mostra un avis.
 
 ## 6. Receptari
 
@@ -303,7 +316,10 @@ Cada apat permet:
 - Mostrar receptes com files compactes.
 - Veure racions planificades.
 - Obrir la recepta.
+- Substituir una recepta concreta sense afectar la resta de l'apat.
 - Eliminar una recepta de l'apat.
+- Veure nutricio aproximada per apat.
+- Veure total nutricional aproximat del dia.
 
 Cada entrada planificada desa:
 
@@ -314,6 +330,19 @@ Cada entrada planificada desa:
 - Racions planificades.
 
 Important: les racions planificades es desen a l'entrada del planner, no a la recepta base.
+
+### Substitucio de receptes
+
+Una recepta planificada es pot substituir des de Home o Planner.
+
+La substitucio:
+
+- Actualitza nomes aquella entrada planificada.
+- Manté la resta de receptes del mateix apat.
+- Manté les racions planificades com a valor inicial.
+- Permet ajustar racions abans de confirmar.
+- No modifica ni elimina la recepta original del receptari.
+- Es reflecteix en Home, Planner, compra futura quan es regeneri, i calculs nutricionals.
 
 ## 12. Selector de receptes del planner
 
@@ -326,6 +355,7 @@ El selector permet:
 - Seleccionar una recepta existent.
 - Crear una recepta draft rapida.
 - Definir racions planificades.
+- Substituir una recepta planificada reutilitzant cerca, categoria, tipus d'apat i racions.
 
 No hi ha drag and drop encara.
 
@@ -450,6 +480,8 @@ Principis:
 - Cada `RecipeIngredient` referencia un `Ingredient` quan es pot resoldre.
 - Les quantitats es calculen segons racions base o racions planificades.
 - Els modes d'escalat continuen sent `linear`, `fixed`, `approximate` i `to_taste`.
+- La nutricio es calcula de forma aproximada i informativa, no com a app de dieta.
+- Si falten dades nutricionals o unitats interpretables, l'app calcula el que pot i mostra avis.
 
 El model `Ingredient` inclou:
 
@@ -471,6 +503,7 @@ Les receptes sempre referencien ingredients, mai productes comercials. Un produc
 El motor nutricional calcula:
 
 - Recepta.
+- Racio.
 - Apat planificat.
 - Dia.
 - Setmana.
@@ -481,7 +514,76 @@ El calcul usa sempre:
 
 No hi ha dependencia d'APIs online. L'arquitectura defineix interficies per poder afegir proveidors futurs de dades nutricionals sense acoblar el domini a BEDCA, CIQUAL, Open Food Facts o qualsevol altra font.
 
-## 18. Dades i persistencia
+Actualment hi ha una petita base local aproximada d'ingredients comuns per poder estimar calories, proteina, hidrats i greix. Tambe hi ha conversio aproximada d'unitats habituals:
+
+- `g`
+- `kg`
+- `ml`
+- `l`
+- `cullerada`
+- `culleradeta`
+- `unitat`, quan es pot deduir un pes habitual.
+
+Les pantalles mostren:
+
+- Detall de recepta: nutricio aproximada per racio.
+- Planner: nutricio per apat i total del dia.
+- Home: resum d'avui i mitjana diaria de la setmana.
+
+## 18. Knowledge Importer
+
+S'ha creat un projecte separat:
+
+`src/Nasdanus.KnowledgeImporter`
+
+Objectiu:
+
+- Importar dades de fonts externes.
+- Normalitzar-les al model canonic de Nasdanus.
+- Validar qualitat i duplicats.
+- Exportar fitxers locals a `Knowledge/`.
+
+Aquest projecte es una eina de desenvolupament. No es publica amb l'app i Nasdanus no depen directament d'APIs externes.
+
+Arquitectura:
+
+```text
+External Provider
+-> Importer
+-> Normalisation
+-> Validation
+-> Knowledge/*.json
+-> Nasdanus Application
+```
+
+Fitxers generats:
+
+- `Knowledge/ingredients.json`
+- `Knowledge/nutrition.json`
+- `Knowledge/food-groups.json`
+- `Knowledge/units.json`
+- `Knowledge/seasonality.json`
+- `Knowledge/aliases.json`
+- `Knowledge/products.json`
+- `Knowledge/validation-report.json`
+
+Proveidors preparats, encara sense implementacio real:
+
+- `BedcaProvider`
+- `CiqualProvider`
+- `OpenFoodFactsProvider`
+
+La interfície comuna es `IKnowledgeProvider` i inclou cerca, descarrega i exportacio. Els models especifics dels proveidors no han d'arribar mai a l'aplicacio.
+
+La validacio informa de:
+
+- Categories desconegudes.
+- Aliases duplicats.
+- Nutricio absent.
+- Unitats absents.
+- Ingredients duplicats.
+
+## 19. Dades i persistencia
 
 L'estat de l'app es gestiona amb `BrowserAppStore`.
 
@@ -512,7 +614,16 @@ La pagina "Dades" permet:
 - Veure un resum de receptes, planner, compra, rebost, ingredients, productes i Recipe Ideas.
 - Incloure Product Backlog, Ingredients i Productes en export/import.
 
-## 19. Product Backlog intern
+Workflow provisional multi-dispositiu:
+
+1. Exportar JSON des del dispositiu on s'han fet canvis.
+2. Guardar-lo a Google Drive personal.
+3. Obrir Nasdanus a l'altre dispositiu.
+4. Importar el JSON des de Google Drive.
+
+Aixo no es sincronitzacio automatica. Es un transport manual segur per poder provar l'app entre ordinador i mobil mentre no hi hagi una capa de sync real.
+
+## 20. Product Backlog intern
 
 Nasdanus inclou un modul intern de Product Backlog per capturar bugs, idees i observacions mentre s'utilitza l'app.
 
@@ -567,7 +678,7 @@ L'arquitectura esta separada en:
 - Components reutilitzables.
 - Seed JSON.
 
-## 20. Desplegament
+## 21. Desplegament
 
 El projecte esta preparat per GitHub Pages.
 
@@ -587,7 +698,7 @@ Workflow:
 
 S'executa:
 
-- En push a `main`.
+- En push a `main` o `master`.
 - Manualment amb `workflow_dispatch`.
 
 Comanda principal:
@@ -596,7 +707,7 @@ Comanda principal:
 dotnet publish src/Nasdanus/Nasdanus.csproj -c Release -o publish
 ```
 
-## 21. Execucio local
+## 22. Execucio local
 
 Per provar localment:
 
@@ -608,7 +719,7 @@ URL prevista:
 
 `http://localhost:5088/receptari-nasdanus/`
 
-## 22. Decisions arquitectoniques importants
+## 23. Decisions arquitectoniques importants
 
 ### Mobile-first
 
@@ -644,15 +755,26 @@ Els passos tenen referencies estructurades a ingredients, quantitat i unitat. No
 
 El rebost no intenta gestionar stock. Només indica que un ingredient no hauria d'apareixer automaticament a la compra.
 
+### Coneixement propi
+
+Nasdanus ha de consumir una base local de coneixement propia.
+
+Les fonts externes, com BEDCA, CIQUAL o Open Food Facts, no s'integren directament a l'aplicacio. Entren a traves de `Nasdanus.KnowledgeImporter`, que genera fitxers locals validats dins `Knowledge/`.
+
+### Multi-dispositiu provisional
+
+Fins que existeixi una sync real, l'intercanvi entre ordinador i mobil es fa amb export/import JSON. Google Drive pot funcionar com a lloc manual on guardar i recuperar aquest fitxer.
+
 ### Static-first
 
 Per facilitar GitHub Pages, l'app actual evita backend. Aixo redueix complexitat de desplegament, pero deixa la sync com a feina futura.
 
-## 23. Limitacions conegudes
+## 24. Limitacions conegudes
 
 Encara no hi ha:
 
 - Sincronitzacio entre dispositius.
+- Integracio automatica amb Google Drive.
 - Comptes d'usuari.
 - Backend.
 - Importacio de Word/PDF/foto.
@@ -661,6 +783,7 @@ Encara no hi ha:
 - UI de congelador.
 - Compra amb deduccio de congelador.
 - Dades nutricionals completes per a tots els ingredients.
+- Proveidors reals implementats al Knowledge Importer.
 - Objectius setmanals calculats de forma real.
 - Recordatoris reals.
 - Historial de cuina funcional a UI.
@@ -670,22 +793,24 @@ Encara no hi ha:
 Algunes parts son encara heuristiques o placeholders:
 
 - Categoritzacio d'ingredients a la compra.
-- Recordatoris de Home.
+- Recordatoris de Home mes avancats, fora dels apats planificats de dema.
 - Resum setmanal de Home.
 - Recipe Ideas com a ajuda setmanal lleugera, no com a inbox completa.
 
-## 24. Properes passes recomanades
+## 25. Properes passes recomanades
 
 Prioritat alta:
 
 - Afegir tests de serveis per planner, shopping i escalat.
 - Revisar textos amb accents i encoding.
 - Provar export/import amb dades reals abans d'usar-ho com a sistema principal.
+- Consolidar el workflow manual amb Google Drive per proves multi-dispositiu.
 
 Prioritat mitjana:
 
 - Millorar unitats i conversions.
 - Completar dades nutricionals locals dels ingredients mes habituals.
+- Implementar imports reals dins `Nasdanus.KnowledgeImporter`, començant per una font concreta.
 - Afegir UI de tags/favorits/rating.
 - Fer historial de cuina.
 - Preparar sincronitzacio futura amb backend opcional.
@@ -698,7 +823,7 @@ Prioritat futura:
 - Recordatoris intelligents.
 - Objectius nutricionals o setmanals calculats.
 
-## 25. Resum curt
+## 26. Resum curt
 
 Nasdanus ja permet:
 
@@ -708,12 +833,15 @@ Nasdanus ja permet:
 - Editar receptes amb ingredients, passos, timers, notes i ingredients per pas.
 - Planificar dinars i sopars setmanals amb multiples receptes per apat.
 - Definir racions per cada apat planificat.
+- Substituir una recepta planificada sense eliminar-la ni afectar altres apats.
 - Cuinar pas a pas amb quantitats escalades.
 - Generar una llista de la compra setmanal.
 - Excloure ingredients habituals gracies al rebost "Sempre tinc".
-- Calcular nutricio localment a partir d'ingredients, racions i planner.
+- Calcular calories i macronutrients aproximats a partir d'ingredients, racions i planner.
 - Exportar i restaurar totes les dades locals amb validacio previa.
+- Transportar backups manualment entre dispositius, per exemple amb Google Drive.
 - Capturar feedback intern amb Product Backlog i exportar-lo amb la resta de dades.
+- Generar fitxers locals de coneixement amb `Nasdanus.KnowledgeImporter`.
 - Funcionar com a Blazor WebAssembly/PWA estatica preparada per GitHub Pages.
 
-El producte esta en bon estat per us personal i familiar setmanal, amb limitacions conscients al voltant de sincronitzacio, imports, inventari i automatitzacions avançades.
+El producte esta en bon estat per us personal i familiar setmanal, amb limitacions conscients al voltant de sincronitzacio automatica, imports reals de coneixement, inventari i automatitzacions avançades.
