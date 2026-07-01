@@ -75,8 +75,8 @@
                             }
                         </div>
 
-                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
-                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" />
+                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
+                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
                     </MudPaper>
                 }
             </div>
@@ -132,6 +132,12 @@
     private async Task RemoveRecipeAsync(int plannedRecipeId)
     {
         await Planner.RemoveRecipeAsync(plannedRecipeId);
+        await LoadWeekAsync();
+    }
+
+    private async Task ReplaceRecipeAsync((int PlannedRecipeId, PlannedRecipeSelection Selection) change)
+    {
+        await Planner.ReplaceRecipeAsync(change.PlannedRecipeId, change.Selection.RecipeId, change.Selection.PlannedServings);
         await LoadWeekAsync();
     }
 

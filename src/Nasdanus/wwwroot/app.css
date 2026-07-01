@@ -145,6 +145,11 @@ h3:focus {
     padding-top: 0;
 }
 
+.home-recipe-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .meal-title {
     line-height: 1.15;
 }

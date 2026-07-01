@@ -2,6 +2,9 @@
 @page "/dashboard"
 @inject PlannerService Planner
 @inject NutritionService Nutrition
+@inject RecipeService Recipes
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <PageTitle>Nasdanus - Avui</PageTitle>
 
@@ -133,6 +136,7 @@
     private MealPlanSlot? _dinner;
     private WeekNutritionSummary? _weekNutrition;
     private IReadOnlyList<TomorrowPrepReminder> _tomorrowReminders = [];
+    private List<Recipe> _recipes = [];
     private bool _isLoading = true;
     private const decimal WeeklyCaloriesDisplayCap = 14000;
     private const decimal WeeklyProteinDisplayCap = 420;
@@ -149,6 +153,7 @@
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
         var tomorrow = today.AddDays(1);
+        _recipes = await Recipes.GetAllAsync();
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
         var tomorrowLunch = await Planner.GetSlotAsync(tomorrow, MealKind.Lunch);
@@ -274,19 +279,74 @@
                         <div class="home-planned-recipe">
                             <MudText Typo="Typo.h5" Class="meal-title">@plannedRecipe.Recipe.Name</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary">@TimeText(plannedRecipe.Recipe)</MudText>
-                            <MudButton Href="@($"recipes/{plannedRecipe.Recipe.Id}")"
-                                       Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       Size="Size.Medium"
-                                       StartIcon="@Icons.Material.Filled.OpenInNew">
-                                Obrir recepta
-                            </MudButton>
+                            <MudStack Row Class="home-recipe-actions">
+                                <MudButton Href="@($"recipes/{plannedRecipe.Recipe.Id}")"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Medium"
+                                           StartIcon="@Icons.Material.Filled.OpenInNew">
+                                    Obrir recepta
+                                </MudButton>
+                                <MudButton OnClick="@(() => OpenReplacementPickerAsync(plannedRecipe, slot!.MealKind))"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           Size="Size.Medium"
+                                           StartIcon="@Icons.Material.Filled.SwapHoriz">
+                                    Substituir
+                                </MudButton>
+                            </MudStack>
                         </div>
                     }
                 }
             }
         </MudStack>
     </MudPaper>;
+
+    private async Task OpenReplacementPickerAsync(MealPlanRecipe plannedRecipe, MealKind mealKind)
+    {
+        var parameters = new DialogParameters<MealRecipePickerDialog>
+        {
+            { dialog => dialog.Recipes, _recipes },
+            { dialog => dialog.SlotMealKind, mealKind },
+            { dialog => dialog.InitialServings, PlannedServingsValue(plannedRecipe) },
+            { dialog => dialog.ActionLabel, "Substituir" },
+            { dialog => dialog.ShowQuickAdd, false }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<MealRecipePickerDialog>("Substituir plat", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled && result.Data is PlannedRecipeSelection selection)
+        {
+            await Planner.ReplaceRecipeAsync(plannedRecipe.Id, selection.RecipeId, selection.PlannedServings);
+            await RefreshTodayAsync();
+            Snackbar.Add("Plat substituit.", Severity.Success);
+        }
+    }
+
+    private async Task RefreshTodayAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
+        _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
+        _weekNutrition = await Nutrition.CalculateWeekAsync(today);
+    }
+
+    private static int PlannedServingsValue(MealPlanRecipe plannedRecipe)
+    {
+        if (plannedRecipe.PlannedServings > 0)
+        {
+            return plannedRecipe.PlannedServings;
+        }
+
+        return plannedRecipe.Recipe?.Servings > 0 ? plannedRecipe.Recipe.Servings : 3;
+    }
 
     private static RenderFragment NutritionMetric(string label, decimal value, string unit, decimal displayCap) => @<div class="nutrition-metric">
         <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">

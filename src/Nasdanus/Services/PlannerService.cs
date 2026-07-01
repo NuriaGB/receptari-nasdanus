@@ -50,6 +50,30 @@ public sealed class PlannerService(BrowserAppStore store)
         await store.SaveAsync();
     }
 
+    public async Task ReplaceRecipeAsync(int plannedRecipeId, int recipeId, int plannedServings)
+    {
+        var state = await store.GetStateAsync();
+        var plannedRecipe = state.MealPlanSlots
+            .SelectMany(slot => slot.PlannedRecipes)
+            .FirstOrDefault(recipe => recipe.Id == plannedRecipeId);
+        var replacementRecipe = store.FindRecipe(state, recipeId);
+
+        if (plannedRecipe is null || replacementRecipe is null)
+        {
+            return;
+        }
+
+        plannedRecipe.RecipeId = replacementRecipe.Id;
+        plannedRecipe.Recipe = replacementRecipe;
+        plannedRecipe.PlannedServings = plannedServings > 0
+            ? plannedServings
+            : replacementRecipe.Servings > 0
+                ? replacementRecipe.Servings
+                : 3;
+
+        await store.SaveAsync();
+    }
+
     public async Task<MealPlanRecipe?> GetPlannedRecipeAsync(int plannedRecipeId)
     {
         var state = await store.GetStateAsync();

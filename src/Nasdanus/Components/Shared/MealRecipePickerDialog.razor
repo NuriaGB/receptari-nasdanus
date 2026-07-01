@@ -73,7 +73,7 @@
                                            Variant="Variant.Filled"
                                            Color="Color.Primary"
                                            Size="Size.Small">
-                                    Afegir
+                                    @ActionLabel
                                 </MudButton>
                             </MudPaper>
                         }
@@ -81,7 +81,9 @@
                 </MudStack>
             </MudTabPanel>
 
-            <MudTabPanel Text="Draft ràpid">
+            @if (ShowQuickAdd)
+            {
+                <MudTabPanel Text="Draft ràpid">
                 <MudStack Spacing="2" Class="quick-add-form">
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
                         Guarda una idea encara que faltin ingredients o passos.
@@ -113,7 +115,8 @@
                         Crear i afegir
                     </MudButton>
                 </MudStack>
-            </MudTabPanel>
+                </MudTabPanel>
+            }
         </MudTabs>
     </DialogContent>
     <DialogActions>
@@ -131,17 +134,33 @@
     [Parameter]
     public MealKind SlotMealKind { get; set; }
 
+    [Parameter]
+    public string ActionLabel { get; set; } = "Afegir";
+
+    [Parameter]
+    public int InitialServings { get; set; } = 3;
+
+    [Parameter]
+    public bool ShowQuickAdd { get; set; } = true;
+
     private readonly QuickAddRecipeRequest _request = new();
     private string _search = string.Empty;
     private string _category = string.Empty;
     private string _mealType = string.Empty;
     private int _plannedServings = 3;
+    private bool _servingsInitialized;
 
     protected override void OnParametersSet()
     {
         if (string.IsNullOrWhiteSpace(_mealType) && SlotMealKind is MealKind.Lunch or MealKind.Dinner)
         {
             _mealType = SlotMealKind.ToString();
+        }
+
+        if (!_servingsInitialized)
+        {
+            _plannedServings = InitialServings > 0 ? InitialServings : 3;
+            _servingsInitialized = true;
         }
     }
 

@@ -38,6 +38,11 @@
                                        Color="Color.Primary"
                                        Size="Size.Small"
                                        aria-label="Obrir recepta" />
+                        <MudIconButton OnClick="@(() => OpenReplacementPickerAsync(plannedRecipe))"
+                                       Icon="@Icons.Material.Filled.SwapHoriz"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       aria-label="Substituir plat" />
                         <MudIconButton OnClick="@(() => RemoveRecipe.InvokeAsync(plannedRecipe.Id))"
                                        Icon="@Icons.Material.Filled.Close"
                                        Color="Color.Secondary"
@@ -66,6 +71,9 @@
     [Parameter]
     public EventCallback<int> RemoveRecipe { get; set; }
 
+    [Parameter]
+    public EventCallback<(int PlannedRecipeId, PlannedRecipeSelection Selection)> ReplaceRecipe { get; set; }
+
     private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
         .OrderBy(plannedRecipe => plannedRecipe.Order)
         .ToList();
@@ -75,9 +83,7 @@
         : Icons.Material.Filled.DarkMode;
     private static string PlannedServingsText(MealPlanRecipe plannedRecipe)
     {
-        var servings = plannedRecipe.PlannedServings > 0
-            ? plannedRecipe.PlannedServings
-            : plannedRecipe.Recipe?.Servings ?? 0;
+        var servings = PlannedServingsValue(plannedRecipe);
         return servings > 0 ? $"{servings} rac." : "Racions?";
     }
 
@@ -102,5 +108,41 @@
         {
             await AddRecipe.InvokeAsync((Slot.Date, Slot.MealKind, selection));
         }
+    }
+
+    private async Task OpenReplacementPickerAsync(MealPlanRecipe plannedRecipe)
+    {
+        var parameters = new DialogParameters<MealRecipePickerDialog>
+        {
+            { dialog => dialog.Recipes, Recipes },
+            { dialog => dialog.SlotMealKind, Slot.MealKind },
+            { dialog => dialog.InitialServings, PlannedServingsValue(plannedRecipe) },
+            { dialog => dialog.ActionLabel, "Substituir" },
+            { dialog => dialog.ShowQuickAdd, false }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<MealRecipePickerDialog>("Substituir plat", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled && result.Data is PlannedRecipeSelection selection)
+        {
+            await ReplaceRecipe.InvokeAsync((plannedRecipe.Id, selection));
+        }
+    }
+
+    private static int PlannedServingsValue(MealPlanRecipe plannedRecipe)
+    {
+        if (plannedRecipe.PlannedServings > 0)
+        {
+            return plannedRecipe.PlannedServings;
+        }
+
+        return plannedRecipe.Recipe?.Servings > 0 ? plannedRecipe.Recipe.Servings : 3;
     }
 }
