@@ -1,5 +1,510 @@
 {
-  "SchemaVersion": 1,
-  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
-  "Items": []
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-01T16:03:27.0534916+00:00",
+  "items": [
+    {
+      "ingredientId": "alberginia",
+      "nutrition": {
+        "calories": 25,
+        "protein": 1,
+        "carbohydrates": 6,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "alberginia",
+      "lastUpdated": "2026-07-01T16:03:27.050535+00:00"
+    },
+    {
+      "ingredientId": "all",
+      "nutrition": {
+        "calories": 149,
+        "protein": 6,
+        "carbohydrates": 33,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "all",
+      "lastUpdated": "2026-07-01T16:03:27.0505363+00:00"
+    },
+    {
+      "ingredientId": "arros",
+      "nutrition": {
+        "calories": 360,
+        "protein": 7,
+        "carbohydrates": 78,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "arros",
+      "lastUpdated": "2026-07-01T16:03:27.0505117+00:00"
+    },
+    {
+      "ingredientId": "bacalla",
+      "nutrition": {
+        "calories": 82,
+        "protein": 18,
+        "carbohydrates": 0,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "bacalla",
+      "lastUpdated": "2026-07-01T16:03:27.050522+00:00"
+    },
+    {
+      "ingredientId": "botifarra",
+      "nutrition": {
+        "calories": 300,
+        "protein": 14,
+        "carbohydrates": 2,
+        "fat": 26
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "botifarra",
+      "lastUpdated": "2026-07-01T16:03:27.0505208+00:00"
+    },
+    {
+      "ingredientId": "brocoli",
+      "nutrition": {
+        "calories": 34,
+        "protein": 3,
+        "carbohydrates": 7,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "brocoli",
+      "lastUpdated": "2026-07-01T16:03:27.0505345+00:00"
+    },
+    {
+      "ingredientId": "carbasso",
+      "nutrition": {
+        "calories": 17,
+        "protein": 1,
+        "carbohydrates": 3,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "carbasso",
+      "lastUpdated": "2026-07-01T16:03:27.0505331+00:00"
+    },
+    {
+      "ingredientId": "ceba",
+      "nutrition": {
+        "calories": 40,
+        "protein": 1,
+        "carbohydrates": 9,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "ceba",
+      "lastUpdated": "2026-07-01T16:03:27.050531+00:00"
+    },
+    {
+      "ingredientId": "cigrons",
+      "nutrition": {
+        "calories": 364,
+        "protein": 19,
+        "carbohydrates": 61,
+        "fat": 6
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "cigrons",
+      "lastUpdated": "2026-07-01T16:03:27.0505156+00:00"
+    },
+    {
+      "ingredientId": "cogombre",
+      "nutrition": {
+        "calories": 15,
+        "protein": 1,
+        "carbohydrates": 4,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "cogombre",
+      "lastUpdated": "2026-07-01T16:03:27.0505359+00:00"
+    },
+    {
+      "ingredientId": "enciam",
+      "nutrition": {
+        "calories": 15,
+        "protein": 1,
+        "carbohydrates": 3,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "enciam",
+      "lastUpdated": "2026-07-01T16:03:27.0505354+00:00"
+    },
+    {
+      "ingredientId": "espinacs",
+      "nutrition": {
+        "calories": 23,
+        "protein": 3,
+        "carbohydrates": 4,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "espinacs",
+      "lastUpdated": "2026-07-01T16:03:27.0505341+00:00"
+    },
+    {
+      "ingredientId": "farina",
+      "nutrition": {
+        "calories": 364,
+        "protein": 10,
+        "carbohydrates": 76,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "farina",
+      "lastUpdated": "2026-07-01T16:03:27.0505111+00:00"
+    },
+    {
+      "ingredientId": "formatge",
+      "nutrition": {
+        "calories": 400,
+        "protein": 25,
+        "carbohydrates": 1,
+        "fat": 33
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "formatge",
+      "lastUpdated": "2026-07-01T16:03:27.0505262+00:00"
+    },
+    {
+      "ingredientId": "gambes",
+      "nutrition": {
+        "calories": 99,
+        "protein": 24,
+        "carbohydrates": 0,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "gambes",
+      "lastUpdated": "2026-07-01T16:03:27.0505228+00:00"
+    },
+    {
+      "ingredientId": "iogurt",
+      "nutrition": {
+        "calories": 60,
+        "protein": 4,
+        "carbohydrates": 5,
+        "fat": 3
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "iogurt",
+      "lastUpdated": "2026-07-01T16:03:27.050529+00:00"
+    },
+    {
+      "ingredientId": "llenties",
+      "nutrition": {
+        "calories": 352,
+        "protein": 25,
+        "carbohydrates": 60,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "llenties",
+      "lastUpdated": "2026-07-01T16:03:27.050516+00:00"
+    },
+    {
+      "ingredientId": "llet",
+      "nutrition": {
+        "calories": 61,
+        "protein": 3,
+        "carbohydrates": 5,
+        "fat": 3
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "llet",
+      "lastUpdated": "2026-07-01T16:03:27.0505284+00:00"
+    },
+    {
+      "ingredientId": "llimona",
+      "nutrition": {
+        "calories": 29,
+        "protein": 1,
+        "carbohydrates": 9,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "llimona",
+      "lastUpdated": "2026-07-01T16:03:27.0505368+00:00"
+    },
+    {
+      "ingredientId": "lluca",
+      "nutrition": {
+        "calories": 86,
+        "protein": 18,
+        "carbohydrates": 0,
+        "fat": 2
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "lluc",
+      "lastUpdated": "2026-07-01T16:03:27.0505224+00:00"
+    },
+    {
+      "ingredientId": "mantega",
+      "nutrition": {
+        "calories": 717,
+        "protein": 1,
+        "carbohydrates": 0,
+        "fat": 81
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "mantega",
+      "lastUpdated": "2026-07-01T16:03:27.050473+00:00"
+    },
+    {
+      "ingredientId": "mongetes",
+      "nutrition": {
+        "calories": 333,
+        "protein": 21,
+        "carbohydrates": 60,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "mongetes",
+      "lastUpdated": "2026-07-01T16:03:27.0505164+00:00"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "nutrition": {
+        "calories": 280,
+        "protein": 18,
+        "carbohydrates": 3,
+        "fat": 22
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "mozzarella",
+      "lastUpdated": "2026-07-01T16:03:27.0505278+00:00"
+    },
+    {
+      "ingredientId": "nata",
+      "nutrition": {
+        "calories": 340,
+        "protein": 2,
+        "carbohydrates": 3,
+        "fat": 36
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "nata",
+      "lastUpdated": "2026-07-01T16:03:27.0505294+00:00"
+    },
+    {
+      "ingredientId": "oli-d\u0027oliva",
+      "nutrition": {
+        "calories": 884,
+        "protein": 0,
+        "carbohydrates": 0,
+        "fat": 100
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "oli-oliva",
+      "lastUpdated": "2026-07-01T16:03:27.0489437+00:00"
+    },
+    {
+      "ingredientId": "ou",
+      "nutrition": {
+        "calories": 143,
+        "protein": 13,
+        "carbohydrates": 1,
+        "fat": 10
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "ou",
+      "lastUpdated": "2026-07-01T16:03:27.0505232+00:00"
+    },
+    {
+      "ingredientId": "pa",
+      "nutrition": {
+        "calories": 265,
+        "protein": 9,
+        "carbohydrates": 49,
+        "fat": 3
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "pa",
+      "lastUpdated": "2026-07-01T16:03:27.0505151+00:00"
+    },
+    {
+      "ingredientId": "pasta",
+      "nutrition": {
+        "calories": 371,
+        "protein": 13,
+        "carbohydrates": 75,
+        "fat": 2
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "pasta",
+      "lastUpdated": "2026-07-01T16:03:27.0505145+00:00"
+    },
+    {
+      "ingredientId": "pastanaga",
+      "nutrition": {
+        "calories": 41,
+        "protein": 1,
+        "carbohydrates": 10,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "pastanaga",
+      "lastUpdated": "2026-07-01T16:03:27.0505314+00:00"
+    },
+    {
+      "ingredientId": "patata",
+      "nutrition": {
+        "calories": 77,
+        "protein": 2,
+        "carbohydrates": 17,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "patata",
+      "lastUpdated": "2026-07-01T16:03:27.0505299+00:00"
+    },
+    {
+      "ingredientId": "pebrot",
+      "nutrition": {
+        "calories": 31,
+        "protein": 1,
+        "carbohydrates": 6,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "pebrot",
+      "lastUpdated": "2026-07-01T16:03:27.0505336+00:00"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "nutrition": {
+        "calories": 165,
+        "protein": 31,
+        "carbohydrates": 0,
+        "fat": 4
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "pit-pollastre",
+      "lastUpdated": "2026-07-01T16:03:27.0505187+00:00"
+    },
+    {
+      "ingredientId": "platan",
+      "nutrition": {
+        "calories": 89,
+        "protein": 1,
+        "carbohydrates": 23,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "platan",
+      "lastUpdated": "2026-07-01T16:03:27.0505414+00:00"
+    },
+    {
+      "ingredientId": "poma",
+      "nutrition": {
+        "calories": 52,
+        "protein": 0,
+        "carbohydrates": 14,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "poma",
+      "lastUpdated": "2026-07-01T16:03:27.0505373+00:00"
+    },
+    {
+      "ingredientId": "porc",
+      "nutrition": {
+        "calories": 242,
+        "protein": 27,
+        "carbohydrates": 0,
+        "fat": 14
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "porc",
+      "lastUpdated": "2026-07-01T16:03:27.0505192+00:00"
+    },
+    {
+      "ingredientId": "salmo",
+      "nutrition": {
+        "calories": 208,
+        "protein": 20,
+        "carbohydrates": 0,
+        "fat": 13
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "salmo",
+      "lastUpdated": "2026-07-01T16:03:27.0505212+00:00"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "nutrition": {
+        "calories": 53,
+        "protein": 8,
+        "carbohydrates": 5,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "salsa-soja",
+      "lastUpdated": "2026-07-01T16:03:27.0505421+00:00"
+    },
+    {
+      "ingredientId": "sucre",
+      "nutrition": {
+        "calories": 400,
+        "protein": 0,
+        "carbohydrates": 100,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "sucre",
+      "lastUpdated": "2026-07-01T16:03:27.0505087+00:00"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "nutrition": {
+        "calories": 18,
+        "protein": 1,
+        "carbohydrates": 4,
+        "fat": 0
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "tomaquet",
+      "lastUpdated": "2026-07-01T16:03:27.0505304+00:00"
+    },
+    {
+      "ingredientId": "tonyina",
+      "nutrition": {
+        "calories": 132,
+        "protein": 28,
+        "carbohydrates": 0,
+        "fat": 1
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "tonyina",
+      "lastUpdated": "2026-07-01T16:03:27.0505216+00:00"
+    },
+    {
+      "ingredientId": "vedella",
+      "nutrition": {
+        "calories": 250,
+        "protein": 26,
+        "carbohydrates": 0,
+        "fat": 15
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "vedella",
+      "lastUpdated": "2026-07-01T16:03:27.0505178+00:00"
+    },
+    {
+      "ingredientId": "xocolata",
+      "nutrition": {
+        "calories": 546,
+        "protein": 5,
+        "carbohydrates": 61,
+        "fat": 31
+      },
+      "source": "nasdanus-local-seed",
+      "sourceId": "xocolata",
+      "lastUpdated": "2026-07-01T16:03:27.0505418+00:00"
+    }
+  ]
 }

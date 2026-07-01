@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Nasdanus.KnowledgeImporter.Domain;
 
 public sealed class CanonicalIngredient
@@ -25,6 +27,7 @@ public sealed class NutritionFacts
     public decimal? Sugar { get; set; }
     public decimal? Salt { get; set; }
 
+    [JsonIgnore]
     public bool HasCoreMacros =>
         Calories is not null
         && Protein is not null

@@ -1,5 +1,7 @@
 @page "/recipes/{Id:int}/edit"
+@using System.Globalization
 @inject RecipeService Recipes
+@inject IngredientKnowledgeService IngredientKnowledge
 @inject NavigationManager Navigation
 
 <PageTitle>@(_recipe is null ? "Editar recepta" : $"Editar {_recipe.Name}")</PageTitle>
@@ -87,7 +89,14 @@
                         @foreach (var ingredient in _edit.Ingredients)
                         {
                             <div class="recipe-edit-row ingredient-edit-row" @key="ingredient">
-                                <MudTextField T="string" Label="Ingredient" @bind-Value="ingredient.Name" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" Class="edit-ingredient-name" />
+                                <MudTextField T="string"
+                                              Label="Ingredient"
+                                              Value="@ingredient.Name"
+                                              ValueChanged="@((string value) => OnIngredientNameChanged(ingredient, value))"
+                                              Immediate="true"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              Class="edit-ingredient-name" />
                                 <MudTextField T="string" Label="Quantitat" @bind-Value="ingredient.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" />
                                 <MudTextField T="string" Label="Unitat" @bind-Value="ingredient.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
                                 <MudSelect T="string" Label="Escala" @bind-Value="ingredient.ScalingMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
@@ -96,6 +105,30 @@
                                     <MudSelectItem T="string" Value="@IngredientScalingMode.Approximate">Approx.</MudSelectItem>
                                     <MudSelectItem T="string" Value="@IngredientScalingMode.ToTaste">Al gust</MudSelectItem>
                                 </MudSelect>
+                                <div class="ingredient-link-field">
+                                    <MudSelect T="string"
+                                               Label="Ingredient conegut"
+                                               Value="@IngredientLinkValue(ingredient)"
+                                               ValueChanged="@((string value) => OnIngredientLinkChanged(ingredient, value))"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense"
+                                               Dense="true"
+                                               Disabled="@(_knownIngredients.Count == 0)">
+                                        <MudSelectItem T="string" Value="@string.Empty">Sense vincle</MudSelectItem>
+                                        @foreach (var knownIngredient in _knownIngredients)
+                                        {
+                                            <MudSelectItem T="string" Value="@knownIngredient.Id.ToString(CultureInfo.InvariantCulture)">
+                                                @knownIngredient.Name
+                                            </MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    <MudChip T="string"
+                                             Color="@IngredientLinkColor(ingredient)"
+                                             Variant="Variant.Outlined"
+                                             Size="Size.Small">
+                                        @IngredientLinkText(ingredient)
+                                    </MudChip>
+                                </div>
                                 <div class="edit-row-actions">
                                     <MudIconButton OnClick="@(() => MoveIngredient(ingredient, -1))"
                                                    Disabled="@IsFirst(_edit.Ingredients, ingredient)"
@@ -275,6 +308,8 @@
 
     private Recipe? _recipe;
     private RecipeEditViewModel _edit = new();
+    private List<Ingredient> _knownIngredients = [];
+    private Dictionary<int, Ingredient> _knownIngredientsById = [];
     private bool _isLoading = true;
     private bool _isSaving;
     private string _generalNotesText = string.Empty;
@@ -288,6 +323,8 @@
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
+        _knownIngredients = await IngredientKnowledge.GetKnownIngredientsAsync();
+        _knownIngredientsById = _knownIngredients.ToDictionary(ingredient => ingredient.Id);
         _recipe = await Recipes.GetByIdAsync(Id);
         if (_recipe is not null)
         {
@@ -315,13 +352,16 @@
         {
             var key = $"ingredient-{ingredient.Id}";
             ingredientKeyMap[ingredient.Id] = key;
+            var knownIngredientId = KnownIngredientIdFor(ingredient);
             _edit.Ingredients.Add(new IngredientRow
             {
                 Key = key,
-                Name = ingredient.DisplayName,
+                IngredientId = knownIngredientId ?? FindKnownIngredientId(ingredient.Name),
+                Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
                 Unit = ingredient.Unit,
-                ScalingMode = ingredient.ScalingMode
+                ScalingMode = ingredient.ScalingMode,
+                IsManualLink = knownIngredientId is not null
             });
         }
 
@@ -359,6 +399,32 @@
     private void AddIngredient()
     {
         _edit.Ingredients.Add(new IngredientRow());
+    }
+
+    private void OnIngredientNameChanged(IngredientRow ingredient, string value)
+    {
+        ingredient.Name = value;
+        if (!ingredient.IsManualLink)
+        {
+            ingredient.IngredientId = FindKnownIngredientId(value);
+        }
+    }
+
+    private void OnIngredientLinkChanged(IngredientRow ingredient, string value)
+    {
+        ingredient.IsManualLink = true;
+        if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var ingredientId)
+            || !_knownIngredientsById.TryGetValue(ingredientId, out var knownIngredient))
+        {
+            ingredient.IngredientId = null;
+            return;
+        }
+
+        ingredient.IngredientId = knownIngredient.Id;
+        if (string.IsNullOrWhiteSpace(ingredient.Name))
+        {
+            ingredient.Name = knownIngredient.Name;
+        }
     }
 
     private void RemoveIngredient(IngredientRow ingredient)
@@ -443,6 +509,7 @@
             .Select((ingredient, index) => new RecipeIngredientEditRequest
             {
                 Key = ingredient.Key,
+                IngredientId = KnownIngredientIdFor(ingredient),
                 Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
                 Unit = ingredient.Unit,
@@ -497,6 +564,46 @@
         _edit.Ingredients.FirstOrDefault(ingredient => ingredient.Key == reference.IngredientKey)?.Name
         ?? reference.IngredientName;
 
+    private int? FindKnownIngredientId(string name)
+    {
+        var normalizedName = IngredientNameNormalizer.Normalize(name);
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return null;
+        }
+
+        var match = _knownIngredients.FirstOrDefault(ingredient =>
+            IngredientNameNormalizer.Normalize(ingredient.Name) == normalizedName
+            || ingredient.Aliases.Any(alias => IngredientNameNormalizer.Normalize(alias) == normalizedName));
+
+        return match?.Id;
+    }
+
+    private string IngredientLinkValue(IngredientRow ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
+            ? ingredientId.ToString(CultureInfo.InvariantCulture)
+            : string.Empty;
+
+    private string IngredientLinkText(IngredientRow ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.TryGetValue(ingredientId, out var knownIngredient)
+            ? $"Vinculat: {knownIngredient.Name}"
+            : "Sense vincle";
+
+    private Color IngredientLinkColor(IngredientRow ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
+            ? Color.Success
+            : Color.Secondary;
+
+    private int? KnownIngredientIdFor(RecipeIngredient ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
+            ? ingredientId
+            : null;
+
+    private int? KnownIngredientIdFor(IngredientRow ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
+            ? ingredientId
+            : null;
+
     private int StepNumber(StepRow step) => _edit.Steps.IndexOf(step) + 1;
 
     private static bool IsFirst<T>(List<T> items, T item) => items.IndexOf(item) == 0;
@@ -542,10 +649,12 @@
     private sealed class IngredientRow
     {
         public string Key { get; set; } = Guid.NewGuid().ToString("N");
+        public int? IngredientId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Quantity { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
         public string ScalingMode { get; set; } = IngredientScalingMode.Linear;
+        public bool IsManualLink { get; set; }
     }
 
     private sealed class StepRow

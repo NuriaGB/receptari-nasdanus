@@ -17,6 +17,7 @@ public sealed class RecipeEditRequest
 public sealed class RecipeIngredientEditRequest
 {
     public string Key { get; set; } = string.Empty;
+    public int? IngredientId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Quantity { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;

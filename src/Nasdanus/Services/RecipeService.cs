@@ -227,6 +227,7 @@ public sealed class RecipeService(BrowserAppStore store)
             {
                 Id = store.NextId(state),
                 RecipeId = recipe.Id,
+                IngredientId = ingredientRequest.Ingredient.IngredientId,
                 Name = ingredientRequest.Ingredient.Name.Trim(),
                 Quantity = ingredientRequest.Ingredient.Quantity.Trim(),
                 Unit = ingredientRequest.Ingredient.Unit.Trim(),

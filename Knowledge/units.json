@@ -1,47 +1,47 @@
 {
-  "SchemaVersion": 1,
-  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
-  "Items": [
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-01T16:03:27.0534916+00:00",
+  "items": [
     {
-      "Id": "g",
-      "Name": "grams",
-      "Kind": "weight",
-      "Grams": 1
+      "id": "g",
+      "name": "grams",
+      "kind": "weight",
+      "grams": 1
     },
     {
-      "Id": "kg",
-      "Name": "kilograms",
-      "Kind": "weight",
-      "Grams": 1000
+      "id": "kg",
+      "name": "kilograms",
+      "kind": "weight",
+      "grams": 1000
     },
     {
-      "Id": "ml",
-      "Name": "millilitres",
-      "Kind": "volume",
-      "Grams": 1
+      "id": "ml",
+      "name": "millilitres",
+      "kind": "volume",
+      "grams": 1
     },
     {
-      "Id": "l",
-      "Name": "litres",
-      "Kind": "volume",
-      "Grams": 1000
+      "id": "l",
+      "name": "litres",
+      "kind": "volume",
+      "grams": 1000
     },
     {
-      "Id": "unit",
-      "Name": "unit",
-      "Kind": "count"
+      "id": "unit",
+      "name": "unit",
+      "kind": "count"
     },
     {
-      "Id": "tbsp",
-      "Name": "tablespoon",
-      "Kind": "volume",
-      "Grams": 15
+      "id": "tbsp",
+      "name": "tablespoon",
+      "kind": "volume",
+      "grams": 15
     },
     {
-      "Id": "tsp",
-      "Name": "teaspoon",
-      "Kind": "volume",
-      "Grams": 5
+      "id": "tsp",
+      "name": "teaspoon",
+      "kind": "volume",
+      "grams": 5
     }
   ]
 }

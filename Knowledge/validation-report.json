@@ -1,9 +1,9 @@
 {
-  "GeneratedAt": "2026-07-01T15:30:36.4773627+00:00",
-  "UnknownCategories": [],
-  "DuplicateAliases": [],
-  "MissingNutrition": [],
-  "MissingUnits": [],
-  "DuplicateIngredients": [],
-  "HasIssues": false
+  "generatedAt": "2026-07-01T16:03:27.0948133+00:00",
+  "unknownCategories": [],
+  "duplicateAliases": [],
+  "missingNutrition": [],
+  "missingUnits": [],
+  "duplicateIngredients": [],
+  "hasIssues": false
 }

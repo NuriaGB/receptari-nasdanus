@@ -3,7 +3,9 @@ namespace Nasdanus.Domain;
 public sealed class Ingredient
 {
     public int Id { get; set; }
+    public string KnowledgeId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    public List<string> Aliases { get; set; } = [];
     public string Category { get; set; } = IngredientCategory.Other;
     public string DefaultUnit { get; set; } = "g";
     public string PantryCategory { get; set; } = ShoppingCategory.Other;

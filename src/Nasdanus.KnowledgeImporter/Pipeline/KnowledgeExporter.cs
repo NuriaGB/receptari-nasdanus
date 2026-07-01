@@ -9,6 +9,7 @@ public sealed class KnowledgeExporter
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 

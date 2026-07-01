@@ -96,7 +96,14 @@ public sealed class NutritionService(BrowserAppStore store)
 
     private static void AddIngredientNutrition(NutritionTotals totals, RecipeIngredient ingredient, decimal scale)
     {
-        var nutrition = ingredient.Ingredient?.NutritionPer100Grams;
+        var linkedIngredient = ingredient.Ingredient;
+        if (linkedIngredient is null || string.IsNullOrWhiteSpace(linkedIngredient.KnowledgeId))
+        {
+            totals.UnknownNutritionCount++;
+            return;
+        }
+
+        var nutrition = linkedIngredient.NutritionPer100Grams;
         if (nutrition is null || !nutrition.HasAnyValue)
         {
             totals.UnknownNutritionCount++;
@@ -166,6 +173,8 @@ public sealed class NutritionService(BrowserAppStore store)
             "trossets" => quantity * 5m,
             "fulla" => quantity * 2m,
             "fulles" => quantity * 2m,
+            "unit" => UnitWeightInGrams(ingredientName) is decimal canonicalUnitWeight ? quantity * canonicalUnitWeight : null,
+            "units" => UnitWeightInGrams(ingredientName) is decimal canonicalUnitsWeight ? quantity * canonicalUnitsWeight : null,
             "unitat" => UnitWeightInGrams(ingredientName) is decimal unitWeight ? quantity * unitWeight : null,
             "unitats" => UnitWeightInGrams(ingredientName) is decimal unitsWeight ? quantity * unitsWeight : null,
             "u" => UnitWeightInGrams(ingredientName) is decimal shortUnitWeight ? quantity * shortUnitWeight : null,

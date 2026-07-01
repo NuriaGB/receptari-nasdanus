@@ -23,6 +23,7 @@ builder.Services.AddScoped<ShoppingListService>();
 builder.Services.AddScoped<PantryService>();
 builder.Services.AddScoped<ProductBacklogService>();
 builder.Services.AddScoped<NutritionService>();
+builder.Services.AddScoped<IngredientKnowledgeService>();
 builder.Services.AddScoped<IIngredientNutritionImportService, IngredientNutritionImportService>();
 
 await builder.Build().RunAsync();

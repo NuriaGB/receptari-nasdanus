@@ -1,56 +1,56 @@
 {
-  "SchemaVersion": 1,
-  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
-  "Items": [
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-01T16:03:27.0534916+00:00",
+  "items": [
     {
-      "Id": "vegetables",
-      "Name": "Vegetables",
-      "ShoppingCategory": "Vegetables"
+      "id": "vegetables",
+      "name": "Vegetables",
+      "shoppingCategory": "Vegetables"
     },
     {
-      "Id": "fruit",
-      "Name": "Fruit",
-      "ShoppingCategory": "Vegetables"
+      "id": "fruit",
+      "name": "Fruit",
+      "shoppingCategory": "Vegetables"
     },
     {
-      "Id": "meat",
-      "Name": "Meat",
-      "ShoppingCategory": "Meat"
+      "id": "meat",
+      "name": "Meat",
+      "shoppingCategory": "Meat"
     },
     {
-      "Id": "fish",
-      "Name": "Fish",
-      "ShoppingCategory": "Fish"
+      "id": "fish",
+      "name": "Fish",
+      "shoppingCategory": "Fish"
     },
     {
-      "Id": "dairy-eggs",
-      "Name": "Dairy \u0026 Eggs",
-      "ShoppingCategory": "Dairy \u0026 Eggs"
+      "id": "dairy-eggs",
+      "name": "Dairy \u0026 Eggs",
+      "shoppingCategory": "Dairy \u0026 Eggs"
     },
     {
-      "Id": "legumes",
-      "Name": "Legumes",
-      "ShoppingCategory": "Pantry"
+      "id": "legumes",
+      "name": "Legumes",
+      "shoppingCategory": "Pantry"
     },
     {
-      "Id": "grains",
-      "Name": "Grains",
-      "ShoppingCategory": "Pantry"
+      "id": "grains",
+      "name": "Grains",
+      "shoppingCategory": "Pantry"
     },
     {
-      "Id": "pantry",
-      "Name": "Pantry",
-      "ShoppingCategory": "Pantry"
+      "id": "pantry",
+      "name": "Pantry",
+      "shoppingCategory": "Pantry"
     },
     {
-      "Id": "spices",
-      "Name": "Spices",
-      "ShoppingCategory": "Spices"
+      "id": "spices",
+      "name": "Spices",
+      "shoppingCategory": "Spices"
     },
     {
-      "Id": "other",
-      "Name": "Other",
-      "ShoppingCategory": "Other"
+      "id": "other",
+      "name": "Other",
+      "shoppingCategory": "Other"
     }
   ]
 }

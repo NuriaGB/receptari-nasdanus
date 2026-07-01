@@ -1,5 +1,626 @@
 {
-  "SchemaVersion": 1,
-  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
-  "Items": []
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-01T16:03:27.0534916+00:00",
+  "items": [
+    {
+      "ingredientId": "oli-d\u0027oliva",
+      "alias": "Aceite de oliva"
+    },
+    {
+      "ingredientId": "all",
+      "alias": "Ajo"
+    },
+    {
+      "ingredientId": "alberginia",
+      "alias": "Alberginia"
+    },
+    {
+      "ingredientId": "all",
+      "alias": "All"
+    },
+    {
+      "ingredientId": "mongetes",
+      "alias": "Alubias"
+    },
+    {
+      "ingredientId": "poma",
+      "alias": "Apple"
+    },
+    {
+      "ingredientId": "arros",
+      "alias": "Arros"
+    },
+    {
+      "ingredientId": "arros",
+      "alias": "Arroz"
+    },
+    {
+      "ingredientId": "tonyina",
+      "alias": "Atun"
+    },
+    {
+      "ingredientId": "alberginia",
+      "alias": "Aubergine"
+    },
+    {
+      "ingredientId": "sucre",
+      "alias": "Azucar"
+    },
+    {
+      "ingredientId": "bacalla",
+      "alias": "Bacalao"
+    },
+    {
+      "ingredientId": "bacalla",
+      "alias": "Bacalla"
+    },
+    {
+      "ingredientId": "bacalla",
+      "alias": "Bacall\u00E0"
+    },
+    {
+      "ingredientId": "platan",
+      "alias": "Banana"
+    },
+    {
+      "ingredientId": "mongetes",
+      "alias": "Beans"
+    },
+    {
+      "ingredientId": "vedella",
+      "alias": "Beef"
+    },
+    {
+      "ingredientId": "alberginia",
+      "alias": "Berenjena"
+    },
+    {
+      "ingredientId": "botifarra",
+      "alias": "Botifarra"
+    },
+    {
+      "ingredientId": "pa",
+      "alias": "Bread"
+    },
+    {
+      "ingredientId": "brocoli",
+      "alias": "Broccoli"
+    },
+    {
+      "ingredientId": "brocoli",
+      "alias": "Brocoli"
+    },
+    {
+      "ingredientId": "brocoli",
+      "alias": "Br\u00F2coli"
+    },
+    {
+      "ingredientId": "botifarra",
+      "alias": "Butifarra"
+    },
+    {
+      "ingredientId": "mantega",
+      "alias": "Butter"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "Calabacin"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "Carbasso"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "Carbass\u00F3"
+    },
+    {
+      "ingredientId": "pastanaga",
+      "alias": "Carrot"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "Ceba"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "Cebes"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "Cebolla"
+    },
+    {
+      "ingredientId": "porc",
+      "alias": "Cerdo"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "Cheese"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Chicken breast"
+    },
+    {
+      "ingredientId": "cigrons",
+      "alias": "Chickpeas"
+    },
+    {
+      "ingredientId": "xocolata",
+      "alias": "Chocolate"
+    },
+    {
+      "ingredientId": "cigrons",
+      "alias": "Cigrons"
+    },
+    {
+      "ingredientId": "bacalla",
+      "alias": "Cod"
+    },
+    {
+      "ingredientId": "cogombre",
+      "alias": "Cogombre"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "Courgette"
+    },
+    {
+      "ingredientId": "nata",
+      "alias": "Cream"
+    },
+    {
+      "ingredientId": "nata",
+      "alias": "Crema de leche"
+    },
+    {
+      "ingredientId": "cogombre",
+      "alias": "Cucumber"
+    },
+    {
+      "ingredientId": "all",
+      "alias": "Dent d\u0027all"
+    },
+    {
+      "ingredientId": "all",
+      "alias": "Dents d\u0027all"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Egg"
+    },
+    {
+      "ingredientId": "alberginia",
+      "alias": "Eggplant"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Eggs"
+    },
+    {
+      "ingredientId": "enciam",
+      "alias": "Enciam"
+    },
+    {
+      "ingredientId": "pasta",
+      "alias": "Espaguetis"
+    },
+    {
+      "ingredientId": "espinacs",
+      "alias": "Espinacas"
+    },
+    {
+      "ingredientId": "espinacs",
+      "alias": "Espinacs"
+    },
+    {
+      "ingredientId": "farina",
+      "alias": "Farina"
+    },
+    {
+      "ingredientId": "farina",
+      "alias": "Farina de blat"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Filet de pollastre"
+    },
+    {
+      "ingredientId": "farina",
+      "alias": "Flour"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "Formatge"
+    },
+    {
+      "ingredientId": "gambes",
+      "alias": "Gamba"
+    },
+    {
+      "ingredientId": "gambes",
+      "alias": "Gambes"
+    },
+    {
+      "ingredientId": "cigrons",
+      "alias": "Garbanzos"
+    },
+    {
+      "ingredientId": "all",
+      "alias": "Garlic"
+    },
+    {
+      "ingredientId": "lluca",
+      "alias": "Hake"
+    },
+    {
+      "ingredientId": "farina",
+      "alias": "Harina"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Huevo"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Huevos"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "Iogurt"
+    },
+    {
+      "ingredientId": "mongetes",
+      "alias": "Judias"
+    },
+    {
+      "ingredientId": "gambes",
+      "alias": "Langostino"
+    },
+    {
+      "ingredientId": "llet",
+      "alias": "Leche"
+    },
+    {
+      "ingredientId": "enciam",
+      "alias": "Lechuga"
+    },
+    {
+      "ingredientId": "llimona",
+      "alias": "Lemon"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "Lentejas"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "Lentils"
+    },
+    {
+      "ingredientId": "enciam",
+      "alias": "Lettuce"
+    },
+    {
+      "ingredientId": "llimona",
+      "alias": "Limon"
+    },
+    {
+      "ingredientId": "gambes",
+      "alias": "Llagosti"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "Llenties"
+    },
+    {
+      "ingredientId": "llet",
+      "alias": "Llet"
+    },
+    {
+      "ingredientId": "llimona",
+      "alias": "Llimona"
+    },
+    {
+      "ingredientId": "lluca",
+      "alias": "Lluc"
+    },
+    {
+      "ingredientId": "lluca",
+      "alias": "Lluca"
+    },
+    {
+      "ingredientId": "pasta",
+      "alias": "Macaroni"
+    },
+    {
+      "ingredientId": "pasta",
+      "alias": "Macarrons"
+    },
+    {
+      "ingredientId": "mantega",
+      "alias": "Mantega"
+    },
+    {
+      "ingredientId": "mantega",
+      "alias": "Mantequilla"
+    },
+    {
+      "ingredientId": "poma",
+      "alias": "Manzana"
+    },
+    {
+      "ingredientId": "lluca",
+      "alias": "Merluza"
+    },
+    {
+      "ingredientId": "llet",
+      "alias": "Milk"
+    },
+    {
+      "ingredientId": "mongetes",
+      "alias": "Mongetes"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "alias": "Mozzarella"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "alias": "Mozzarella cheese"
+    },
+    {
+      "ingredientId": "nata",
+      "alias": "Nata"
+    },
+    {
+      "ingredientId": "oli-d\u0027oliva",
+      "alias": "Oli"
+    },
+    {
+      "ingredientId": "oli-d\u0027oliva",
+      "alias": "Oli d\u0027oliva"
+    },
+    {
+      "ingredientId": "oli-d\u0027oliva",
+      "alias": "Olive oil"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "Onion"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Ou"
+    },
+    {
+      "ingredientId": "ou",
+      "alias": "Ous"
+    },
+    {
+      "ingredientId": "pa",
+      "alias": "Pa"
+    },
+    {
+      "ingredientId": "pa",
+      "alias": "Pan"
+    },
+    {
+      "ingredientId": "pasta",
+      "alias": "Pasta"
+    },
+    {
+      "ingredientId": "pastanaga",
+      "alias": "Pastanaga"
+    },
+    {
+      "ingredientId": "pastanaga",
+      "alias": "Pastanagues"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "Patata"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "Patates"
+    },
+    {
+      "ingredientId": "pebrot",
+      "alias": "Pebrot"
+    },
+    {
+      "ingredientId": "pebrot",
+      "alias": "Pebrots"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Pechuga de pollo"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Pechugas de pollo"
+    },
+    {
+      "ingredientId": "cogombre",
+      "alias": "Pepino"
+    },
+    {
+      "ingredientId": "pebrot",
+      "alias": "Pepper"
+    },
+    {
+      "ingredientId": "pebrot",
+      "alias": "Pimiento"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Pit de pollastre"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Pits de pollastre"
+    },
+    {
+      "ingredientId": "platan",
+      "alias": "Platan"
+    },
+    {
+      "ingredientId": "platan",
+      "alias": "Pl\u00E0tan"
+    },
+    {
+      "ingredientId": "platan",
+      "alias": "Platano"
+    },
+    {
+      "ingredientId": "pit-de-pollastre",
+      "alias": "Pollastre"
+    },
+    {
+      "ingredientId": "poma",
+      "alias": "Poma"
+    },
+    {
+      "ingredientId": "porc",
+      "alias": "Porc"
+    },
+    {
+      "ingredientId": "porc",
+      "alias": "Pork"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "Potato"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "Potatoes"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "Queso"
+    },
+    {
+      "ingredientId": "arros",
+      "alias": "Rice"
+    },
+    {
+      "ingredientId": "salmo",
+      "alias": "Salmo"
+    },
+    {
+      "ingredientId": "salmo",
+      "alias": "Salm\u00F3"
+    },
+    {
+      "ingredientId": "salmo",
+      "alias": "Salmon"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "Salsa de soja"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "Salsa soja"
+    },
+    {
+      "ingredientId": "botifarra",
+      "alias": "Salsitxa"
+    },
+    {
+      "ingredientId": "botifarra",
+      "alias": "Sausage"
+    },
+    {
+      "ingredientId": "gambes",
+      "alias": "Shrimp"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "Soy sauce"
+    },
+    {
+      "ingredientId": "pasta",
+      "alias": "Spaghetti"
+    },
+    {
+      "ingredientId": "espinacs",
+      "alias": "Spinach"
+    },
+    {
+      "ingredientId": "sucre",
+      "alias": "Sucre"
+    },
+    {
+      "ingredientId": "sucre",
+      "alias": "Sugar"
+    },
+    {
+      "ingredientId": "vedella",
+      "alias": "Ternera"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tomaquet"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tom\u00E0quet"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tomaquets"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tomate"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tomates"
+    },
+    {
+      "ingredientId": "tomaquet",
+      "alias": "Tomato"
+    },
+    {
+      "ingredientId": "tonyina",
+      "alias": "Tonyina"
+    },
+    {
+      "ingredientId": "tonyina",
+      "alias": "Tuna"
+    },
+    {
+      "ingredientId": "vedella",
+      "alias": "Vedella"
+    },
+    {
+      "ingredientId": "xocolata",
+      "alias": "Xocolata"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "Yoghurt"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "Yogur"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "Yogurt"
+    },
+    {
+      "ingredientId": "pastanaga",
+      "alias": "Zanahoria"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "Zucchini"
+    }
+  ]
 }

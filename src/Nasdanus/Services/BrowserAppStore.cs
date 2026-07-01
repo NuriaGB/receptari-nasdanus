@@ -26,6 +26,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     };
 
     private LocalAppState? state;
+    private IngredientKnowledgeFile? ingredientKnowledge;
 
     public async Task<LocalAppState> GetStateAsync()
     {
@@ -36,6 +37,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
         state = await LoadStoredStateAsync();
 
+        Normalize(state);
+        await MergeIngredientKnowledgeAsync(state);
         Normalize(state);
         return state;
     }
@@ -115,6 +118,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         }
 
         state = validation.State;
+        await MergeIngredientKnowledgeAsync(state);
         await SaveAsync();
         return validation;
     }
@@ -530,7 +534,15 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         foreach (var ingredient in appState.Ingredients)
         {
             AssignId(appState, ingredient.Id, value => ingredient.Id = value, ref maxId);
+            ingredient.KnowledgeId = ingredient.KnowledgeId.Trim();
             ingredient.Name = ingredient.Name.Trim();
+            ingredient.Aliases ??= [];
+            ingredient.Aliases = ingredient.Aliases
+                .Where(alias => !string.IsNullOrWhiteSpace(alias))
+                .Select(alias => alias.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(alias => alias)
+                .ToList();
             ingredient.Category = NormalizeIngredientCategory(ingredient.Category);
             ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
             EnrichIngredientNutrition(ingredient);
@@ -724,24 +736,31 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private Ingredient ResolveRecipeIngredient(LocalAppState appState, RecipeIngredient recipeIngredient, ref int maxId)
     {
+        var name = (recipeIngredient.Ingredient?.Name ?? recipeIngredient.Name).Trim();
+
         if (recipeIngredient.IngredientId is int ingredientId)
         {
             var existingById = FindIngredient(appState, ingredientId);
             if (existingById is not null)
             {
+                var knownMatch = FindIngredientByKnowledgeMatch(appState, name);
+                if (knownMatch is not null
+                    && knownMatch.Id != existingById.Id
+                    && string.IsNullOrWhiteSpace(existingById.KnowledgeId))
+                {
+                    return knownMatch;
+                }
+
                 return existingById;
             }
         }
 
-        var name = (recipeIngredient.Ingredient?.Name ?? recipeIngredient.Name).Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
             name = "Ingredient sense nom";
         }
 
-        var normalizedName = IngredientNameNormalizer.Normalize(name);
-        var existing = appState.Ingredients.FirstOrDefault(ingredient =>
-            IngredientNameNormalizer.Normalize(ingredient.Name) == normalizedName);
+        var existing = FindIngredientByKnowledgeMatch(appState, name);
         if (existing is not null)
         {
             return existing;
@@ -785,7 +804,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     private static Ingredient CloneIngredient(Ingredient ingredient) => new()
     {
         Id = ingredient.Id,
+        KnowledgeId = ingredient.KnowledgeId,
         Name = ingredient.Name,
+        Aliases = ingredient.Aliases.ToList(),
         Category = ingredient.Category,
         DefaultUnit = ingredient.DefaultUnit,
         PantryCategory = ingredient.PantryCategory,
@@ -810,6 +831,162 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private static Ingredient CreateIngredientSnapshot(Ingredient ingredient) => CloneIngredient(ingredient);
 
+    private async Task MergeIngredientKnowledgeAsync(LocalAppState appState)
+    {
+        var knowledge = await LoadIngredientKnowledgeAsync();
+        if (knowledge.Items.Count == 0)
+        {
+            return;
+        }
+
+        EnsureCollections(appState);
+        foreach (var item in knowledge.Items.Where(item => !string.IsNullOrWhiteSpace(item.Name)))
+        {
+            var ingredient = FindIngredientForKnowledgeItem(appState, item);
+            if (ingredient is null)
+            {
+                ingredient = new Ingredient
+                {
+                    Id = NextId(appState),
+                    Name = item.Name.Trim()
+                };
+                appState.Ingredients.Add(ingredient);
+            }
+
+            ApplyKnowledge(ingredient, item);
+        }
+    }
+
+    private async Task<IngredientKnowledgeFile> LoadIngredientKnowledgeAsync()
+    {
+        if (ingredientKnowledge is not null)
+        {
+            return ingredientKnowledge;
+        }
+
+        try
+        {
+            ingredientKnowledge = await httpClient.GetFromJsonAsync<IngredientKnowledgeFile>(
+                "data/ingredients.json",
+                JsonOptions)
+                ?? new IngredientKnowledgeFile();
+        }
+        catch
+        {
+            ingredientKnowledge = new IngredientKnowledgeFile();
+        }
+
+        ingredientKnowledge.Items ??= [];
+        return ingredientKnowledge;
+    }
+
+    private static Ingredient? FindIngredientForKnowledgeItem(LocalAppState appState, IngredientKnowledgeItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Id))
+        {
+            var existingByKnowledgeId = appState.Ingredients.FirstOrDefault(ingredient =>
+                string.Equals(ingredient.KnowledgeId, item.Id, StringComparison.OrdinalIgnoreCase));
+            if (existingByKnowledgeId is not null)
+            {
+                return existingByKnowledgeId;
+            }
+        }
+
+        var knowledgeKeys = KnowledgeKeysFor(item).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return appState.Ingredients.FirstOrDefault(ingredient =>
+            IngredientKeysFor(ingredient).Any(knowledgeKeys.Contains));
+    }
+
+    private static Ingredient? FindIngredientByKnowledgeMatch(LocalAppState appState, string name)
+    {
+        var normalizedName = IngredientNameNormalizer.Normalize(name);
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return null;
+        }
+
+        return appState.Ingredients.FirstOrDefault(ingredient =>
+            IngredientKeysFor(ingredient).Any(key => key == normalizedName));
+    }
+
+    private static IEnumerable<string> IngredientKeysFor(Ingredient ingredient)
+    {
+        var name = IngredientNameNormalizer.Normalize(ingredient.Name);
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            yield return name;
+        }
+
+        foreach (var alias in ingredient.Aliases ?? Enumerable.Empty<string>())
+        {
+            var normalized = IngredientNameNormalizer.Normalize(alias);
+            if (!string.IsNullOrWhiteSpace(normalized))
+            {
+                yield return normalized;
+            }
+        }
+    }
+
+    private static IEnumerable<string> KnowledgeKeysFor(IngredientKnowledgeItem item)
+    {
+        var name = IngredientNameNormalizer.Normalize(item.Name);
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            yield return name;
+        }
+
+        foreach (var alias in item.Aliases ?? Enumerable.Empty<string>())
+        {
+            var normalized = IngredientNameNormalizer.Normalize(alias);
+            if (!string.IsNullOrWhiteSpace(normalized))
+            {
+                yield return normalized;
+            }
+        }
+    }
+
+    private static void ApplyKnowledge(Ingredient ingredient, IngredientKnowledgeItem item)
+    {
+        ingredient.KnowledgeId = item.Id.Trim();
+        if (string.IsNullOrWhiteSpace(ingredient.Name))
+        {
+            ingredient.Name = item.Name.Trim();
+        }
+
+        ingredient.Aliases = ingredient.Aliases
+            .Concat(item.Aliases ?? Enumerable.Empty<string>())
+            .Append(item.Name)
+            .Where(alias => !string.IsNullOrWhiteSpace(alias))
+            .Select(alias => alias.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(alias => alias)
+            .ToList();
+
+        ingredient.Category = MapKnowledgeIngredientCategory(item.Category);
+        ingredient.DefaultUnit = string.IsNullOrWhiteSpace(item.DefaultUnit)
+            ? ingredient.DefaultUnit
+            : item.DefaultUnit.Trim();
+        ingredient.PantryCategory = MapKnowledgeShoppingCategory(item.PantryCategory, item.Category);
+        ingredient.CanFreeze = item.CanFreeze;
+
+        if (item.Nutrition is not null)
+        {
+            ingredient.NutritionPer100Grams = new IngredientNutrition
+            {
+                CaloriesKcal = item.Nutrition.Calories,
+                ProteinGrams = item.Nutrition.Protein,
+                CarbohydrateGrams = item.Nutrition.Carbohydrates,
+                FatGrams = item.Nutrition.Fat,
+                FibreGrams = item.Nutrition.Fibre,
+                SugarGrams = item.Nutrition.Sugar,
+                SaltGrams = item.Nutrition.Salt
+            };
+            ingredient.NutritionSource = string.IsNullOrWhiteSpace(item.Source)
+                ? "Nasdanus Knowledge"
+                : item.Source.Trim();
+        }
+    }
+
     private static Product CreateProductSnapshot(Product product) => new()
     {
         Id = product.Id,
@@ -831,6 +1008,39 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         ShoppingCategory.DisplayOrder.Contains(category)
             ? category
             : ShoppingCategory.Other;
+
+    private static string MapKnowledgeIngredientCategory(string category) =>
+        category switch
+        {
+            "vegetables" => IngredientCategory.Vegetables,
+            "fruit" => IngredientCategory.Fruit,
+            "meat" => IngredientCategory.Meat,
+            "fish" => IngredientCategory.Fish,
+            "dairy-eggs" => IngredientCategory.DairyEggs,
+            "legumes" => IngredientCategory.Legumes,
+            "grains" => IngredientCategory.Grains,
+            "pantry" => IngredientCategory.Pantry,
+            "spices" => IngredientCategory.Spices,
+            _ => IngredientCategory.Other
+        };
+
+    private static string MapKnowledgeShoppingCategory(string pantryCategory, string ingredientCategory)
+    {
+        var category = string.IsNullOrWhiteSpace(pantryCategory) || pantryCategory == "other"
+            ? ingredientCategory
+            : pantryCategory;
+
+        return category switch
+        {
+            "vegetables" or "fruit" => ShoppingCategory.Vegetables,
+            "meat" => ShoppingCategory.Meat,
+            "fish" => ShoppingCategory.Fish,
+            "dairy-eggs" => ShoppingCategory.DairyEggs,
+            "spices" => ShoppingCategory.Spices,
+            "legumes" or "grains" or "pantry" => ShoppingCategory.Pantry,
+            _ => ShoppingCategory.Other
+        };
+    }
 
     private static string DefaultUnitFor(string unit)
     {
@@ -1092,6 +1302,39 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         UpdatedAt = item.UpdatedAt,
         ClosedAt = item.ClosedAt
     };
+
+    private sealed class IngredientKnowledgeFile
+    {
+        public int SchemaVersion { get; set; }
+        public DateTimeOffset GeneratedAt { get; set; }
+        public string Generator { get; set; } = string.Empty;
+        public List<IngredientKnowledgeItem> Items { get; set; } = [];
+    }
+
+    private sealed class IngredientKnowledgeItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public List<string> Aliases { get; set; } = [];
+        public string Category { get; set; } = string.Empty;
+        public string DefaultUnit { get; set; } = string.Empty;
+        public bool CanFreeze { get; set; }
+        public string PantryCategory { get; set; } = string.Empty;
+        public IngredientKnowledgeNutrition? Nutrition { get; set; }
+        public string Source { get; set; } = string.Empty;
+        public string SourceId { get; set; } = string.Empty;
+    }
+
+    private sealed class IngredientKnowledgeNutrition
+    {
+        public decimal? Calories { get; set; }
+        public decimal? Protein { get; set; }
+        public decimal? Carbohydrates { get; set; }
+        public decimal? Fat { get; set; }
+        public decimal? Fibre { get; set; }
+        public decimal? Sugar { get; set; }
+        public decimal? Salt { get; set; }
+    }
 
     private static LocalAppState CreateFallbackState()
     {
