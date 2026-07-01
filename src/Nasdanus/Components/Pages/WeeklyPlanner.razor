@@ -77,6 +77,10 @@
 
                         <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
                         <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
+                        <NutritionSummary Title="Total dia"
+                                          Subtitle="Dinar + sopar"
+                                          Totals="@DayNutritionTotals(day)"
+                                          Dense="true" />
                     </MudPaper>
                 }
             </div>
@@ -160,4 +164,12 @@
     }
 
     private static string FormatDay(DateOnly date) => date.ToString("ddd d/M", Catalan);
+
+    private static NutritionTotals DayNutritionTotals(DayPlan day)
+    {
+        var totals = new NutritionTotals();
+        totals.Add(NutritionService.CalculateMeal(day.Lunch).Totals);
+        totals.Add(NutritionService.CalculateMeal(day.Dinner).Totals);
+        return totals;
+    }
 }

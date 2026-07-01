@@ -78,6 +78,12 @@ public sealed class NutritionService(BrowserAppStore store)
         return totals;
     }
 
+    public static NutritionTotals PerServing(NutritionTotals totals, int servings) =>
+        totals.DivideBy(servings > 0 ? servings : 1);
+
+    public static NutritionTotals AveragePerDay(WeekNutritionSummary week) =>
+        week.Totals.DivideBy(7);
+
     public static string CompactNutritionText(NutritionTotals totals)
     {
         if (!totals.HasKnownNutrition)
@@ -128,12 +134,12 @@ public sealed class NutritionService(BrowserAppStore store)
             ? ingredient.Ingredient?.DefaultUnit ?? string.Empty
             : ingredient.Unit;
 
-        return UnitToGrams(scaledQuantity, unit);
+        return UnitToGrams(scaledQuantity, unit, ingredient.DisplayName);
     }
 
-    private static decimal? UnitToGrams(decimal quantity, string unit)
+    private static decimal? UnitToGrams(decimal quantity, string unit, string ingredientName)
     {
-        var normalized = unit.Trim().ToLowerInvariant();
+        var normalized = FoodText.Normalize(unit);
         return normalized switch
         {
             "" => quantity,
@@ -143,9 +149,88 @@ public sealed class NutritionService(BrowserAppStore store)
             "grams" => quantity,
             "kg" => quantity * 1000m,
             "mg" => quantity / 1000m,
+            "ml" => quantity,
+            "cl" => quantity * 10m,
+            "l" => quantity * 1000m,
+            "cullerada" => quantity * 15m,
+            "cullerades" => quantity * 15m,
+            "tbsp" => quantity * 15m,
+            "culleradeta" => quantity * 5m,
+            "culleradetes" => quantity * 5m,
+            "tsp" => quantity * 5m,
+            "dent" => quantity * 5m,
+            "dents" => quantity * 5m,
+            "grapat" => quantity * 30m,
+            "grapats" => quantity * 30m,
+            "trosset" => quantity * 5m,
+            "trossets" => quantity * 5m,
+            "fulla" => quantity * 2m,
+            "fulles" => quantity * 2m,
+            "unitat" => UnitWeightInGrams(ingredientName) is decimal unitWeight ? quantity * unitWeight : null,
+            "unitats" => UnitWeightInGrams(ingredientName) is decimal unitsWeight ? quantity * unitsWeight : null,
+            "u" => UnitWeightInGrams(ingredientName) is decimal shortUnitWeight ? quantity * shortUnitWeight : null,
             _ => null
         };
     }
+
+    private static decimal? UnitWeightInGrams(string ingredientName)
+    {
+        var name = FoodText.Normalize(ingredientName);
+        if (ContainsAny(name, "ou", "egg"))
+        {
+            return 50m;
+        }
+
+        if (ContainsAny(name, "ceba", "onion"))
+        {
+            return 150m;
+        }
+
+        if (ContainsAny(name, "pastanaga", "carrot"))
+        {
+            return 60m;
+        }
+
+        if (ContainsAny(name, "carbasso", "zucchini"))
+        {
+            return 200m;
+        }
+
+        if (ContainsAny(name, "tomaquet", "tomato"))
+        {
+            return 120m;
+        }
+
+        if (ContainsAny(name, "patata", "potato"))
+        {
+            return 150m;
+        }
+
+        if (ContainsAny(name, "pebrot", "pepper"))
+        {
+            return 120m;
+        }
+
+        if (ContainsAny(name, "llimona", "lemon"))
+        {
+            return 60m;
+        }
+
+        if (ContainsAny(name, "poma", "apple"))
+        {
+            return 150m;
+        }
+
+        if (ContainsAny(name, "platan", "banana"))
+        {
+            return 120m;
+        }
+
+        return null;
+    }
+
+    private static bool ContainsAny(string value, params string[] fragments) =>
+        fragments.Any(fragment => value.Contains(fragment, StringComparison.OrdinalIgnoreCase));
 
     private static MealPlanSlot? SlotFor(LocalAppState state, DateOnly date, MealKind mealKind) =>
         state.MealPlanSlots.FirstOrDefault(slot => slot.Date == date && slot.MealKind == mealKind);

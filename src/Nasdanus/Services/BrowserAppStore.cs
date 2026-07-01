@@ -533,6 +533,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ingredient.Name = ingredient.Name.Trim();
             ingredient.Category = NormalizeIngredientCategory(ingredient.Category);
             ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
+            EnrichIngredientNutrition(ingredient);
         }
 
         foreach (var product in appState.Products)
@@ -755,10 +756,30 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             PantryCategory = GuessPantryCategory(name),
             CanFreeze = GuessCanFreeze(name)
         };
+        EnrichIngredientNutrition(ingredient);
 
         appState.Ingredients.Add(ingredient);
         maxId = Math.Max(maxId, ingredient.Id);
         return ingredient;
+    }
+
+    private static void EnrichIngredientNutrition(Ingredient ingredient)
+    {
+        if (ingredient.NutritionPer100Grams?.HasAnyValue == true)
+        {
+            return;
+        }
+
+        var nutrition = IngredientNutritionKnowledge.FindForName(ingredient.Name);
+        if (nutrition is null)
+        {
+            return;
+        }
+
+        ingredient.NutritionPer100Grams = nutrition;
+        ingredient.NutritionSource = string.IsNullOrWhiteSpace(ingredient.NutritionSource)
+            ? "Local approximate"
+            : ingredient.NutritionSource;
     }
 
     private static Ingredient CloneIngredient(Ingredient ingredient) => new()

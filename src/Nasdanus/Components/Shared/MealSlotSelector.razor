@@ -55,6 +55,12 @@
         <MudText Typo="Typo.caption" Class="meal-nutrition-summary">
             @NutritionService.CompactNutritionText(MealNutrition.Totals)
         </MudText>
+        @if (MealNutrition.Totals.HasMissingData)
+        {
+            <MudText Typo="Typo.caption" Class="nutrition-warning">
+                Some ingredients are missing nutrition data.
+            </MudText>
+        }
     }
 </MudStack>
 

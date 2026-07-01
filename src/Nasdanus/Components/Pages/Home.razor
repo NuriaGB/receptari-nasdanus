@@ -30,6 +30,10 @@
                 </MudItem>
             </MudGrid>
 
+            <NutritionSummary Title="Today"
+                              Subtitle="Lunch + dinner"
+                              Totals="@TodayNutrition" />
+
             @if (_tomorrowReminders.Count > 0)
             {
                 <MudPaper Class="tomorrow-prep" Elevation="0">
@@ -60,39 +64,9 @@
                 </MudStack>
             </MudPaper>
 
-            <MudPaper Class="weekly-nutrition-card" Elevation="0">
-                <MudStack Spacing="2">
-                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="week-summary-content">
-                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                            <MudIcon Icon="@Icons.Material.Filled.MonitorHeart" Color="Color.Primary" Size="Size.Small" />
-                            <MudText Typo="Typo.h6">Nutricio setmanal</MudText>
-                        </MudStack>
-                        @if (_weekNutrition?.Totals.HasKnownNutrition == true)
-                        {
-                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
-                                @_weekNutrition.Totals.KnownIngredientCount ingredients
-                            </MudChip>
-                        }
-                    </MudStack>
-
-                    @if (_weekNutrition is not null)
-                    {
-                        <div class="nutrition-metric-grid">
-                            @NutritionMetric("Calories", _weekNutrition.Totals.CaloriesKcal, "kcal", WeeklyCaloriesDisplayCap)
-                            @NutritionMetric("Proteina", _weekNutrition.Totals.ProteinGrams, "g", WeeklyProteinDisplayCap)
-                            @NutritionMetric("Hidrats", _weekNutrition.Totals.CarbohydrateGrams, "g", WeeklyCarbohydrateDisplayCap)
-                            @NutritionMetric("Greix", _weekNutrition.Totals.FatGrams, "g", WeeklyFatDisplayCap)
-                        </div>
-
-                        @if (!_weekNutrition.Totals.HasKnownNutrition)
-                        {
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                La nutricio apareixera quan completis les dades dels ingredients.
-                            </MudText>
-                        }
-                    }
-                </MudStack>
-            </MudPaper>
+            <NutritionSummary Title="Week average"
+                              Subtitle="Per day, planned lunch + dinner"
+                              Totals="@WeekAverageNutrition" />
 
             <MudPaper Class="future-reminders" Elevation="0">
                 <MudStack Spacing="2">
@@ -138,10 +112,19 @@
     private IReadOnlyList<TomorrowPrepReminder> _tomorrowReminders = [];
     private List<Recipe> _recipes = [];
     private bool _isLoading = true;
-    private const decimal WeeklyCaloriesDisplayCap = 14000;
-    private const decimal WeeklyProteinDisplayCap = 420;
-    private const decimal WeeklyCarbohydrateDisplayCap = 1750;
-    private const decimal WeeklyFatDisplayCap = 540;
+    private NutritionTotals TodayNutrition
+    {
+        get
+        {
+            var totals = new NutritionTotals();
+            totals.Add(NutritionService.CalculateMeal(_lunch).Totals);
+            totals.Add(NutritionService.CalculateMeal(_dinner).Totals);
+            return totals;
+        }
+    }
+    private NutritionTotals WeekAverageNutrition => _weekNutrition is null
+        ? new NutritionTotals()
+        : NutritionService.AveragePerDay(_weekNutrition);
     private readonly string[] _futureReminders =
     [
         "Recorda treure pollastre del congelador demà.",
@@ -347,17 +330,6 @@
 
         return plannedRecipe.Recipe?.Servings > 0 ? plannedRecipe.Recipe.Servings : 3;
     }
-
-    private static RenderFragment NutritionMetric(string label, decimal value, string unit, decimal displayCap) => @<div class="nutrition-metric">
-        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.body2">@label</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">@($"{value:0} {unit}")</MudText>
-        </MudStack>
-        <MudProgressLinear Value="@ProgressValue(value, displayCap)" Color="Color.Primary" Rounded="true" Class="nutrition-progress" />
-    </div>;
-
-    private static double ProgressValue(decimal value, decimal displayCap) =>
-        displayCap <= 0 ? 0 : Math.Min(100, (double)(value / displayCap * 100));
 
     private sealed record TomorrowPrepReminder(string Title, string Detail, string Icon);
 }

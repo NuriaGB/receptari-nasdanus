@@ -1,0 +1,68 @@
+@using System.Globalization
+
+<MudPaper Class="@CssClass" Elevation="0">
+    <MudStack Spacing="1">
+        @if (!string.IsNullOrWhiteSpace(Title) || !string.IsNullOrWhiteSpace(Subtitle))
+        {
+            <div class="nutrition-summary-heading">
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <MudText Typo="@(Dense ? Typo.subtitle2 : Typo.h6)">@Title</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Subtitle</MudText>
+                }
+            </div>
+        }
+
+        <div class="nutrition-summary-grid">
+            @Metric("kcal", Totals.CaloriesKcal, "kcal")
+            @Metric("Protein", Totals.ProteinGrams, "g")
+            @Metric("Carbs", Totals.CarbohydrateGrams, "g")
+            @Metric("Fat", Totals.FatGrams, "g")
+        </div>
+
+        @if (ShowWarning && Totals.HasMissingData)
+        {
+            <MudText Typo="Typo.caption" Class="nutrition-warning">
+                Some ingredients are missing nutrition data.
+            </MudText>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public NutritionTotals Totals { get; set; } = new();
+
+    [Parameter]
+    public bool Dense { get; set; }
+
+    [Parameter]
+    public bool ShowWarning { get; set; } = true;
+
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    private string CssClass => string.Join(
+        " ",
+        new[] { "nutrition-summary-card", Dense ? "is-dense" : string.Empty, Class }
+            .Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static RenderFragment Metric(string label, decimal value, string unit) => @<div class="nutrition-summary-metric">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@label</MudText>
+        <MudText Typo="Typo.subtitle2">@Format(value, unit)</MudText>
+    </div>;
+
+    private static string Format(decimal value, string unit) =>
+        unit == "kcal"
+            ? $"{value.ToString("0", CultureInfo.InvariantCulture)} {unit}"
+            : $"{value.ToString("0", CultureInfo.InvariantCulture)} {unit}";
+}

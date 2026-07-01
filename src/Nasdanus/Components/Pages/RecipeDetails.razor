@@ -132,6 +132,10 @@
                                  AdornmentIcon="@Icons.Material.Filled.Groups" />
             </MudPaper>
 
+            <NutritionSummary Title="Nutricio aproximada"
+                              Subtitle="Per racio"
+                              Totals="@RecipeNutritionPerServing" />
+
             <MudPaper Class="detail-section ingredient-section" Elevation="0">
                 <MudText Typo="Typo.h5">Ingredients</MudText>
                 @if (_recipe.Ingredients.Count == 0)
@@ -233,6 +237,8 @@
     private bool IsPlannedContext => _plannedRecipe is not null;
     private string ServingInputLabel => IsPlannedContext ? "Racions planificades" : "Racions temporals";
     private decimal ScaleFactor => _recipe is null ? 1 : IngredientScaling.ScaleFactor(_recipe.Servings, _displayServings);
+    private NutritionTotals RecipeNutrition => _recipe is null ? new NutritionTotals() : NutritionService.CalculateRecipe(_recipe, _displayServings);
+    private NutritionTotals RecipeNutritionPerServing => NutritionService.PerServing(RecipeNutrition, _displayServings);
     private string CookHref
     {
         get

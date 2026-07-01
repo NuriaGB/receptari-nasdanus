@@ -14,6 +14,7 @@ public sealed class NutritionTotals
     public int UnknownQuantityCount { get; set; }
 
     public bool HasKnownNutrition => KnownIngredientCount > 0;
+    public bool HasMissingData => UnknownNutritionCount > 0 || UnknownQuantityCount > 0;
 
     public void Add(NutritionTotals other)
     {
@@ -42,6 +43,28 @@ public sealed class NutritionTotals
         UnknownNutritionCount = UnknownNutritionCount,
         UnknownQuantityCount = UnknownQuantityCount
     };
+
+    public NutritionTotals DivideBy(decimal divisor)
+    {
+        if (divisor <= 0)
+        {
+            return Clone();
+        }
+
+        return new NutritionTotals
+        {
+            CaloriesKcal = CaloriesKcal / divisor,
+            ProteinGrams = ProteinGrams / divisor,
+            CarbohydrateGrams = CarbohydrateGrams / divisor,
+            FatGrams = FatGrams / divisor,
+            FibreGrams = FibreGrams / divisor,
+            SugarGrams = SugarGrams / divisor,
+            SaltGrams = SaltGrams / divisor,
+            KnownIngredientCount = KnownIngredientCount,
+            UnknownNutritionCount = UnknownNutritionCount,
+            UnknownQuantityCount = UnknownQuantityCount
+        };
+    }
 }
 
 public sealed record RecipeNutritionSummary(
