@@ -1,0 +1,56 @@
+{
+  "SchemaVersion": 1,
+  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
+  "Items": [
+    {
+      "Id": "vegetables",
+      "Name": "Vegetables",
+      "ShoppingCategory": "Vegetables"
+    },
+    {
+      "Id": "fruit",
+      "Name": "Fruit",
+      "ShoppingCategory": "Vegetables"
+    },
+    {
+      "Id": "meat",
+      "Name": "Meat",
+      "ShoppingCategory": "Meat"
+    },
+    {
+      "Id": "fish",
+      "Name": "Fish",
+      "ShoppingCategory": "Fish"
+    },
+    {
+      "Id": "dairy-eggs",
+      "Name": "Dairy \u0026 Eggs",
+      "ShoppingCategory": "Dairy \u0026 Eggs"
+    },
+    {
+      "Id": "legumes",
+      "Name": "Legumes",
+      "ShoppingCategory": "Pantry"
+    },
+    {
+      "Id": "grains",
+      "Name": "Grains",
+      "ShoppingCategory": "Pantry"
+    },
+    {
+      "Id": "pantry",
+      "Name": "Pantry",
+      "ShoppingCategory": "Pantry"
+    },
+    {
+      "Id": "spices",
+      "Name": "Spices",
+      "ShoppingCategory": "Spices"
+    },
+    {
+      "Id": "other",
+      "Name": "Other",
+      "ShoppingCategory": "Other"
+    }
+  ]
+}

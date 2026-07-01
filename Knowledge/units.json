@@ -1,0 +1,47 @@
+{
+  "SchemaVersion": 1,
+  "GeneratedAt": "2026-07-01T15:30:36.463501+00:00",
+  "Items": [
+    {
+      "Id": "g",
+      "Name": "grams",
+      "Kind": "weight",
+      "Grams": 1
+    },
+    {
+      "Id": "kg",
+      "Name": "kilograms",
+      "Kind": "weight",
+      "Grams": 1000
+    },
+    {
+      "Id": "ml",
+      "Name": "millilitres",
+      "Kind": "volume",
+      "Grams": 1
+    },
+    {
+      "Id": "l",
+      "Name": "litres",
+      "Kind": "volume",
+      "Grams": 1000
+    },
+    {
+      "Id": "unit",
+      "Name": "unit",
+      "Kind": "count"
+    },
+    {
+      "Id": "tbsp",
+      "Name": "tablespoon",
+      "Kind": "volume",
+      "Grams": 15
+    },
+    {
+      "Id": "tsp",
+      "Name": "teaspoon",
+      "Kind": "volume",
+      "Grams": 5
+    }
+  ]
+}
