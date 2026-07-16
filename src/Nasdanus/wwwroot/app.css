@@ -225,6 +225,19 @@ h3:focus {
     flex-wrap: wrap;
 }
 
+.food-target-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.6rem;
+    min-width: 0;
+    margin-top: 0.4rem;
+}
+
+.food-target-chips .mud-chip {
+    max-width: 100%;
+}
+
 .prep-list .mud-list-item {
     padding-left: 0;
 }
