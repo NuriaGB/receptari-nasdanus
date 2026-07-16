@@ -66,15 +66,15 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
         NutritionGoals = new HouseholdNutritionGoals
         {
             GoalScope = settings?.NutritionGoals?.GoalScope ?? NutritionGoalScope.WeeklyAverage,
-            MacroMode = settings?.NutritionGoals?.MacroMode ?? NutritionMacroMode.AbsoluteGrams,
+            MacroMode = NutritionMacroMode.PercentageDistribution,
             TargetCaloriesPerPerson = settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000,
-            MinimumProteinGramsPerPerson = settings?.NutritionGoals?.MinimumProteinGramsPerPerson ?? 85,
-            TargetCarbohydrateGramsPerPerson = settings?.NutritionGoals?.TargetCarbohydrateGramsPerPerson ?? 240,
-            TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 70,
-            TargetFibreGramsPerPerson = settings?.NutritionGoals?.TargetFibreGramsPerPerson ?? 25,
+            MinimumProteinGramsPerPerson = CalculateMacroGrams(settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000, settings?.NutritionGoals?.ProteinPercent ?? 30, 4),
+            TargetCarbohydrateGramsPerPerson = CalculateMacroGrams(settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000, settings?.NutritionGoals?.CarbohydratePercent ?? 35, 4),
+            TargetFatGramsPerPerson = CalculateMacroGrams(settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000, settings?.NutritionGoals?.FatPercent ?? 35, 9),
+            TargetFibreGramsPerPerson = settings?.NutritionGoals?.TargetFibreGramsPerPerson ?? 30,
             ProteinPercent = settings?.NutritionGoals?.ProteinPercent ?? 30,
-            CarbohydratePercent = settings?.NutritionGoals?.CarbohydratePercent ?? 40,
-            FatPercent = settings?.NutritionGoals?.FatPercent ?? 30
+            CarbohydratePercent = settings?.NutritionGoals?.CarbohydratePercent ?? 35,
+            FatPercent = settings?.NutritionGoals?.FatPercent ?? 35
         },
         WeeklyFoodRules = new WeeklyFoodRules
         {
@@ -159,4 +159,9 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
             PreserveManualItemsWhenRegenerating = settings?.Shopping?.PreserveManualItemsWhenRegenerating ?? true
         }
     };
+
+    private static decimal CalculateMacroGrams(decimal calories, decimal percent, decimal caloriesPerGram) =>
+        calories <= 0 || percent <= 0 || caloriesPerGram <= 0
+            ? 0
+            : Math.Round(calories * percent / 100m / caloriesPerGram, 1);
 }

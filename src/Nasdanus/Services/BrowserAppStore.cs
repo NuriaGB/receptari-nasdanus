@@ -1200,15 +1200,15 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             NutritionGoals = new HouseholdNutritionGoals
             {
                 GoalScope = settings?.NutritionGoals?.GoalScope ?? NutritionGoalScope.WeeklyAverage,
-                MacroMode = settings?.NutritionGoals?.MacroMode ?? NutritionMacroMode.AbsoluteGrams,
+                MacroMode = settings?.NutritionGoals?.MacroMode ?? NutritionMacroMode.PercentageDistribution,
                 TargetCaloriesPerPerson = settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000,
-                MinimumProteinGramsPerPerson = settings?.NutritionGoals?.MinimumProteinGramsPerPerson ?? 85,
-                TargetCarbohydrateGramsPerPerson = settings?.NutritionGoals?.TargetCarbohydrateGramsPerPerson ?? 240,
-                TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 70,
-                TargetFibreGramsPerPerson = settings?.NutritionGoals?.TargetFibreGramsPerPerson ?? 25,
+                MinimumProteinGramsPerPerson = settings?.NutritionGoals?.MinimumProteinGramsPerPerson ?? 150,
+                TargetCarbohydrateGramsPerPerson = settings?.NutritionGoals?.TargetCarbohydrateGramsPerPerson ?? 175,
+                TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 77.8m,
+                TargetFibreGramsPerPerson = settings?.NutritionGoals?.TargetFibreGramsPerPerson ?? 30,
                 ProteinPercent = settings?.NutritionGoals?.ProteinPercent ?? 30,
-                CarbohydratePercent = settings?.NutritionGoals?.CarbohydratePercent ?? 40,
-                FatPercent = settings?.NutritionGoals?.FatPercent ?? 30
+                CarbohydratePercent = settings?.NutritionGoals?.CarbohydratePercent ?? 35,
+                FatPercent = settings?.NutritionGoals?.FatPercent ?? 35
             },
             WeeklyFoodRules = new WeeklyFoodRules
             {
@@ -1361,20 +1361,28 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             .Select(NormalizeHouseholdMemberProfile)
             .ToList();
 
+        var usedLegacyMacroDefaults = settings.NutritionGoals.MacroMode == NutritionMacroMode.AbsoluteGrams
+            && settings.NutritionGoals.ProteinPercent == 30
+            && settings.NutritionGoals.CarbohydratePercent == 40
+            && settings.NutritionGoals.FatPercent == 30;
+
         settings.NutritionGoals.GoalScope = NutritionGoalScope.All.Contains(settings.NutritionGoals.GoalScope)
             ? settings.NutritionGoals.GoalScope
             : NutritionGoalScope.WeeklyAverage;
-        settings.NutritionGoals.MacroMode = NutritionMacroMode.All.Contains(settings.NutritionGoals.MacroMode)
-            ? settings.NutritionGoals.MacroMode
-            : NutritionMacroMode.AbsoluteGrams;
+        settings.NutritionGoals.MacroMode = NutritionMacroMode.PercentageDistribution;
         settings.NutritionGoals.TargetCaloriesPerPerson = Math.Max(0, settings.NutritionGoals.TargetCaloriesPerPerson);
-        settings.NutritionGoals.MinimumProteinGramsPerPerson = Math.Max(0, settings.NutritionGoals.MinimumProteinGramsPerPerson);
-        settings.NutritionGoals.TargetCarbohydrateGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetCarbohydrateGramsPerPerson);
-        settings.NutritionGoals.TargetFatGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetFatGramsPerPerson);
         settings.NutritionGoals.TargetFibreGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetFibreGramsPerPerson);
         settings.NutritionGoals.ProteinPercent = Math.Clamp(settings.NutritionGoals.ProteinPercent, 0, 100);
         settings.NutritionGoals.CarbohydratePercent = Math.Clamp(settings.NutritionGoals.CarbohydratePercent, 0, 100);
         settings.NutritionGoals.FatPercent = Math.Clamp(settings.NutritionGoals.FatPercent, 0, 100);
+        if (usedLegacyMacroDefaults)
+        {
+            settings.NutritionGoals.CarbohydratePercent = 35;
+            settings.NutritionGoals.FatPercent = 35;
+            settings.NutritionGoals.TargetFibreGramsPerPerson = 30;
+        }
+
+        SyncCalculatedMacroGramTargets(settings.NutritionGoals);
 
         settings.WeeklyFoodRules.MinimumFishMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumFishMeals);
         settings.WeeklyFoodRules.MinimumLegumeMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumLegumeMeals);
@@ -1501,6 +1509,18 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
         return normalized;
     }
+
+    private static void SyncCalculatedMacroGramTargets(HouseholdNutritionGoals goals)
+    {
+        goals.MinimumProteinGramsPerPerson = CalculateMacroGrams(goals.TargetCaloriesPerPerson, goals.ProteinPercent, 4);
+        goals.TargetCarbohydrateGramsPerPerson = CalculateMacroGrams(goals.TargetCaloriesPerPerson, goals.CarbohydratePercent, 4);
+        goals.TargetFatGramsPerPerson = CalculateMacroGrams(goals.TargetCaloriesPerPerson, goals.FatPercent, 9);
+    }
+
+    private static decimal CalculateMacroGrams(decimal calories, decimal percent, decimal caloriesPerGram) =>
+        calories <= 0 || percent <= 0 || caloriesPerGram <= 0
+            ? 0
+            : Math.Round(calories * percent / 100m / caloriesPerGram, 1);
 
     private static BodyMeasurement NormalizeBodyMeasurement(BodyMeasurement measurement)
     {

@@ -274,15 +274,15 @@ public static class HouseholdMemberDefaults
 public sealed class HouseholdNutritionGoals
 {
     public string GoalScope { get; set; } = NutritionGoalScope.WeeklyAverage;
-    public string MacroMode { get; set; } = NutritionMacroMode.AbsoluteGrams;
+    public string MacroMode { get; set; } = NutritionMacroMode.PercentageDistribution;
     public decimal TargetCaloriesPerPerson { get; set; } = 2000;
-    public decimal MinimumProteinGramsPerPerson { get; set; } = 85;
-    public decimal TargetCarbohydrateGramsPerPerson { get; set; } = 240;
-    public decimal TargetFatGramsPerPerson { get; set; } = 70;
-    public decimal TargetFibreGramsPerPerson { get; set; } = 25;
+    public decimal MinimumProteinGramsPerPerson { get; set; } = 150;
+    public decimal TargetCarbohydrateGramsPerPerson { get; set; } = 175;
+    public decimal TargetFatGramsPerPerson { get; set; } = 77.8m;
+    public decimal TargetFibreGramsPerPerson { get; set; } = 30;
     public decimal ProteinPercent { get; set; } = 30;
-    public decimal CarbohydratePercent { get; set; } = 40;
-    public decimal FatPercent { get; set; } = 30;
+    public decimal CarbohydratePercent { get; set; } = 35;
+    public decimal FatPercent { get; set; } = 35;
 }
 
 public sealed class WeeklyFoodRules

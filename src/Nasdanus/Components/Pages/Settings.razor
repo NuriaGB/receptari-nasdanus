@@ -87,7 +87,7 @@
                     <MudPaper Class="settings-section" Elevation="0">
                         @SectionHeading("Household Members", "Perfils informatius per personalitzar suggeriments. No son dades mediques ni prescriuen dietes.")
                         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                            Aquests perfils ajudaran el motor de nutricio i suggeriments a entendre la composicio de la llar, activitat, gustos i consideracions generals.
+                            Nasdanus plans one shared family menu. Member profiles only help understand the household's activity, preferences and general considerations; they never create separate meal plans.
                         </MudAlert>
                         <MudButton OnClick="AddMember"
                                    Variant="Variant.Outlined"
@@ -262,7 +262,10 @@
                                         }
                                     </MudPaper>
 
-                                    <MudText Typo="Typo.subtitle2">Objectius nutricionals</MudText>
+                                    <MudText Typo="Typo.subtitle2">Informative factors for family recipe ranking</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        These notes may influence future recommendation scoring, but they do not create individual nutrition targets or different meals.
+                                    </MudText>
                                     <div class="settings-check-grid">
                                         @foreach (var goal in MemberNutritionGoal.All)
                                         {
@@ -280,11 +283,14 @@
                     </MudPaper>
                 </MudTabPanel>
 
-                <MudTabPanel Text="Nutrition Goals">
+                <MudTabPanel Text="Family Nutrition Profile">
                     <MudPaper Class="settings-section" Elevation="0">
-                        @SectionHeading("Nutrition Goals", "Objectius aproximats per menjar millor durant la setmana.")
+                        @SectionHeading("Family Nutrition Profile", "One nutritional profile for the household's shared weekly menu.")
                         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                            Nutrition targets are always defined per person and per day. When Weekly daily average is selected, Nasdanus compares the average of the planned days with these daily values.
+                            Nasdanus is a Family Meal Planner. The family cooks one menu for everyone; individual profiles help understand the household, not generate separate recipes.
+                        </MudAlert>
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Text">
+                            Nutritional targets are always expressed per person per day. When Weekly Daily Average is selected, Nasdanus compares the average intake across the planned week.
                         </MudAlert>
                         <MudGrid Spacing="2">
                             <MudItem xs="12" md="4">
@@ -296,54 +302,39 @@
                                 </MudSelect>
                             </MudItem>
                             <MudItem xs="12" md="4">
-                                <MudSelect T="string" Label="Input mode" @bind-Value="_settings.NutritionGoals.MacroMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
-                                    @foreach (var mode in NutritionMacroMode.All)
-                                    {
-                                        <MudSelectItem T="string" Value="@mode">@MacroModeDisplayName(mode)</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            </MudItem>
-                            <MudItem xs="12" md="4">
-                                <MudNumericField T="decimal" Label="Calories kcal/person/day" @bind-Value="_settings.NutritionGoals.TargetCaloriesPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Approximate household target kcal/person/day" @bind-Value="_settings.NutritionGoals.TargetCaloriesPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
                             </MudItem>
                         </MudGrid>
 
-                        @if (_settings.NutritionGoals.MacroMode == NutritionMacroMode.PercentageDistribution)
+                        @if (!IsMacroPercentValid)
                         {
-                            @if (!IsMacroPercentValid)
-                            {
-                                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
-                                    Protein, carbohydrates and fat must add up to 100%. Current total: @MacroPercentTotal.ToString("0.#", CultureInfo.InvariantCulture)%.
-                                </MudAlert>
-                            }
-                            <div class="settings-grid settings-grid-four">
-                                <MudNumericField T="decimal" Label="Proteina %" @bind-Value="_settings.NutritionGoals.ProteinPercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudNumericField T="decimal" Label="Hidrats %" @bind-Value="_settings.NutritionGoals.CarbohydratePercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudNumericField T="decimal" Label="Greix %" @bind-Value="_settings.NutritionGoals.FatPercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudPaper Class="settings-metric" Elevation="0">
-                                    <MudText Typo="Typo.overline">Total</MudText>
-                                    <MudText Typo="Typo.h6">@MacroPercentTotal.ToString("0", CultureInfo.InvariantCulture)%</MudText>
-                                </MudPaper>
-                            </div>
-                            <div class="settings-grid settings-grid-four">
-                                @AboutMetric("Protein calculated", $"{CalculatedProteinGrams.ToString("0.#", CultureInfo.InvariantCulture)} g/person/day")
-                                @AboutMetric("Carbs calculated", $"{CalculatedCarbGrams.ToString("0.#", CultureInfo.InvariantCulture)} g/person/day")
-                                @AboutMetric("Fat calculated", $"{CalculatedFatGrams.ToString("0.#", CultureInfo.InvariantCulture)} g/person/day")
-                                <MudNumericField T="decimal" Label="Fibre g/person/day optional" @bind-Value="_settings.NutritionGoals.TargetFibreGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                            </div>
+                            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                                Protein, carbohydrates and fat must add up to 100%. Current total: @MacroPercentTotal.ToString("0.#", CultureInfo.InvariantCulture)%.
+                            </MudAlert>
                         }
-                        else
-                        {
-                            <div class="settings-grid settings-grid-four">
-                                <MudNumericField T="decimal" Label="Protein g/person/day" @bind-Value="_settings.NutritionGoals.MinimumProteinGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudNumericField T="decimal" Label="Carbohydrates g/person/day" @bind-Value="_settings.NutritionGoals.TargetCarbohydrateGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudNumericField T="decimal" Label="Fat g/person/day" @bind-Value="_settings.NutritionGoals.TargetFatGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudNumericField T="decimal" Label="Fibre g/person/day optional" @bind-Value="_settings.NutritionGoals.TargetFibreGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                            </div>
-                        }
-                        <MudAlert Severity="Severity.Info" Variant="Variant.Text">
-                            Household defaults are editable here. Individual goal overrides will be supported later and will always be labelled as approximate, never as medical recommendations.
-                        </MudAlert>
+
+                        <div class="family-macro-grid">
+                            @MacroEditor("Protein", _settings.NutritionGoals.ProteinPercent, value => _settings.NutritionGoals.ProteinPercent = value, CalculatedProteinGrams)
+                            @MacroEditor("Carbohydrates", _settings.NutritionGoals.CarbohydratePercent, value => _settings.NutritionGoals.CarbohydratePercent = value, CalculatedCarbGrams)
+                            @MacroEditor("Fat", _settings.NutritionGoals.FatPercent, value => _settings.NutritionGoals.FatPercent = value, CalculatedFatGrams)
+                            <MudPaper Class="settings-metric" Elevation="0">
+                                <MudText Typo="Typo.overline">Total macro distribution</MudText>
+                                <MudText Typo="Typo.h6">@MacroPercentTotal.ToString("0.#", CultureInfo.InvariantCulture)%</MudText>
+                            </MudPaper>
+                        </div>
+
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4">
+                                <MudNumericField T="decimal" Label="Fibre g/person/day" @bind-Value="_settings.NutritionGoals.TargetFibreGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudPaper Class="family-purpose-panel" Elevation="0">
+                            <MudText Typo="Typo.h6">Household purpose</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                This profile helps evaluate the family as a whole: increase protein intake, eat enough fish, include legumes regularly, improve weekly balance and reduce planning effort. It is not intended for dieting or medical prescriptions.
+                            </MudText>
+                        </MudPaper>
                     </MudPaper>
                 </MudTabPanel>
 
@@ -839,8 +830,7 @@
             + _settings.NutritionGoals.CarbohydratePercent
             + _settings.NutritionGoals.FatPercent;
 
-    private bool IsMacroPercentValid => _settings?.NutritionGoals.MacroMode != NutritionMacroMode.PercentageDistribution
-        || MacroPercentTotal == 100m;
+    private bool IsMacroPercentValid => MacroPercentTotal == 100m;
     private decimal CalculatedProteinGrams => CalculatedMacroGrams(_settings?.NutritionGoals.ProteinPercent ?? 0, 4);
     private decimal CalculatedCarbGrams => CalculatedMacroGrams(_settings?.NutritionGoals.CarbohydratePercent ?? 0, 4);
     private decimal CalculatedFatGrams => CalculatedMacroGrams(_settings?.NutritionGoals.FatPercent ?? 0, 9);
@@ -893,6 +883,7 @@
             return;
         }
 
+        SyncFamilyNutritionProfile();
         _isSavingSettings = true;
         try
         {
@@ -1054,6 +1045,19 @@
     private void RemoveFreezerItem(FreezerInventoryItem item)
     {
         _settings?.KitchenPantry.FreezerItems.Remove(item);
+    }
+
+    private void SyncFamilyNutritionProfile()
+    {
+        if (_settings is null)
+        {
+            return;
+        }
+
+        _settings.NutritionGoals.MacroMode = NutritionMacroMode.PercentageDistribution;
+        _settings.NutritionGoals.MinimumProteinGramsPerPerson = CalculatedProteinGrams;
+        _settings.NutritionGoals.TargetCarbohydrateGramsPerPerson = CalculatedCarbGrams;
+        _settings.NutritionGoals.TargetFatGramsPerPerson = CalculatedFatGrams;
     }
 
     private static bool IsGoalSelected(HouseholdMemberProfile member, string goal) =>
@@ -1225,13 +1229,6 @@
         return Math.Round(_settings.NutritionGoals.TargetCaloriesPerPerson * percent / 100m / caloriesPerGram, 1);
     }
 
-    private static string MacroModeDisplayName(string mode) => mode switch
-    {
-        NutritionMacroMode.AbsoluteGrams => "Grams per person per day",
-        NutritionMacroMode.PercentageDistribution => "Percentage of calories",
-        _ => mode
-    };
-
     private static string DisplayTranslations(Ingredient ingredient)
     {
         var names = new[] { ingredient.CatalanName, ingredient.SpanishName }
@@ -1266,6 +1263,18 @@
     private static RenderFragment AboutMetric(string label, string value) => @<MudPaper Class="settings-metric" Elevation="0">
         <MudText Typo="Typo.overline">@label</MudText>
         <MudText Typo="Typo.h6">@value</MudText>
+    </MudPaper>;
+
+    private RenderFragment MacroEditor(string label, decimal percent, Action<decimal> setPercent, decimal calculatedGrams) => @<MudPaper Class="family-macro-card" Elevation="0">
+        <MudNumericField T="decimal"
+                         Label="@($"{label} %")"
+                         Value="@percent"
+                         ValueChanged="@((decimal value) => setPercent(Math.Clamp(value, 0, 100)))"
+                         Min="0"
+                         Max="100"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense" />
+        <MudText Typo="Typo.body2" Color="Color.Secondary">~ @calculatedGrams.ToString("0.#", CultureInfo.InvariantCulture) g/day</MudText>
     </MudPaper>;
 
     private sealed record CategoryFilter(string Category, string Label);

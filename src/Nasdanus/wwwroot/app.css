@@ -353,6 +353,22 @@ h3:focus {
     background: #fff;
 }
 
+.family-macro-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.family-macro-card,
+.family-purpose-panel {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
 .member-profile-card {
     display: grid;
     gap: 1rem;
@@ -458,6 +474,7 @@ h3:focus {
     .ingredient-preference-row,
     .ingredient-preference-controls,
     .settings-grid-four,
+    .family-macro-grid,
     .settings-target-row,
     .freezer-inventory-row,
     .member-bmi-summary,
