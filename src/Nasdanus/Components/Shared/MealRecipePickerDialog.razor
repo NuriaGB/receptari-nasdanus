@@ -38,44 +38,120 @@
                                        Dense="true"
                                        Adornment="Adornment.Start"
                                        AdornmentIcon="@Icons.Material.Filled.Restaurant">
-                                <MudSelectItem T="string" Value="@string.Empty">Tots els àpats</MudSelectItem>
+                                <MudSelectItem T="string" Value="@string.Empty">Tots els apats</MudSelectItem>
                                 <MudSelectItem T="string" Value="@MealKind.Lunch.ToString()">Dinar</MudSelectItem>
                                 <MudSelectItem T="string" Value="@MealKind.Dinner.ToString()">Sopar</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                     </MudGrid>
 
-                    <MudNumericField T="int"
-                                     Label="Racions planificades"
-                                     @bind-Value="_plannedServings"
-                                     Min="1"
-                                     Immediate="true"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Adornment="Adornment.Start"
-                                     AdornmentIcon="@Icons.Material.Filled.Groups" />
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" sm="4">
+                            <MudSelect T="string"
+                                       Label="Documentation"
+                                       @bind-Value="_documentationStatus"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Dense="true">
+                                <MudSelectItem T="string" Value="@string.Empty">Usable by default</MudSelectItem>
+                                @foreach (var status in RecipeDocumentationStatus.All)
+                                {
+                                    <MudSelectItem T="string" Value="@status">@RecipeDocumentationStatus.ToDisplayName(status)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudSelect T="string"
+                                       Label="Cooking"
+                                       @bind-Value="_cookingStatus"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Dense="true">
+                                <MudSelectItem T="string" Value="@string.Empty">All cooking statuses</MudSelectItem>
+                                @foreach (var status in RecipeCookingStatus.All)
+                                {
+                                    <MudSelectItem T="string" Value="@status">@RecipeCookingStatus.ToDisplayName(status)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudNumericField T="int"
+                                             Label="Racions planificades"
+                                             @bind-Value="_plannedServings"
+                                             Min="1"
+                                             Immediate="true"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Adornment="Adornment.Start"
+                                             AdornmentIcon="@Icons.Material.Filled.Groups" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <div class="recipe-filter-chips" role="group" aria-label="Recipe picker quick filters">
+                        @foreach (var filter in QuickFilters)
+                        {
+                            <MudButton OnClick="@(() => ToggleQuickFilter(filter.Key))"
+                                       Variant="@QuickFilterVariant(filter.Key)"
+                                       Color="Color.Primary"
+                                       Size="Size.Small">
+                                @filter.Label
+                            </MudButton>
+                        }
+                    </div>
+
+                    <div class="recipe-picker-actions">
+                        <MudButton OnClick="ShowRecommendations"
+                                   Variant="@(_viewAll ? Variant.Outlined : Variant.Filled)"
+                                   Color="Color.Primary"
+                                   Size="Size.Small">
+                            Recommended recipes
+                        </MudButton>
+                        <MudButton OnClick="ShowAllRecipes"
+                                   Variant="@(_viewAll ? Variant.Filled : Variant.Outlined)"
+                                   Color="Color.Primary"
+                                   Size="Size.Small">
+                            View all recipes
+                        </MudButton>
+                        @if (_viewAll && !IsSearchActive)
+                        {
+                            <MudCheckBox T="bool" Label="Include draft" @bind-Value="_includeDraft" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Include empty" @bind-Value="_includeEmpty" Color="Color.Primary" />
+                        }
+                    </div>
+
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @PickerModeText
+                    </MudText>
 
                     <div class="picker-recipe-list">
-                        @foreach (var recipe in FilteredRecipes)
+                        @if (VisibleRecipes.Count == 0)
                         {
-                            <MudPaper Class="picker-recipe-card" Elevation="0">
-                                <div>
-                                    <MudText Typo="Typo.subtitle1">@recipe.Name</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                        @(string.IsNullOrWhiteSpace(recipe.Category) ? "Sense categoria" : recipe.Category)
-                                        @if (recipe.IsDraft)
-                                        {
-                                            <span> · Draft</span>
-                                        }
-                                    </MudText>
-                                </div>
-                                <MudButton OnClick="@(() => Pick(recipe))"
-                                           Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Size="Size.Small">
-                                    @ActionLabel
-                                </MudButton>
-                            </MudPaper>
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No hi ha receptes amb aquests filtres.</MudAlert>
+                        }
+                        else
+                        {
+                            @foreach (var item in VisibleRecipes)
+                            {
+                                <MudPaper Class="picker-recipe-card" Elevation="0">
+                                    <div>
+                                        <MudText Typo="Typo.subtitle1">@item.Recipe.Name</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                            @(string.IsNullOrWhiteSpace(item.Recipe.Category) ? "Sense categoria" : item.Recipe.Category)
+                                            <span> - @RecipeDocumentationStatus.ToDisplayName(item.Profile.DocumentationStatus)</span>
+                                            <span> - @RecipeCookingStatus.ToDisplayName(item.Profile.CookingStatus)</span>
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            Completion @item.Profile.CompletionPercent% - @item.Profile.LinkedIngredientCount/@item.Profile.TotalIngredientCount ingredients linked
+                                        </MudText>
+                                    </div>
+                                    <MudButton OnClick="@(() => Pick(item.Recipe))"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Small">
+                                        @ActionLabel
+                                    </MudButton>
+                                </MudPaper>
+                            }
                         }
                     </div>
                 </MudStack>
@@ -83,24 +159,24 @@
 
             @if (ShowQuickAdd)
             {
-                <MudTabPanel Text="Draft ràpid">
+                <MudTabPanel Text="Draft rapid">
                 <MudStack Spacing="2" Class="quick-add-form">
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
                         Guarda una idea encara que faltin ingredients o passos.
                     </MudText>
 
                     <MudTextField T="string" Label="Nom" @bind-Value="_request.Name" Required="true" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                    <MudTextField T="string" Label="Descripció curta" @bind-Value="_request.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" />
+                    <MudTextField T="string" Label="Descripcio curta" @bind-Value="_request.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" />
                     <MudTextField T="string" Label="Categoria" @bind-Value="_request.Category" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                    <MudTextField T="string" Label="Ingredients" Placeholder="Un ingredient per línia" @bind-Value="_request.IngredientsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
-                    <MudTextField T="string" Label="Passos" Placeholder="Un pas per línia" @bind-Value="_request.StepsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+                    <MudTextField T="string" Label="Ingredients" Placeholder="Un ingredient per linia" @bind-Value="_request.IngredientsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+                    <MudTextField T="string" Label="Passos" Placeholder="Un pas per linia" @bind-Value="_request.StepsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
 
                     <MudGrid Spacing="2">
                         <MudItem xs="12" sm="4">
                             <MudNumericField T="int?" Label="Prep. min" @bind-Value="_request.PreparationTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="4">
-                            <MudNumericField T="int?" Label="Cocció min" @bind-Value="_request.CookingTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudNumericField T="int?" Label="Coccio min" @bind-Value="_request.CookingTimeMinutes" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="12" sm="4">
                             <MudNumericField T="int?" Label="Racions" @bind-Value="_request.Servings" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -120,7 +196,7 @@
         </MudTabs>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel·lar</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -147,8 +223,33 @@
     private string _search = string.Empty;
     private string _category = string.Empty;
     private string _mealType = string.Empty;
+    private string _documentationStatus = string.Empty;
+    private string _cookingStatus = string.Empty;
+    private string _quickFilter = string.Empty;
     private int _plannedServings = 3;
     private bool _servingsInitialized;
+    private bool _viewAll;
+    private bool _includeDraft;
+    private bool _includeEmpty;
+
+    private static readonly RecipeFilterChip[] QuickFilters =
+    [
+        new(RecipeLibraryFilter.Favourite, "Favourite"),
+        new(RecipeLibraryFilter.Fish, "Fish"),
+        new(RecipeLibraryFilter.Chicken, "Chicken"),
+        new(RecipeLibraryFilter.Meat, "Meat"),
+        new(RecipeLibraryFilter.Pasta, "Pasta"),
+        new(RecipeLibraryFilter.Salad, "Salad"),
+        new(RecipeLibraryFilter.Legumes, "Legumes"),
+        new(RecipeLibraryFilter.Soup, "Soup"),
+        new(RecipeLibraryFilter.Dessert, "Dessert"),
+        new(RecipeLibraryFilter.HighProtein, "High protein"),
+        new(RecipeLibraryFilter.QuickMeals, "Quick meals"),
+        new(RecipeLibraryFilter.Seasonal, "Seasonal"),
+        new(RecipeLibraryFilter.FreezerFriendly, "Freezer friendly"),
+        new(RecipeLibraryFilter.BatchCooking, "Batch cooking"),
+        new(RecipeLibraryFilter.Vegetarian, "Vegetarian")
+    ];
 
     protected override void OnParametersSet()
     {
@@ -164,6 +265,13 @@
         }
     }
 
+    private bool IsSearchActive => !string.IsNullOrWhiteSpace(_search);
+    private string PickerModeText => IsSearchActive
+        ? $"{VisibleRecipes.Count} search result(s). Search checks the complete recipe database."
+        : _viewAll
+            ? $"{VisibleRecipes.Count} recipe(s). Draft and empty recipes stay hidden unless included."
+            : $"{VisibleRecipes.Count} recommended recipe(s). Type to search every recipe.";
+
     private IReadOnlyList<string> Categories => Recipes
         .Select(recipe => recipe.Category)
         .Where(category => !string.IsNullOrWhiteSpace(category))
@@ -171,12 +279,107 @@
         .OrderBy(category => category)
         .ToList();
 
-    private IEnumerable<Recipe> FilteredRecipes => Recipes
-        .Where(recipe =>
-            (string.IsNullOrWhiteSpace(_search) || recipe.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrWhiteSpace(_category) || string.Equals(recipe.Category, _category, StringComparison.OrdinalIgnoreCase)) &&
-            MatchesMealType(recipe))
-        .OrderBy(recipe => recipe.Name);
+    private List<PickerRecipeItem> VisibleRecipes => Recipes
+        .Select(recipe => new PickerRecipeItem(recipe, RecipeLibraryAnalysis.Analyze(recipe)))
+        .Where(MatchesVisibleMode)
+        .OrderByDescending(RecommendationScore)
+        .ThenBy(item => item.Recipe.Name)
+        .Take(IsSearchActive || _viewAll ? 200 : 10)
+        .ToList();
+
+    private bool MatchesVisibleMode(PickerRecipeItem item)
+    {
+        if (IsSearchActive)
+        {
+            return RecipeLibraryAnalysis.MatchesSearch(item.Recipe, _search)
+                && MatchesCommonFilters(item);
+        }
+
+        if (_viewAll)
+        {
+            return AllowsDocumentationForBrowsing(item.Profile)
+                && MatchesCommonFilters(item);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_documentationStatus))
+        {
+            return AllowsDocumentationForBrowsing(item.Profile)
+                && MatchesCommonFilters(item);
+        }
+
+        return item.Profile.DocumentationStatus == RecipeDocumentationStatus.Complete
+            && MatchesMealType(item.Recipe)
+            && MatchesCommonFilters(item);
+    }
+
+    private bool MatchesCommonFilters(PickerRecipeItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(_category)
+            && !string.Equals(item.Recipe.Category, _category, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!MatchesMealType(item.Recipe))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_documentationStatus)
+            && item.Profile.DocumentationStatus != _documentationStatus)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_cookingStatus)
+            && !RecipeLibraryAnalysis.MatchesCookingStatus(item.Profile, _cookingStatus))
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_quickFilter)
+            || RecipeLibraryAnalysis.MatchesFilter(item.Recipe, item.Profile, _quickFilter);
+    }
+
+    private bool AllowsDocumentationForBrowsing(RecipeLibraryProfile profile)
+    {
+        if (!string.IsNullOrWhiteSpace(_documentationStatus))
+        {
+            return profile.DocumentationStatus == _documentationStatus;
+        }
+
+        return profile.DocumentationStatus == RecipeDocumentationStatus.Complete
+            || (_includeDraft && profile.DocumentationStatus == RecipeDocumentationStatus.Draft)
+            || (_includeEmpty && profile.DocumentationStatus == RecipeDocumentationStatus.Empty);
+    }
+
+    private decimal RecommendationScore(PickerRecipeItem item)
+    {
+        if (IsSearchActive)
+        {
+            return item.Profile.DocumentationStatus == RecipeDocumentationStatus.Complete ? 20 : 0;
+        }
+
+        var score = item.Profile.CompletionPercent;
+        score += item.Profile.CookingStatus switch
+        {
+            RecipeCookingStatus.Favourite => 35,
+            RecipeCookingStatus.FamilyApproved => 30,
+            RecipeCookingStatus.Tested => 15,
+            _ => 0
+        };
+        if (item.Profile.IsHighProtein)
+        {
+            score += 12;
+        }
+
+        if (item.Profile.IsQuickMeal)
+        {
+            score += 8;
+        }
+
+        return score;
+    }
 
     private bool MatchesMealType(Recipe recipe)
     {
@@ -188,6 +391,31 @@
         var displayName = Enum.Parse<MealKind>(_mealType).ToDisplayName();
         return string.Equals(recipe.Category, displayName, StringComparison.OrdinalIgnoreCase);
     }
+
+    private void ShowRecommendations()
+    {
+        _viewAll = false;
+        _search = string.Empty;
+        _documentationStatus = string.Empty;
+    }
+
+    private void ShowAllRecipes()
+    {
+        _viewAll = true;
+        _search = string.Empty;
+    }
+
+    private void ToggleQuickFilter(string filter)
+    {
+        _quickFilter = string.Equals(_quickFilter, filter, StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : filter;
+    }
+
+    private Variant QuickFilterVariant(string filter) =>
+        string.Equals(_quickFilter, filter, StringComparison.OrdinalIgnoreCase)
+            ? Variant.Filled
+            : Variant.Outlined;
 
     private void Pick(Recipe recipe)
     {
@@ -219,4 +447,7 @@
 
         return recipe.Servings > 0 ? recipe.Servings : 3;
     }
+
+    private sealed record PickerRecipeItem(Recipe Recipe, RecipeLibraryProfile Profile);
+    private sealed record RecipeFilterChip(string Key, string Label);
 }

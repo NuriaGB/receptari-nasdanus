@@ -12,6 +12,12 @@
                 {
                     <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined" Size="Size.Small">Draft</MudChip>
                 }
+                <MudChip T="string" Color="@DocumentationColor" Variant="Variant.Outlined" Size="Size.Small">
+                    @RecipeDocumentationStatus.ToDisplayName(Profile.DocumentationStatus)
+                </MudChip>
+                <MudChip T="string" Color="@CookingColor" Variant="Variant.Outlined" Size="Size.Small">
+                    @RecipeCookingStatus.ToDisplayName(Profile.CookingStatus)
+                </MudChip>
                 @if (Recipe.VariationOfRecipeId is not null)
                 {
                     <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">Variacio</MudChip>
@@ -29,6 +35,17 @@
             <span><MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" /> @Recipe.PreparationTimeMinutes min prep.</span>
             <span><MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" /> @Recipe.CookingTimeMinutes min cocció</span>
             <span><MudIcon Icon="@Icons.Material.Filled.SignalCellularAlt" Size="Size.Small" /> Dificultat @Recipe.Difficulty</span>
+        </div>
+
+        <div class="recipe-completion">
+            <div class="recipe-completion-header">
+                <MudText Typo="Typo.caption">Recipe completion</MudText>
+                <MudText Typo="Typo.caption">@Profile.CompletionPercent%</MudText>
+            </div>
+            <MudProgressLinear Value="@Profile.CompletionPercent" Color="@CompletionColor" Rounded="true" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                @KnowledgeText
+            </MudText>
         </div>
 
         <MudStack Row Justify="Justify.FlexEnd" Class="summary-actions">
@@ -58,7 +75,30 @@
     [Parameter]
     public EventCallback<Recipe> OnConsolidate { get; set; }
 
+    private RecipeLibraryProfile Profile => RecipeLibraryAnalysis.Analyze(Recipe);
     private string CategoryText => string.IsNullOrWhiteSpace(Recipe.Category) ? "Sense categoria" : Recipe.Category;
+    private Color DocumentationColor => Profile.DocumentationStatus switch
+    {
+        RecipeDocumentationStatus.Complete => Color.Success,
+        RecipeDocumentationStatus.Draft => Color.Warning,
+        RecipeDocumentationStatus.Empty => Color.Error,
+        _ => Color.Default
+    };
+    private Color CookingColor => Profile.CookingStatus switch
+    {
+        RecipeCookingStatus.Favourite => Color.Primary,
+        RecipeCookingStatus.FamilyApproved => Color.Success,
+        RecipeCookingStatus.Tested => Color.Info,
+        _ => Color.Default
+    };
+    private Color CompletionColor => Profile.CompletionPercent >= 80
+        ? Color.Success
+        : Profile.CompletionPercent >= 50
+            ? Color.Warning
+            : Color.Error;
+    private string KnowledgeText => Profile.TotalIngredientCount == 0
+        ? "No ingredients documented"
+        : $"{Profile.LinkedIngredientCount}/{Profile.TotalIngredientCount} ingredients linked - {Profile.NutritionLinkedIngredientCount}/{Profile.TotalIngredientCount} with nutrition";
 
     private async Task ConsolidateAsync()
     {

@@ -26,7 +26,7 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
         var recentGroups = RecentPrimaryGroups(state, date).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         return state.Recipes
-            .Where(recipe => !recipe.IsDraft)
+            .Where(RecipeLibraryAnalysis.IsUsableForPlanning)
             .Select(recipe => ScoreRecipe(
                 store.CloneRecipe(recipe),
                 date,
