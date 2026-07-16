@@ -261,6 +261,14 @@ h3:focus {
 
 .settings-counts {
     min-height: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.settings-category-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .ingredient-preference-list {

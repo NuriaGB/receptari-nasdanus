@@ -50,6 +50,34 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
         await store.SaveAsync();
     }
 
+    public async Task SaveManyAsync(IEnumerable<HouseholdIngredientPreference> preferences)
+    {
+        var normalizedPreferences = preferences
+            .Select(Normalize)
+            .Where(preference => !string.IsNullOrWhiteSpace(preference.IngredientKnowledgeId))
+            .GroupBy(preference => preference.IngredientKnowledgeId, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .ToList();
+
+        if (normalizedPreferences.Count == 0)
+        {
+            return;
+        }
+
+        var state = await store.GetStateAsync();
+        var knowledgeIds = normalizedPreferences
+            .Select(preference => preference.IngredientKnowledgeId)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        state.HouseholdIngredientPreferences.RemoveAll(existing =>
+            knowledgeIds.Contains(existing.IngredientKnowledgeId));
+
+        state.HouseholdIngredientPreferences.AddRange(
+            normalizedPreferences.Where(preference => !IsDefault(preference)));
+
+        await store.SaveAsync();
+    }
+
     private static HouseholdIngredientPreference Normalize(HouseholdIngredientPreference preference) => new()
     {
         IngredientKnowledgeId = preference.IngredientKnowledgeId.Trim(),
