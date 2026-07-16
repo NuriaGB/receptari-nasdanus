@@ -27,6 +27,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private LocalAppState? state;
     private IngredientKnowledgeFile? ingredientKnowledge;
+    private HouseholdIngredientPreferenceSeedFile? householdIngredientPreferenceSeed;
 
     public async Task<LocalAppState> GetStateAsync()
     {
@@ -39,6 +40,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
         Normalize(state);
         await MergeIngredientKnowledgeAsync(state);
+        await MergeHouseholdIngredientPreferenceSeedAsync(state);
         Normalize(state);
         return state;
     }
@@ -119,6 +121,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
         state = validation.State;
         await MergeIngredientKnowledgeAsync(state);
+        await MergeHouseholdIngredientPreferenceSeedAsync(state);
         await SaveAsync();
         return validation;
     }
@@ -907,6 +910,93 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         return ingredientKnowledge;
     }
 
+    private async Task MergeHouseholdIngredientPreferenceSeedAsync(LocalAppState appState)
+    {
+        var preferenceSeed = await LoadHouseholdIngredientPreferenceSeedAsync();
+        if (preferenceSeed.Items.Count == 0)
+        {
+            return;
+        }
+
+        EnsureCollections(appState);
+        var existingKnowledgeIds = appState.HouseholdIngredientPreferences
+            .Where(preference => !string.IsNullOrWhiteSpace(preference.IngredientKnowledgeId))
+            .Select(preference => preference.IngredientKnowledgeId)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var item in preferenceSeed.Items)
+        {
+            var ingredient = FindIngredientForPreferenceSeed(appState, item);
+            if (ingredient is null
+                || string.IsNullOrWhiteSpace(ingredient.KnowledgeId)
+                || existingKnowledgeIds.Contains(ingredient.KnowledgeId))
+            {
+                continue;
+            }
+
+            appState.HouseholdIngredientPreferences.Add(new HouseholdIngredientPreference
+            {
+                IngredientKnowledgeId = ingredient.KnowledgeId,
+                IsFrequentlyUsed = item.IsFrequentlyUsed,
+                IsUsuallyAvailable = item.IsUsuallyAvailable,
+                UseFrequency = IngredientUseFrequency.All.Contains(item.UseFrequency)
+                    ? item.UseFrequency
+                    : IngredientUseFrequency.Frequent,
+                PreferredAlias = item.PreferredAlias.Trim(),
+                HouseholdNotes = item.HouseholdNotes.Trim()
+            });
+            existingKnowledgeIds.Add(ingredient.KnowledgeId);
+        }
+    }
+
+    private async Task<HouseholdIngredientPreferenceSeedFile> LoadHouseholdIngredientPreferenceSeedAsync()
+    {
+        if (householdIngredientPreferenceSeed is not null)
+        {
+            return householdIngredientPreferenceSeed;
+        }
+
+        try
+        {
+            householdIngredientPreferenceSeed = await httpClient.GetFromJsonAsync<HouseholdIngredientPreferenceSeedFile>(
+                "data/household-ingredient-preferences.json",
+                JsonOptions)
+                ?? new HouseholdIngredientPreferenceSeedFile();
+        }
+        catch
+        {
+            householdIngredientPreferenceSeed = new HouseholdIngredientPreferenceSeedFile();
+        }
+
+        householdIngredientPreferenceSeed.Items ??= [];
+        return householdIngredientPreferenceSeed;
+    }
+
+    private static Ingredient? FindIngredientForPreferenceSeed(
+        LocalAppState appState,
+        HouseholdIngredientPreferenceSeedItem item)
+    {
+        var matchKeys = item.MatchNames
+            .Append(item.PreferredAlias)
+            .Select(IngredientNameNormalizer.Normalize)
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (matchKeys.Count == 0)
+        {
+            return null;
+        }
+
+        return appState.Ingredients
+            .Where(ingredient => !string.IsNullOrWhiteSpace(ingredient.KnowledgeId))
+            .FirstOrDefault(ingredient =>
+            {
+                var ingredientKeys = IngredientKeysFor(ingredient).ToList();
+                return matchKeys.Any(matchKey => ingredientKeys.Any(key => IsIngredientNameMatch(matchKey, key)));
+            });
+    }
+
     private static Ingredient? FindIngredientForKnowledgeItem(LocalAppState appState, IngredientKnowledgeItem item)
     {
         if (!string.IsNullOrWhiteSpace(item.Id))
@@ -1014,11 +1104,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     private static void ApplyKnowledge(Ingredient ingredient, IngredientKnowledgeItem item)
     {
         ingredient.KnowledgeId = item.Id.Trim();
-        if (string.IsNullOrWhiteSpace(ingredient.Name))
-        {
-            ingredient.Name = item.Name.Trim();
-        }
-
+        ingredient.Name = item.Name.Trim();
         ingredient.CatalanName = item.CatalanName.Trim();
         ingredient.SpanishName = item.SpanishName.Trim();
         ingredient.Aliases = ingredient.Aliases
@@ -1514,6 +1600,24 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         public decimal? Fibre { get; set; }
         public decimal? Sugar { get; set; }
         public decimal? Salt { get; set; }
+    }
+
+    private sealed class HouseholdIngredientPreferenceSeedFile
+    {
+        public int SchemaVersion { get; set; }
+        public DateTimeOffset GeneratedAt { get; set; }
+        public List<HouseholdIngredientPreferenceSeedItem> Items { get; set; } = [];
+        public List<string> UnresolvedItems { get; set; } = [];
+    }
+
+    private sealed class HouseholdIngredientPreferenceSeedItem
+    {
+        public List<string> MatchNames { get; set; } = [];
+        public bool IsFrequentlyUsed { get; set; } = true;
+        public bool IsUsuallyAvailable { get; set; } = true;
+        public string UseFrequency { get; set; } = IngredientUseFrequency.Frequent;
+        public string PreferredAlias { get; set; } = string.Empty;
+        public string HouseholdNotes { get; set; } = string.Empty;
     }
 
     private static LocalAppState CreateFallbackState()
