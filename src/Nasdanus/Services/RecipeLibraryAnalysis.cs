@@ -7,6 +7,7 @@ public sealed record RecipeLibraryProfile(
     string CookingStatus,
     int CompletionPercent,
     IReadOnlyList<RecipeCompletionItem> CompletionItems,
+    RecipeWorkflowAction NextAction,
     int TotalIngredientCount,
     int LinkedIngredientCount,
     int NutritionLinkedIngredientCount,
@@ -21,6 +22,17 @@ public sealed record RecipeLibraryProfile(
 
 public sealed record RecipeCompletionItem(string Label, bool IsComplete);
 
+public sealed record RecipeWorkflowAction(
+    string Key,
+    string Label,
+    string FilterLabel,
+    string DashboardLabel,
+    string TargetKind,
+    string TargetFragment,
+    bool IsComplete = false);
+
+public sealed record RecipeCurrentWorkItem(RecipeWorkflowAction Action, int Count);
+
 public sealed record RecipeLibraryDashboard(
     int TotalRecipes,
     int EmptyRecipes,
@@ -32,7 +44,34 @@ public sealed record RecipeLibraryDashboard(
     int FavouriteRecipes,
     int FullyLinkedRecipes,
     int PartiallyLinkedRecipes,
-    int UnresolvedRecipes);
+    int UnresolvedRecipes,
+    IReadOnlyList<RecipeCurrentWorkItem> CurrentWork);
+
+public static class RecipeWorkflowActionKind
+{
+    public const string AddIngredients = "AddIngredients";
+    public const string LinkIngredients = "LinkIngredients";
+    public const string AddNutritionLinks = "AddNutritionLinks";
+    public const string AddCookingSteps = "AddCookingSteps";
+    public const string AddPreparationTime = "AddPreparationTime";
+    public const string AddCookingTime = "AddCookingTime";
+    public const string AddServings = "AddServings";
+    public const string AddCategories = "AddCategories";
+    public const string AddTags = "AddTags";
+    public const string AddEquipment = "AddEquipment";
+    public const string AddNotes = "AddNotes";
+    public const string AddImage = "AddImage";
+    public const string TestRecipe = "TestRecipe";
+    public const string ReviewAfterCooking = "ReviewAfterCooking";
+    public const string Done = "Done";
+}
+
+public static class RecipeWorkflowTargetKind
+{
+    public const string Edit = "Edit";
+    public const string Cook = "Cook";
+    public const string Details = "Details";
+}
 
 public static class RecipeDocumentationStatus
 {
@@ -93,6 +132,25 @@ public static class RecipeLibraryFilter
 
 public static class RecipeLibraryAnalysis
 {
+    public static readonly RecipeWorkflowAction[] WorkflowActions =
+    [
+        new(RecipeWorkflowActionKind.AddIngredients, "Add ingredients", "Need ingredients", "need ingredients", RecipeWorkflowTargetKind.Edit, "ingredients"),
+        new(RecipeWorkflowActionKind.LinkIngredients, "Link ingredients", "Need ingredient links", "need ingredient linking", RecipeWorkflowTargetKind.Edit, "ingredients"),
+        new(RecipeWorkflowActionKind.AddNutritionLinks, "Add nutrition links", "Need nutrition links", "need nutrition links", RecipeWorkflowTargetKind.Edit, "ingredients"),
+        new(RecipeWorkflowActionKind.AddCookingSteps, "Add cooking steps", "Need cooking steps", "need cooking steps", RecipeWorkflowTargetKind.Edit, "steps"),
+        new(RecipeWorkflowActionKind.AddPreparationTime, "Add preparation time", "Need preparation time", "need preparation time", RecipeWorkflowTargetKind.Edit, "basics"),
+        new(RecipeWorkflowActionKind.AddCookingTime, "Add cooking time", "Need cooking time", "need cooking time", RecipeWorkflowTargetKind.Edit, "basics"),
+        new(RecipeWorkflowActionKind.AddServings, "Add servings", "Need servings", "need servings", RecipeWorkflowTargetKind.Edit, "basics"),
+        new(RecipeWorkflowActionKind.AddCategories, "Add categories", "Need categories", "need categories", RecipeWorkflowTargetKind.Edit, "basics"),
+        new(RecipeWorkflowActionKind.AddTags, "Add tags", "Need tags", "need tags", RecipeWorkflowTargetKind.Edit, "tags"),
+        new(RecipeWorkflowActionKind.AddEquipment, "Add equipment", "Need equipment", "need equipment", RecipeWorkflowTargetKind.Edit, "tags"),
+        new(RecipeWorkflowActionKind.AddNotes, "Add notes", "Need notes", "need notes", RecipeWorkflowTargetKind.Edit, "notes"),
+        new(RecipeWorkflowActionKind.AddImage, "Add image", "Need images", "only need a photo", RecipeWorkflowTargetKind.Edit, "image"),
+        new(RecipeWorkflowActionKind.TestRecipe, "Test recipe", "Need testing", "need testing", RecipeWorkflowTargetKind.Cook, string.Empty),
+        new(RecipeWorkflowActionKind.ReviewAfterCooking, "Review after cooking", "Need review", "are ready for family approval", RecipeWorkflowTargetKind.Details, "recipe-status"),
+        new(RecipeWorkflowActionKind.Done, "Family approved", "Family approved", "are family approved", RecipeWorkflowTargetKind.Details, "recipe-status", IsComplete: true)
+    ];
+
     public static RecipeLibraryProfile Analyze(Recipe recipe)
     {
         var foodProfile = RecipeFoodClassifier.Classify(recipe);
@@ -104,6 +162,7 @@ public static class RecipeLibraryAnalysis
         var hasUnresolvedIngredients = totalIngredients == 0 || linkedIngredients < totalIngredients;
         var hasMissingNutrition = totalIngredients == 0 || nutritionLinkedIngredients < totalIngredients;
         var completionItems = CompletionItems(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients);
+        var nextAction = NextAction(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients);
         var completionPercent = (int)Math.Round(
             completionItems.Count(item => item.IsComplete) * 100m / completionItems.Count,
             MidpointRounding.AwayFromZero);
@@ -113,6 +172,7 @@ public static class RecipeLibraryAnalysis
             CookingStatus: CookingStatus(recipe),
             CompletionPercent: completionPercent,
             CompletionItems: completionItems,
+            NextAction: nextAction,
             TotalIngredientCount: totalIngredients,
             LinkedIngredientCount: linkedIngredients,
             NutritionLinkedIngredientCount: nutritionLinkedIngredients,
@@ -131,6 +191,13 @@ public static class RecipeLibraryAnalysis
         var profiles = recipes
             .Select(Analyze)
             .ToList();
+        var currentWork = WorkflowActions
+            .Where(action => !action.IsComplete)
+            .Select(action => new RecipeCurrentWorkItem(
+                action,
+                profiles.Count(profile => profile.NextAction.Key == action.Key)))
+            .Where(item => item.Count > 0)
+            .ToList();
 
         return new RecipeLibraryDashboard(
             TotalRecipes: profiles.Count,
@@ -143,7 +210,8 @@ public static class RecipeLibraryAnalysis
             FavouriteRecipes: profiles.Count(profile => profile.CookingStatus == RecipeCookingStatus.Favourite),
             FullyLinkedRecipes: profiles.Count(profile => profile.TotalIngredientCount > 0 && profile.LinkedIngredientCount == profile.TotalIngredientCount),
             PartiallyLinkedRecipes: profiles.Count(profile => profile.LinkedIngredientCount > 0 && profile.LinkedIngredientCount < profile.TotalIngredientCount),
-            UnresolvedRecipes: profiles.Count(profile => profile.TotalIngredientCount == 0 || profile.LinkedIngredientCount == 0));
+            UnresolvedRecipes: profiles.Count(profile => profile.TotalIngredientCount == 0 || profile.LinkedIngredientCount == 0),
+            CurrentWork: currentWork);
     }
 
     public static bool MatchesSearch(Recipe recipe, string search)
@@ -200,6 +268,22 @@ public static class RecipeLibraryAnalysis
         return profile.DocumentationStatus == RecipeDocumentationStatus.Complete;
     }
 
+    public static string WorkHref(Recipe recipe, RecipeWorkflowAction action) => action.TargetKind switch
+    {
+        RecipeWorkflowTargetKind.Cook => recipe.Servings > 0
+            ? $"cook/{recipe.Id}?servings={recipe.Servings}"
+            : $"cook/{recipe.Id}",
+        RecipeWorkflowTargetKind.Edit => string.IsNullOrWhiteSpace(action.TargetFragment)
+            ? $"recipes/{recipe.Id}/edit"
+            : $"recipes/{recipe.Id}/edit#{action.TargetFragment}",
+        _ => string.IsNullOrWhiteSpace(action.TargetFragment)
+            ? $"recipes/{recipe.Id}"
+            : $"recipes/{recipe.Id}#{action.TargetFragment}"
+    };
+
+    public static RecipeWorkflowAction? WorkflowActionFor(string key) =>
+        WorkflowActions.FirstOrDefault(action => string.Equals(action.Key, key, StringComparison.OrdinalIgnoreCase));
+
     private static IReadOnlyList<RecipeCompletionItem> CompletionItems(
         Recipe recipe,
         int totalIngredients,
@@ -207,16 +291,100 @@ public static class RecipeLibraryAnalysis
         int nutritionLinkedIngredients) =>
     [
         new("Ingredients", totalIngredients > 0),
-        new("Steps", recipe.Steps.Count > 0),
-        new("Preparation times", recipe.PreparationTimeMinutes + recipe.CookingTimeMinutes > 0),
+        new("Ingredient links", totalIngredients > 0 && linkedIngredients == totalIngredients),
+        new("Nutrition links", totalIngredients > 0 && nutritionLinkedIngredients == totalIngredients),
+        new("Steps", HasCookingSteps(recipe)),
+        new("Preparation time", recipe.PreparationTimeMinutes > 0),
+        new("Cooking time", recipe.CookingTimeMinutes > 0),
         new("Servings", recipe.Servings > 0),
         new("Categories", !string.IsNullOrWhiteSpace(recipe.Category)),
         new("Tags", recipe.Tags.Count > 0),
-        new("Nutrition links", totalIngredients > 0 && linkedIngredients == totalIngredients && nutritionLinkedIngredients == totalIngredients),
-        new("Equipment", HasRecipeSignal(recipe, "forn", "oven", "air fryer", "thermomix", "bbq", "vapor", "olla", "pressure")),
-        new("Images", HasRecipeSignal(recipe, "image", "photo", "imatge", "foto")),
-        new("Notes", recipe.Notes.Count > 0)
+        new("Equipment", HasEquipment(recipe)),
+        new("Notes", recipe.Notes.Count > 0),
+        new("Photo", HasImage(recipe)),
+        new("Tested", recipe.CookingHistory.Count > 0),
+        new("Family approved", CookingStatus(recipe) is RecipeCookingStatus.FamilyApproved or RecipeCookingStatus.Favourite)
     ];
+
+    private static RecipeWorkflowAction NextAction(
+        Recipe recipe,
+        int totalIngredients,
+        int linkedIngredients,
+        int nutritionLinkedIngredients)
+    {
+        if (totalIngredients == 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddIngredients);
+        }
+
+        if (linkedIngredients < totalIngredients)
+        {
+            return Action(RecipeWorkflowActionKind.LinkIngredients);
+        }
+
+        if (nutritionLinkedIngredients < totalIngredients)
+        {
+            return Action(RecipeWorkflowActionKind.AddNutritionLinks);
+        }
+
+        if (!HasCookingSteps(recipe))
+        {
+            return Action(RecipeWorkflowActionKind.AddCookingSteps);
+        }
+
+        if (recipe.PreparationTimeMinutes <= 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddPreparationTime);
+        }
+
+        if (recipe.CookingTimeMinutes <= 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddCookingTime);
+        }
+
+        if (recipe.Servings <= 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddServings);
+        }
+
+        if (string.IsNullOrWhiteSpace(recipe.Category))
+        {
+            return Action(RecipeWorkflowActionKind.AddCategories);
+        }
+
+        if (recipe.Tags.Count == 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddTags);
+        }
+
+        if (!HasEquipment(recipe))
+        {
+            return Action(RecipeWorkflowActionKind.AddEquipment);
+        }
+
+        if (recipe.Notes.Count == 0)
+        {
+            return Action(RecipeWorkflowActionKind.AddNotes);
+        }
+
+        if (!HasImage(recipe))
+        {
+            return Action(RecipeWorkflowActionKind.AddImage);
+        }
+
+        if (recipe.CookingHistory.Count == 0)
+        {
+            return Action(RecipeWorkflowActionKind.TestRecipe);
+        }
+
+        var cookingStatus = CookingStatus(recipe);
+        if (cookingStatus == RecipeCookingStatus.Tested)
+        {
+            return Action(RecipeWorkflowActionKind.ReviewAfterCooking);
+        }
+
+        return Action(RecipeWorkflowActionKind.Done);
+    }
 
     private static string DocumentationStatus(Recipe recipe)
     {
@@ -259,6 +427,7 @@ public static class RecipeLibraryAnalysis
         && recipe.PreparationTimeMinutes <= 0
         && recipe.CookingTimeMinutes <= 0
         && recipe.Servings <= 0
+        && string.IsNullOrWhiteSpace(recipe.ImageUrl)
         && recipe.Tags.Count == 0
         && recipe.Notes.Count == 0;
 
@@ -281,6 +450,19 @@ public static class RecipeLibraryAnalysis
     private static int TotalMinutes(Recipe recipe) =>
         Math.Max(0, recipe.PreparationTimeMinutes) + Math.Max(0, recipe.CookingTimeMinutes);
 
+    private static bool HasCookingSteps(Recipe recipe) =>
+        recipe.Steps.Any(step => !string.IsNullOrWhiteSpace(step.Title) || !string.IsNullOrWhiteSpace(step.Instruction));
+
+    private static bool HasEquipment(Recipe recipe) =>
+        HasRecipeSignal(recipe, "forn", "oven", "air fryer", "thermomix", "bbq", "vapor", "vaporera", "olla", "pressure", "paella", "cassola", "planxa", "grill");
+
+    private static bool HasImage(Recipe recipe) =>
+        !string.IsNullOrWhiteSpace(recipe.ImageUrl)
+        || HasRecipeSignal(recipe, "image", "photo", "imatge", "foto");
+
+    private static RecipeWorkflowAction Action(string key) =>
+        WorkflowActionFor(key) ?? WorkflowActions[^1];
+
     private static bool HasRecipeSignal(Recipe recipe, params string[] fragments) =>
         ContainsRecipeText(recipe, fragments);
 
@@ -288,7 +470,7 @@ public static class RecipeLibraryAnalysis
     {
         var text = string.Join(
             " ",
-            new[] { recipe.Name, recipe.Category, recipe.Description, recipe.SeasonalRecommendation }
+            new[] { recipe.Name, recipe.Category, recipe.Description, recipe.SeasonalRecommendation, recipe.ImageUrl }
                 .Concat(recipe.Tags.Select(tag => tag.Name))
                 .Concat(recipe.PlanningMetadata.Select(metadata => $"{metadata.Kind} {metadata.Value} {metadata.Notes}"))
                 .Concat(recipe.Ingredients.Select(ingredient => ingredient.DisplayName)));

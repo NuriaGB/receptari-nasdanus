@@ -113,6 +113,8 @@ h3:focus {
 
 .meal-card,
 .recipe-summary,
+.recipe-current-work,
+.recipe-status-panel,
 .filter-bar,
 .detail-section,
 .metric,
@@ -280,6 +282,28 @@ h3:focus {
     border: 1px solid var(--nas-border);
     border-radius: 8px;
     background: #fff;
+}
+
+.recipe-current-work {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+.recipe-current-work-heading,
+.recipe-status-heading,
+.recipe-next-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.recipe-current-work-list,
+.recipe-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .recipe-filter-actions,
@@ -568,6 +592,33 @@ h3:focus {
     padding: 1.25rem;
 }
 
+.recipe-status-panel {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.recipe-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.5rem;
+}
+
+.recipe-status-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcf9;
+}
+
+.recipe-status-item.is-missing {
+    background: #fff8ec;
+}
+
 .serving-scale-panel {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
@@ -610,6 +661,10 @@ h3:focus {
 .recipe-edit-section {
     display: grid;
     gap: 1rem;
+}
+
+.recipe-edit-anchor {
+    scroll-margin-top: 1rem;
 }
 
 .recipe-edit-section-heading,
@@ -1399,6 +1454,13 @@ h3:focus {
 
     .serving-scale-panel {
         grid-template-columns: 1fr;
+    }
+
+    .recipe-current-work-heading,
+    .recipe-status-heading,
+    .recipe-next-action {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .detail-step {

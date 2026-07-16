@@ -48,9 +48,39 @@
                 </div>
             </MudPaper>
 
+            @if (Dashboard.CurrentWork.Count > 0)
+            {
+                <MudPaper Class="recipe-current-work" Elevation="0">
+                    <div class="recipe-current-work-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">Current work</MudText>
+                            <MudText Typo="Typo.h6">What should I do next?</MudText>
+                        </div>
+                        <MudButton OnClick="ClearNextActionFilter"
+                                   Variant="Variant.Text"
+                                   Color="Color.Primary"
+                                   Size="Size.Small">
+                            Clear
+                        </MudButton>
+                    </div>
+                    <div class="recipe-current-work-list">
+                        @foreach (var item in Dashboard.CurrentWork.Take(6))
+                        {
+                            <MudButton OnClick="@(() => SetNextActionFilter(item.Action.Key))"
+                                       Variant="@NextActionButtonVariant(item.Action.Key)"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Build">
+                                @item.Count recipes @item.Action.DashboardLabel
+                            </MudButton>
+                        }
+                    </div>
+                </MudPaper>
+            }
+
             <MudPaper Class="filter-bar" Elevation="0">
                 <MudGrid Spacing="2">
-                    <MudItem xs="12" md="5">
+                    <MudItem xs="12" md="4">
                         <MudTextField T="string"
                                       @bind-Value="_search"
                                       Immediate="true"
@@ -60,7 +90,7 @@
                                       Adornment="Adornment.Start"
                                       AdornmentIcon="@Icons.Material.Filled.Search" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="3">
+                    <MudItem xs="12" sm="6" md="2">
                         <MudSelect T="string"
                                    @bind-Value="_category"
                                    Variant="Variant.Outlined"
@@ -103,6 +133,20 @@
                             }
                         </MudSelect>
                     </MudItem>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudSelect T="string"
+                                   Label="Next action"
+                                   @bind-Value="_nextActionFilter"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true">
+                            <MudSelectItem T="string" Value="@string.Empty">All</MudSelectItem>
+                            @foreach (var action in RecipeLibraryAnalysis.WorkflowActions.Where(action => !action.IsComplete))
+                            {
+                                <MudSelectItem T="string" Value="@action.Key">@action.FilterLabel</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
                 </MudGrid>
 
                 <div class="recipe-filter-actions">
@@ -112,6 +156,13 @@
                     <MudButton OnClick="@(() => ShowDocumentation(RecipeDocumentationStatus.Draft))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Only draft</MudButton>
                     <MudButton OnClick="@(() => SetQuickFilter(RecipeLibraryFilter.WithoutNutrition))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Without nutrition</MudButton>
                     <MudButton OnClick="@(() => SetQuickFilter(RecipeLibraryFilter.UnresolvedIngredients))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Unresolved ingredients</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.AddIngredients))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Need ingredients</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.LinkIngredients))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Need links</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.AddNutritionLinks))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Need nutrition links</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.AddCookingSteps))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Need steps</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.AddImage))" Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">Need images</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.TestRecipe))" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small">Need testing</MudButton>
+                    <MudButton OnClick="@(() => SetNextActionFilter(RecipeWorkflowActionKind.ReviewAfterCooking))" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small">Need review</MudButton>
                     <MudButton OnClick="@(() => ShowCooking(RecipeCookingStatus.NeverCooked))" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small">Never cooked</MudButton>
                     <MudButton OnClick="@(() => ShowCooking(RecipeCookingStatus.FamilyApproved))" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small">Family Approved</MudButton>
                 </div>
@@ -157,6 +208,7 @@
     private string _category = string.Empty;
     private string _documentationStatus = RecipeDocumentationStatus.Complete;
     private string _cookingStatus = RecipeCookingStatus.FamilyApproved;
+    private string _nextActionFilter = string.Empty;
     private string _quickFilter = string.Empty;
     private bool _isLoading = true;
 
@@ -215,6 +267,12 @@
             return false;
         }
 
+        if (!string.IsNullOrWhiteSpace(_nextActionFilter)
+            && !string.Equals(profile.NextAction.Key, _nextActionFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
         if (IsSearchActive)
         {
             return true;
@@ -258,6 +316,7 @@
         _search = string.Empty;
         _documentationStatus = RecipeDocumentationStatus.Complete;
         _cookingStatus = RecipeCookingStatus.FamilyApproved;
+        _nextActionFilter = string.Empty;
         _quickFilter = string.Empty;
     }
 
@@ -265,6 +324,7 @@
     {
         _documentationStatus = string.Empty;
         _cookingStatus = string.Empty;
+        _nextActionFilter = string.Empty;
         _quickFilter = string.Empty;
     }
 
@@ -273,6 +333,7 @@
         _search = string.Empty;
         _documentationStatus = status;
         _cookingStatus = string.Empty;
+        _nextActionFilter = string.Empty;
         _quickFilter = string.Empty;
     }
 
@@ -281,6 +342,7 @@
         _search = string.Empty;
         _documentationStatus = string.Empty;
         _cookingStatus = status;
+        _nextActionFilter = string.Empty;
         _quickFilter = string.Empty;
     }
 
@@ -289,6 +351,7 @@
         _quickFilter = filter;
         _documentationStatus = string.Empty;
         _cookingStatus = string.Empty;
+        _nextActionFilter = string.Empty;
     }
 
     private void ToggleQuickFilter(string filter)
@@ -298,8 +361,27 @@
             : filter;
     }
 
+    private void SetNextActionFilter(string actionKey)
+    {
+        _search = string.Empty;
+        _documentationStatus = string.Empty;
+        _cookingStatus = string.Empty;
+        _quickFilter = string.Empty;
+        _nextActionFilter = actionKey;
+    }
+
+    private void ClearNextActionFilter()
+    {
+        _nextActionFilter = string.Empty;
+    }
+
     private Variant QuickFilterVariant(string filter) =>
         string.Equals(_quickFilter, filter, StringComparison.OrdinalIgnoreCase)
+            ? Variant.Filled
+            : Variant.Outlined;
+
+    private Variant NextActionButtonVariant(string actionKey) =>
+        string.Equals(_nextActionFilter, actionKey, StringComparison.OrdinalIgnoreCase)
             ? Variant.Filled
             : Variant.Outlined;
 

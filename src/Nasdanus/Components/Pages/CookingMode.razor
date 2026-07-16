@@ -96,7 +96,7 @@
                     </MudButton>
                 </MudItem>
                 <MudItem xs="12" sm="4" Class="complete-action">
-                    <MudButton OnClick="CompleteCurrentStep"
+                    <MudButton OnClick="CompleteCurrentStepAsync"
                                Disabled="@IsCompleteActionDisabled"
                                FullWidth="true"
                                Variant="Variant.Filled"
@@ -209,11 +209,11 @@
         }
     }
 
-    private void CompleteCurrentStep()
+    private async Task CompleteCurrentStepAsync()
     {
         if (IsLastStep)
         {
-            FinishRecipe();
+            await FinishRecipeAsync();
             return;
         }
 
@@ -221,14 +221,24 @@
         NextStep();
     }
 
-    private void FinishRecipe()
+    private async Task FinishRecipeAsync()
     {
+        if (_isFinished)
+        {
+            return;
+        }
+
         foreach (var step in OrderedSteps)
         {
             _completedStepIds.Add(step.Id);
         }
 
         _isFinished = true;
+
+        if (_recipe is not null)
+        {
+            await Recipes.RecordCookingSessionAsync(_recipe.Id, _displayServings);
+        }
     }
 
     private async Task ConfirmInternalNavigationAsync(LocationChangingContext context)

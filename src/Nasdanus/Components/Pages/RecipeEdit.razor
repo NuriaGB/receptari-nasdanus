@@ -40,7 +40,7 @@
                 </MudButton>
             </div>
 
-            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+            <MudPaper id="basics" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
                 <MudText Typo="Typo.h5">Dades basiques</MudText>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" md="6">
@@ -51,6 +51,15 @@
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField T="string" Label="Descripcio" @bind-Value="_edit.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" />
+                    </MudItem>
+                    <MudItem xs="12" id="image">
+                        <MudTextField T="string"
+                                      Label="Imatge / URL"
+                                      @bind-Value="_edit.ImageUrl"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Image" />
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudNumericField T="int" Label="Racions" @bind-Value="_edit.Servings" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -67,7 +76,19 @@
                 </MudGrid>
             </MudPaper>
 
-            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+            <MudPaper id="tags" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
+                <MudText Typo="Typo.h5">Tags i equipament</MudText>
+                <MudTextField T="string"
+                              Label="Tags, equipament i paraules clau"
+                              @bind-Value="_edit.TagsText"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="3"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Label" />
+            </MudPaper>
+
+            <MudPaper id="ingredients" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
                 <div class="recipe-edit-section-heading">
                     <MudText Typo="Typo.h5">Ingredients</MudText>
                     <MudButton OnClick="AddIngredient"
@@ -154,7 +175,7 @@
                 }
             </MudPaper>
 
-            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+            <MudPaper id="steps" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
                 <div class="recipe-edit-section-heading">
                     <MudText Typo="Typo.h5">Passos</MudText>
                     <MudButton OnClick="AddStep"
@@ -267,7 +288,7 @@
                 }
             </MudPaper>
 
-            <MudPaper Class="detail-section recipe-edit-section" Elevation="0">
+            <MudPaper id="notes" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
                 <MudText Typo="Typo.h5">Notes</MudText>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" md="4">
@@ -341,6 +362,8 @@
             Name = recipe.Name,
             Description = recipe.Description,
             Category = recipe.Category,
+            ImageUrl = recipe.ImageUrl,
+            TagsText = TagsText(recipe),
             Servings = recipe.Servings,
             PreparationTimeMinutes = recipe.PreparationTimeMinutes,
             CookingTimeMinutes = recipe.CookingTimeMinutes,
@@ -505,6 +528,8 @@
         PreparationTimeMinutes = _edit.PreparationTimeMinutes,
         CookingTimeMinutes = _edit.CookingTimeMinutes,
         Difficulty = _edit.Difficulty,
+        ImageUrl = _edit.ImageUrl,
+        Tags = ParseTags(_edit.TagsText),
         Ingredients = _edit.Ingredients
             .Select((ingredient, index) => new RecipeIngredientEditRequest
             {
@@ -629,15 +654,29 @@
             .OrderBy(note => note.Order)
             .Select(note => note.Content));
 
+    private static string TagsText(Recipe recipe) =>
+        string.Join(", ", recipe.Tags
+            .Select(tag => tag.Name)
+            .Where(tag => !string.IsNullOrWhiteSpace(tag))
+            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase));
+
     private static IEnumerable<string> ParseNoteLines(string text) => text
         .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Where(line => !string.IsNullOrWhiteSpace(line));
+
+    private static List<string> ParseTags(string text) => text
+        .Split([',', ';', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(tag => !string.IsNullOrWhiteSpace(tag))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
 
     private sealed class RecipeEditViewModel
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public string TagsText { get; set; } = string.Empty;
         public int Servings { get; set; }
         public int PreparationTimeMinutes { get; set; }
         public int CookingTimeMinutes { get; set; }

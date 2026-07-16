@@ -9,6 +9,8 @@ public sealed class RecipeEditRequest
     public int PreparationTimeMinutes { get; set; }
     public int CookingTimeMinutes { get; set; }
     public int Difficulty { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public List<string> Tags { get; set; } = [];
     public List<RecipeIngredientEditRequest> Ingredients { get; set; } = [];
     public List<RecipeStepEditRequest> Steps { get; set; } = [];
     public List<RecipeNoteEditRequest> Notes { get; set; } = [];

@@ -46,6 +46,9 @@
             <MudText Typo="Typo.caption" Color="Color.Secondary">
                 @KnowledgeText
             </MudText>
+            <MudText Typo="Typo.caption" Color="@NextActionColor">
+                Next action: @Profile.NextAction.Label
+            </MudText>
         </div>
 
         <MudStack Row Justify="Justify.FlexEnd" Class="summary-actions">
@@ -56,6 +59,15 @@
                            Color="Color.Warning"
                            StartIcon="@Icons.Material.Filled.CheckCircle">
                     Consolidar
+                </MudButton>
+            }
+            @if (!Profile.NextAction.IsComplete)
+            {
+                <MudButton Href="@WorkHref"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@WorkActionIcon">
+                    Work on Next Action
                 </MudButton>
             }
             <MudButton Href="@($"recipes/{Recipe.Id}")"
@@ -99,6 +111,14 @@
     private string KnowledgeText => Profile.TotalIngredientCount == 0
         ? "No ingredients documented"
         : $"{Profile.LinkedIngredientCount}/{Profile.TotalIngredientCount} ingredients linked - {Profile.NutritionLinkedIngredientCount}/{Profile.TotalIngredientCount} with nutrition";
+    private string WorkHref => RecipeLibraryAnalysis.WorkHref(Recipe, Profile.NextAction);
+    private Color NextActionColor => Profile.NextAction.IsComplete ? Color.Success : Color.Warning;
+    private string WorkActionIcon => Profile.NextAction.TargetKind switch
+    {
+        RecipeWorkflowTargetKind.Cook => Icons.Material.Filled.Restaurant,
+        RecipeWorkflowTargetKind.Details => Icons.Material.Filled.RateReview,
+        _ => Icons.Material.Filled.Build
+    };
 
     private async Task ConsolidateAsync()
     {

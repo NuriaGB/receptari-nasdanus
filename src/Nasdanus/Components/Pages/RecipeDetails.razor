@@ -17,6 +17,8 @@
     }
     else
     {
+        var profile = RecipeLibraryAnalysis.Analyze(_recipe);
+
         <MudStack Spacing="3">
             <MudButton Href="recipes"
                        Variant="Variant.Text"
@@ -113,6 +115,57 @@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
+
+            <MudPaper id="recipe-status" Class="recipe-status-panel" Elevation="0">
+                <div class="recipe-status-heading">
+                    <div>
+                        <MudText Typo="Typo.overline">Recipe Status</MudText>
+                        <MudText Typo="Typo.h5">@profile.CompletionPercent% complete</MudText>
+                    </div>
+                    <MudChip T="string" Color="@(profile.NextAction.IsComplete ? Color.Success : Color.Warning)" Variant="Variant.Outlined">
+                        @profile.NextAction.Label
+                    </MudChip>
+                </div>
+                <MudProgressLinear Value="@profile.CompletionPercent" Color="@CompletionColor(profile)" Rounded="true" />
+                <div class="recipe-status-grid">
+                    @foreach (var item in profile.CompletionItems)
+                    {
+                        <div class="recipe-status-item @(item.IsComplete ? "is-complete" : "is-missing")">
+                            <MudIcon Icon="@(item.IsComplete ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)"
+                                     Color="@(item.IsComplete ? Color.Success : Color.Warning)"
+                                     Size="Size.Small" />
+                            <span>@item.Label</span>
+                        </div>
+                    }
+                </div>
+                <div class="recipe-next-action">
+                    <div>
+                        <MudText Typo="Typo.overline">Next Action</MudText>
+                        <MudText Typo="Typo.subtitle1">@profile.NextAction.Label</MudText>
+                    </div>
+                    <MudStack Row Class="recipe-status-actions">
+                        @if (!profile.NextAction.IsComplete)
+                        {
+                            <MudButton Href="@RecipeLibraryAnalysis.WorkHref(_recipe, profile.NextAction)"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@WorkActionIcon(profile.NextAction)">
+                                Work on Next Action
+                            </MudButton>
+                        }
+                        @if (profile.NextAction.Key == RecipeWorkflowActionKind.ReviewAfterCooking)
+                        {
+                            <MudButton OnClick="MarkFamilyApprovedAsync"
+                                       Disabled="@_isMutating"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.ThumbUp">
+                                Family Approved
+                            </MudButton>
+                        }
+                    </MudStack>
+                </div>
+            </MudPaper>
 
             <MudPaper Class="serving-scale-panel" Elevation="0">
                 <div>
@@ -260,6 +313,20 @@
             .OrderBy(note => note.Order)
             .ToList() ?? [];
 
+    private static Color CompletionColor(RecipeLibraryProfile profile) =>
+        profile.CompletionPercent >= 80
+            ? Color.Success
+            : profile.CompletionPercent >= 50
+                ? Color.Warning
+                : Color.Error;
+
+    private static string WorkActionIcon(RecipeWorkflowAction action) => action.TargetKind switch
+    {
+        RecipeWorkflowTargetKind.Cook => Icons.Material.Filled.Restaurant,
+        RecipeWorkflowTargetKind.Details => Icons.Material.Filled.RateReview,
+        _ => Icons.Material.Filled.Build
+    };
+
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
@@ -302,6 +369,20 @@
             : null;
         _isMutating = false;
         Snackbar.Add("Recepta consolidada.", Severity.Success);
+    }
+
+    private async Task MarkFamilyApprovedAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        _isMutating = true;
+        await Recipes.MarkFamilyApprovedAsync(_recipe.Id);
+        _recipe = await Recipes.GetByIdAsync(_recipe.Id);
+        _isMutating = false;
+        Snackbar.Add("Recepta aprovada per la familia.", Severity.Success);
     }
 
     private async Task CreateVariationAsync()

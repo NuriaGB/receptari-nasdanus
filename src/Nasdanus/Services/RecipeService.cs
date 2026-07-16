@@ -43,7 +43,8 @@ public sealed class RecipeService(BrowserAppStore store)
             PreparationTimeMinutes = request.PreparationTimeMinutes ?? 0,
             CookingTimeMinutes = request.CookingTimeMinutes ?? 0,
             Difficulty = 1,
-            Servings = request.Servings ?? 0
+            Servings = request.Servings ?? 0,
+            ImageUrl = string.Empty
         };
 
         recipe.Ingredients = ParseLines(request.IngredientsText)
@@ -110,6 +111,7 @@ public sealed class RecipeService(BrowserAppStore store)
             CookingTimeMinutes = source.CookingTimeMinutes,
             Difficulty = source.Difficulty,
             Servings = source.Servings,
+            ImageUrl = source.ImageUrl,
             VariationOfRecipeId = source.Id
         };
 
@@ -213,10 +215,12 @@ public sealed class RecipeService(BrowserAppStore store)
         recipe.PreparationTimeMinutes = Math.Max(0, request.PreparationTimeMinutes);
         recipe.CookingTimeMinutes = Math.Max(0, request.CookingTimeMinutes);
         recipe.Difficulty = Math.Clamp(request.Difficulty, 0, 5);
+        recipe.ImageUrl = request.ImageUrl?.Trim() ?? string.Empty;
 
         recipe.Ingredients = [];
         recipe.Steps = [];
         recipe.Notes = [];
+        recipe.Tags = [];
 
         var ingredientMap = new Dictionary<string, RecipeIngredient>(StringComparer.OrdinalIgnoreCase);
         foreach (var ingredientRequest in request.Ingredients
@@ -288,6 +292,20 @@ public sealed class RecipeService(BrowserAppStore store)
             });
         }
 
+        foreach (var tagName in request.Tags
+            .Where(tag => !string.IsNullOrWhiteSpace(tag))
+            .Select(tag => tag.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase))
+        {
+            recipe.Tags.Add(new RecipeTag
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Name = tagName
+            });
+        }
+
         if (!IsKnownStatus(recipe.Status))
         {
             recipe.Status = IsIncomplete(recipe)
@@ -295,6 +313,40 @@ public sealed class RecipeService(BrowserAppStore store)
                 : RecipeStatus.Active;
         }
 
+        await store.SaveAsync();
+    }
+
+    public async Task RecordCookingSessionAsync(int id, int plannedServings)
+    {
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
+        if (recipe is null)
+        {
+            return;
+        }
+
+        recipe.CookingHistory.Add(new RecipeCookingSession
+        {
+            Id = store.NextId(state),
+            RecipeId = recipe.Id,
+            CookedAt = DateTime.UtcNow,
+            PlannedServings = plannedServings > 0 ? plannedServings : null,
+            ActualServings = plannedServings > 0 ? plannedServings : null
+        });
+
+        await store.SaveAsync();
+    }
+
+    public async Task MarkFamilyApprovedAsync(int id)
+    {
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
+        if (recipe is null)
+        {
+            return;
+        }
+
+        recipe.Rating = Math.Max(recipe.Rating ?? 0, 4);
         await store.SaveAsync();
     }
 
