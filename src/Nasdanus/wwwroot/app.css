@@ -259,6 +259,46 @@ h3:focus {
     padding: 1rem;
 }
 
+.settings-counts {
+    min-height: 100%;
+}
+
+.ingredient-preference-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.ingredient-preference-row {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) minmax(0, 2fr);
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.ingredient-preference-main {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.ingredient-preference-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(8rem, auto)) minmax(10rem, 1fr) minmax(10rem, 1fr) minmax(10rem, 1fr) auto;
+    gap: 0.65rem;
+    align-items: center;
+}
+
+@media (max-width: 960px) {
+    .ingredient-preference-row,
+    .ingredient-preference-controls {
+        grid-template-columns: 1fr;
+    }
+}
+
 .summary-badges,
 .recipe-badges {
     flex-wrap: wrap;

@@ -1,0 +1,205 @@
+@page "/settings"
+@inject HouseholdIngredientPreferenceService Preferences
+@inject ISnackbar Snackbar
+
+<PageTitle>Nasdanus - Configuracio</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="page-shell settings-shell">
+    <MudStack Spacing="3">
+        <div class="page-heading">
+            <MudText Typo="Typo.overline">Configuracio</MudText>
+            <MudText Typo="Typo.h3">Ingredients de casa</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Marca els ingredients que feu servir sovint o que normalment teniu disponibles.
+            </MudText>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudPaper Class="filter-bar" Elevation="0">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="7">
+                        <MudTextField T="string"
+                                      @bind-Value="_search"
+                                      Immediate="true"
+                                      Placeholder="Cerca ingredient"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudSelect T="string"
+                                   @bind-Value="_category"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true"
+                                   AdornmentIcon="@Icons.Material.Filled.Category"
+                                   Adornment="Adornment.Start">
+                            <MudSelectItem T="string" Value="@string.Empty">Totes</MudSelectItem>
+                            @foreach (var category in _categories)
+                            {
+                                <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="2">
+                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="settings-counts">
+                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
+                                @ConfiguredCount marcats
+                            </MudChip>
+                        </MudStack>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            @if (VisibleRows.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No hi ha ingredients amb aquest filtre.</MudAlert>
+            }
+            else
+            {
+                <div class="ingredient-preference-list">
+                    @foreach (var row in VisibleRows)
+                    {
+                        <MudPaper Class="ingredient-preference-row" Elevation="0">
+                            <div class="ingredient-preference-main">
+                                <MudText Typo="Typo.subtitle1">@row.Ingredient.Name</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @DisplayTranslations(row.Ingredient)
+                                </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @row.Ingredient.Category
+                                    @if (!string.IsNullOrWhiteSpace(row.Ingredient.Subcategory))
+                                    {
+                                        <span> / @row.Ingredient.Subcategory</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(row.Ingredient.NutritionSourceId))
+                                    {
+                                        <span> / @row.Ingredient.NutritionSource @row.Ingredient.NutritionSourceId</span>
+                                    }
+                                </MudText>
+                            </div>
+
+                            <div class="ingredient-preference-controls">
+                                <MudCheckBox T="bool"
+                                             @bind-Value="row.Preference.IsUsuallyAvailable"
+                                             Color="Color.Primary"
+                                             Label="Disponible" />
+                                <MudCheckBox T="bool"
+                                             @bind-Value="row.Preference.IsFrequentlyUsed"
+                                             Color="Color.Primary"
+                                             Label="Habitual" />
+                                <MudSelect T="string"
+                                           @bind-Value="row.Preference.UseFrequency"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Dense="true"
+                                           Label="Frequencia">
+                                    @foreach (var frequency in IngredientUseFrequency.All)
+                                    {
+                                        <MudSelectItem T="string" Value="@frequency">@IngredientUseFrequency.ToDisplayName(frequency)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                                <MudTextField T="string"
+                                              @bind-Value="row.Preference.PreferredAlias"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              Label="Alias de casa" />
+                                <MudTextField T="string"
+                                              @bind-Value="row.Preference.HouseholdNotes"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              Label="Notes" />
+                                <MudIconButton OnClick="@(() => SaveRowAsync(row))"
+                                               Icon="@Icons.Material.Filled.Save"
+                                               Color="Color.Primary"
+                                               aria-label="Desar preferencia" />
+                            </div>
+                        </MudPaper>
+                    }
+                </div>
+            }
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<HouseholdIngredientPreferenceRow> _rows = [];
+    private List<string> _categories = [];
+    private string _search = string.Empty;
+    private string _category = string.Empty;
+    private bool _isLoading = true;
+
+    private int ConfiguredCount => _rows.Count(row => HasConfiguredPreference(row.Preference));
+
+    private List<HouseholdIngredientPreferenceRow> VisibleRows => _rows
+        .Where(MatchesFilters)
+        .Take(140)
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadAsync()
+    {
+        _rows = await Preferences.GetRowsAsync();
+        _categories = _rows
+            .Select(row => row.Ingredient.Category)
+            .Where(category => !string.IsNullOrWhiteSpace(category))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(category => category)
+            .ToList();
+    }
+
+    private bool MatchesFilters(HouseholdIngredientPreferenceRow row)
+    {
+        if (!string.IsNullOrWhiteSpace(_category)
+            && !string.Equals(row.Ingredient.Category, _category, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_search))
+        {
+            return true;
+        }
+
+        var search = _search.Trim();
+        return row.Ingredient.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Ingredient.CatalanName.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Ingredient.SpanishName.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Ingredient.Aliases.Any(alias => alias.Contains(search, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task SaveRowAsync(HouseholdIngredientPreferenceRow row)
+    {
+        await Preferences.SaveAsync(row.Preference);
+        await LoadAsync();
+        Snackbar.Add("Preferencia desada.", Severity.Success);
+    }
+
+    private static bool HasConfiguredPreference(HouseholdIngredientPreference preference) =>
+        preference.IsFrequentlyUsed
+        || preference.IsUsuallyAvailable
+        || preference.UseFrequency != IngredientUseFrequency.Occasional
+        || !string.IsNullOrWhiteSpace(preference.PreferredAlias)
+        || !string.IsNullOrWhiteSpace(preference.HouseholdNotes);
+
+    private static string DisplayTranslations(Ingredient ingredient)
+    {
+        var names = new[] { ingredient.CatalanName, ingredient.SpanishName }
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return names.Count == 0 ? "Sense traduccions" : string.Join(" / ", names);
+    }
+}

@@ -54,18 +54,22 @@ public sealed class KnowledgeNormalizer
         {
             if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
             {
-                builder.Append(character);
+                builder.Append(char.IsLetterOrDigit(character) ? character : ' ');
             }
         }
 
-        return builder.ToString().Normalize(NormalizationForm.FormC);
+        return string.Join(
+            " ",
+            builder
+                .ToString()
+                .Normalize(NormalizationForm.FormC)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
 
     private static CanonicalIngredient NormalizeIngredient(ProviderIngredient source)
     {
         var name = source.Name.Trim();
         var aliases = source.Aliases
-            .Append(name)
             .Where(alias => !string.IsNullOrWhiteSpace(alias))
             .Select(alias => alias.Trim())
             .Distinct(StringComparer.CurrentCultureIgnoreCase)
@@ -76,12 +80,16 @@ public sealed class KnowledgeNormalizer
         {
             Id = StableIngredientId(name),
             Name = name,
+            CatalanName = source.CatalanName.Trim(),
+            SpanishName = source.SpanishName.Trim(),
             Aliases = aliases,
             Category = NormalizeCategory(source.Category),
+            Subcategory = source.Subcategory.Trim(),
             DefaultUnit = NormalizeUnit(source.DefaultUnit),
             CanFreeze = source.CanFreeze ?? false,
             PantryCategory = NormalizeCategory(source.PantryCategory),
             Nutrition = source.Nutrition,
+            NutritionState = NormalizeNutritionState(source.NutritionState),
             Source = source.Provider,
             SourceId = source.ProviderId,
             LastUpdated = source.LastUpdated
@@ -98,6 +106,12 @@ public sealed class KnowledgeNormalizer
             .ToList();
 
         target.Nutrition ??= source.Nutrition;
+        target.CatalanName = string.IsNullOrWhiteSpace(target.CatalanName) ? source.CatalanName : target.CatalanName;
+        target.SpanishName = string.IsNullOrWhiteSpace(target.SpanishName) ? source.SpanishName : target.SpanishName;
+        target.Subcategory = string.IsNullOrWhiteSpace(target.Subcategory) ? source.Subcategory : target.Subcategory;
+        target.NutritionState = target.NutritionState == NutritionRecordState.Unspecified
+            ? source.NutritionState
+            : target.NutritionState;
         target.CanFreeze = target.CanFreeze || source.CanFreeze;
         target.LastUpdated = target.LastUpdated > source.LastUpdated ? target.LastUpdated : source.LastUpdated;
     }
@@ -120,6 +134,12 @@ public sealed class KnowledgeNormalizer
     {
         var normalized = NormalizeKey(unit);
         return KnowledgeUnits.All.Contains(normalized) ? normalized : KnowledgeUnits.Grams;
+    }
+
+    private static string NormalizeNutritionState(string state)
+    {
+        var normalized = NormalizeKey(state);
+        return NutritionRecordState.All.Contains(normalized) ? normalized : NutritionRecordState.Unspecified;
     }
 
     private static KnowledgeCatalog CreateBaseCatalog() => new()

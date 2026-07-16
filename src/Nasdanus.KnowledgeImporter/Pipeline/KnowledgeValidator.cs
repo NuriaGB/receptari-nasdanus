@@ -1,4 +1,5 @@
 using Nasdanus.KnowledgeImporter.Domain;
+using System.Text.Json;
 
 namespace Nasdanus.KnowledgeImporter.Pipeline;
 
@@ -12,6 +13,9 @@ public sealed class KnowledgeValidator
         ValidateAliases(catalog, report);
         ValidateIngredients(catalog, report);
         ValidateNutrition(catalog, report);
+        ValidateTranslations(catalog, report);
+        ValidateSources(catalog, report);
+        ValidateSeedRecipeResolution(catalog, report);
         return report;
     }
 
@@ -70,5 +74,103 @@ public sealed class KnowledgeValidator
             .Where(ingredient => ingredient.Nutrition?.HasCoreMacros != true)
             .Select(ingredient => $"{ingredient.Id}: {ingredient.Name}")
             .OrderBy(value => value));
+    }
+
+    private static void ValidateTranslations(KnowledgeCatalog catalog, KnowledgeValidationReport report)
+    {
+        report.MissingTranslations.AddRange(catalog.Ingredients
+            .Where(ingredient => string.IsNullOrWhiteSpace(ingredient.CatalanName)
+                || string.IsNullOrWhiteSpace(ingredient.SpanishName))
+            .Select(ingredient => $"{ingredient.Id}: {ingredient.Name}")
+            .OrderBy(value => value));
+    }
+
+    private static void ValidateSources(KnowledgeCatalog catalog, KnowledgeValidationReport report)
+    {
+        report.MissingSourceInformation.AddRange(catalog.Ingredients
+            .Where(ingredient => string.IsNullOrWhiteSpace(ingredient.Source)
+                || string.IsNullOrWhiteSpace(ingredient.SourceId))
+            .Select(ingredient => $"{ingredient.Id}: {ingredient.Name}")
+            .OrderBy(value => value));
+    }
+
+    private static void ValidateSeedRecipeResolution(KnowledgeCatalog catalog, KnowledgeValidationReport report)
+    {
+        var seedPath = Path.Combine("src", "Nasdanus", "wwwroot", "data", "nasdanus-seed.json");
+        if (!File.Exists(seedPath))
+        {
+            return;
+        }
+
+        var knownKeys = catalog.Ingredients
+            .SelectMany(IngredientKeysFor)
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        using var document = JsonDocument.Parse(File.ReadAllText(seedPath));
+        if (!document.RootElement.TryGetProperty("Recipes", out var recipes)
+            || recipes.ValueKind != JsonValueKind.Array)
+        {
+            return;
+        }
+
+        foreach (var recipe in recipes.EnumerateArray())
+        {
+            var recipeName = recipe.TryGetProperty("Name", out var recipeNameProperty)
+                ? recipeNameProperty.GetString() ?? "Recipe"
+                : "Recipe";
+            if (!recipe.TryGetProperty("Ingredients", out var ingredients)
+                || ingredients.ValueKind != JsonValueKind.Array)
+            {
+                continue;
+            }
+
+            foreach (var ingredient in ingredients.EnumerateArray())
+            {
+                var ingredientName = ingredient.TryGetProperty("Name", out var ingredientNameProperty)
+                    ? ingredientNameProperty.GetString() ?? string.Empty
+                    : string.Empty;
+                var normalized = KnowledgeNormalizer.NormalizeKey(ingredientName);
+                if (string.IsNullOrWhiteSpace(normalized)
+                    || knownKeys.Any(key => IsIngredientNameMatch(normalized, key)))
+                {
+                    continue;
+                }
+
+                report.RecipesUsingUnresolvedIngredients.Add($"{recipeName}: {ingredientName}");
+            }
+        }
+
+        report.RecipesUsingUnresolvedIngredients = report.RecipesUsingUnresolvedIngredients
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(value => value)
+            .ToList();
+    }
+
+    private static bool IsIngredientNameMatch(string normalizedName, string normalizedKnownKey)
+    {
+        if (string.Equals(normalizedName, normalizedKnownKey, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(normalizedKnownKey) || normalizedKnownKey.Length < 5)
+        {
+            return false;
+        }
+
+        return $" {normalizedName} ".Contains($" {normalizedKnownKey} ", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IEnumerable<string> IngredientKeysFor(CanonicalIngredient ingredient)
+    {
+        yield return KnowledgeNormalizer.NormalizeKey(ingredient.Name);
+        yield return KnowledgeNormalizer.NormalizeKey(ingredient.CatalanName);
+        yield return KnowledgeNormalizer.NormalizeKey(ingredient.SpanishName);
+
+        foreach (var alias in ingredient.Aliases)
+        {
+            yield return KnowledgeNormalizer.NormalizeKey(alias);
+        }
     }
 }

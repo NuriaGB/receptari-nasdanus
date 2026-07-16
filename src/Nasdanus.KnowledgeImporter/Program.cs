@@ -4,7 +4,7 @@ using Nasdanus.KnowledgeImporter.Providers;
 var outputDirectory = ParseOutputDirectory(args);
 var providers = new IKnowledgeProvider[]
 {
-    new LocalSeedKnowledgeProvider(),
+    new UsdaSrLegacyMediterraneanProvider(),
     new BedcaProvider(),
     new CiqualProvider(),
     new OpenFoodFactsProvider()

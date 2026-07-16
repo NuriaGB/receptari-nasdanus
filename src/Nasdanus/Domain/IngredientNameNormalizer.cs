@@ -22,7 +22,7 @@ public static class IngredientNameNormalizer
                 continue;
             }
 
-            builder.Append(char.IsWhiteSpace(character) ? ' ' : character);
+            builder.Append(char.IsLetterOrDigit(character) ? character : ' ');
         }
 
         return string.Join(

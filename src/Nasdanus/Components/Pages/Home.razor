@@ -1,8 +1,10 @@
 @page "/"
 @page "/dashboard"
+@using System.Globalization
 @inject PlannerService Planner
 @inject NutritionService Nutrition
 @inject RecipeService Recipes
+@inject RecipeSuggestionService Suggestions
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -31,8 +33,9 @@
             </MudGrid>
 
             <NutritionSummary Title="Today"
-                              Subtitle="Lunch + dinner"
-                              Totals="@TodayNutrition" />
+                              Subtitle="Approximate total for planned lunch + dinner"
+                              Totals="@TodayNutrition"
+                              ShowApproximateNote="true" />
 
             @if (_tomorrowReminders.Count > 0)
             {
@@ -60,13 +63,73 @@
             <MudPaper Class="week-summary" Elevation="0">
                 <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="week-summary-content">
                     <MudIcon Icon="@Icons.Material.Filled.Insights" Color="Color.Primary" Size="Size.Small" />
-                    <MudText Typo="Typo.body2">Peix 0/2 · Llegums 0/1 · Verdures 0/7 · Proteïna baixa</MudText>
+                    <MudText Typo="Typo.body2">
+                        Protein this week: @FormatGrams(WeekAverageNutrition.ProteinGrams)/person/day
+                    </MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Target: @FormatGrams(ProteinTarget)/person/day
+                    </MudText>
+                </MudStack>
+                @if (IsProteinLow)
+                {
+                    <MudText Typo="Typo.caption" Class="nutrition-warning">
+                        Protein is below the household target. Suggestions are ordered to help close the gap.
+                    </MudText>
+                }
+                <MudStack Row Class="food-target-chips">
+                    @foreach (var target in FoodTargetStatuses)
+                    {
+                        <MudChip T="string" Color="@FoodTargetColor(target)" Variant="Variant.Outlined" Size="Size.Small">
+                            @FoodTargetText(target)
+                        </MudChip>
+                    }
                 </MudStack>
             </MudPaper>
 
             <NutritionSummary Title="Week average"
-                              Subtitle="Per day, planned lunch + dinner"
-                              Totals="@WeekAverageNutrition" />
+                              Subtitle="Per person/day, planned lunch + dinner"
+                              Totals="@WeekAverageNutrition"
+                              ShowApproximateNote="true" />
+
+            @if (_todaySuggestions.Count > 0)
+            {
+                <MudPaper Class="suggestion-panel" Elevation="0">
+                    <MudStack Spacing="2">
+                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="suggestion-heading">
+                            <div>
+                                <MudText Typo="Typo.h6">Suggested today</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@SuggestionContextText</MudText>
+                            </div>
+                            <MudButton Href="planner"
+                                       Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       EndIcon="@Icons.Material.Filled.CalendarMonth">
+                                Planner
+                            </MudButton>
+                        </MudStack>
+                        <div class="home-suggestion-list">
+                            @foreach (var suggestion in _todaySuggestions)
+                            {
+                                <div class="home-suggestion-row">
+                                    <div class="suggestion-main">
+                                        <MudText Typo="Typo.subtitle2">@suggestion.Recipe.Name</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @FormatGrams(suggestion.NutritionPerServing.ProteinGrams) g protein/person - @string.Join(", ", suggestion.Reasons)
+                                        </MudText>
+                                    </div>
+                                    <MudButton OnClick="@(() => ApplySuggestionAsync(suggestion))"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               Size="Size.Small">
+                                        @SuggestionActionLabel
+                                    </MudButton>
+                                </div>
+                            }
+                        </div>
+                    </MudStack>
+                </MudPaper>
+            }
 
             <MudPaper Class="future-reminders" Elevation="0">
                 <MudStack Spacing="2">
@@ -109,6 +172,8 @@
     private MealPlanSlot? _lunch;
     private MealPlanSlot? _dinner;
     private WeekNutritionSummary? _weekNutrition;
+    private WeeklyNutritionGoalStatus? _weekStatus;
+    private IReadOnlyList<RecipeSuggestion> _todaySuggestions = [];
     private IReadOnlyList<TomorrowPrepReminder> _tomorrowReminders = [];
     private List<Recipe> _recipes = [];
     private bool _isLoading = true;
@@ -124,7 +189,20 @@
     }
     private NutritionTotals WeekAverageNutrition => _weekNutrition is null
         ? new NutritionTotals()
-        : NutritionService.AveragePerDay(_weekNutrition);
+        : NutritionService.AveragePerPersonPerDay(_weekNutrition);
+    private IReadOnlyList<FoodGroupTargetStatus> FoodTargetStatuses =>
+        _weekStatus?.FoodGroupTargets ?? [];
+    private decimal ProteinTarget =>
+        _weekStatus?.Settings.NutritionGoals.MinimumProteinGramsPerPerson ?? 85;
+    private bool IsProteinLow => WeekAverageNutrition.ProteinGrams + 1m < ProteinTarget;
+    private MealKind SuggestionMealKind =>
+        _lunch?.PlannedRecipes.Count is not > 0 ? MealKind.Lunch : MealKind.Dinner;
+    private bool HasMissingMeal =>
+        _lunch?.PlannedRecipes.Count is not > 0 || _dinner?.PlannedRecipes.Count is not > 0;
+    private string SuggestionActionLabel => HasMissingMeal ? "Add" : "Replace";
+    private string SuggestionContextText => HasMissingMeal
+        ? $"Missing {SuggestionMealKind.ToDisplayName().ToLowerInvariant()}"
+        : "Replacement ideas to improve the week";
     private readonly string[] _futureReminders =
     [
         "Recorda treure pollastre del congelador demà.",
@@ -143,6 +221,8 @@
         var tomorrowDinner = await Planner.GetSlotAsync(tomorrow, MealKind.Dinner);
         _tomorrowReminders = BuildTomorrowReminders(tomorrowLunch, tomorrowDinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
+        _weekStatus = await Suggestions.GetWeekStatusAsync(today);
+        _todaySuggestions = await Suggestions.GetSuggestionsAsync(today, SuggestionMealKind, 3);
         _isLoading = false;
     }
 
@@ -319,6 +399,44 @@
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
+        _weekStatus = await Suggestions.GetWeekStatusAsync(today);
+        _todaySuggestions = await Suggestions.GetSuggestionsAsync(today, SuggestionMealKind, 3);
+    }
+
+    private async Task ApplySuggestionAsync(RecipeSuggestion suggestion)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var targetSlot = TargetSlotForSuggestion();
+        var plannedServings = suggestion.Recipe.Servings > 0 ? suggestion.Recipe.Servings : 3;
+
+        if (targetSlot?.PlannedRecipes.Count is not > 0)
+        {
+            await Planner.AddRecipeAsync(today, SuggestionMealKind, suggestion.Recipe.Id, plannedServings);
+            Snackbar.Add("Suggested recipe added.", Severity.Success);
+        }
+        else
+        {
+            var plannedRecipe = targetSlot.PlannedRecipes.OrderBy(recipe => recipe.Order).First();
+            await Planner.ReplaceRecipeAsync(plannedRecipe.Id, suggestion.Recipe.Id, plannedServings);
+            Snackbar.Add("Meal replaced.", Severity.Success);
+        }
+
+        await RefreshTodayAsync();
+    }
+
+    private MealPlanSlot? TargetSlotForSuggestion()
+    {
+        if (_lunch?.PlannedRecipes.Count is not > 0)
+        {
+            return _lunch;
+        }
+
+        if (_dinner?.PlannedRecipes.Count is not > 0)
+        {
+            return _dinner;
+        }
+
+        return _dinner;
     }
 
     private static int PlannedServingsValue(MealPlanRecipe plannedRecipe)
@@ -329,6 +447,30 @@
         }
 
         return plannedRecipe.Recipe?.Servings > 0 ? plannedRecipe.Recipe.Servings : 3;
+    }
+
+    private static string FormatGrams(decimal value) =>
+        value.ToString("0", CultureInfo.InvariantCulture);
+
+    private static string FoodTargetText(FoodGroupTargetStatus target)
+    {
+        var label = FoodGroupKind.ToDisplayName(target.FoodGroup);
+        return target.IsMaximum
+            ? $"{label}: {target.Current} / max {target.Target}"
+            : $"{label}: {target.Current} / {target.Target}";
+    }
+
+    private static Color FoodTargetColor(FoodGroupTargetStatus target)
+    {
+        if (target.Target <= 0)
+        {
+            return Color.Secondary;
+        }
+
+        var ok = target.IsMaximum
+            ? target.Current <= target.Target
+            : target.Current >= target.Target;
+        return ok ? Color.Success : Color.Warning;
     }
 
     private sealed record TomorrowPrepReminder(string Title, string Detail, string Icon);

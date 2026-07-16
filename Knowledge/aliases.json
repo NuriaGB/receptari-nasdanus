@@ -1,626 +1,3574 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-01T16:03:27.0534916+00:00",
+  "generatedAt": "2026-07-16T10:18:32.8817628+00:00",
   "items": [
     {
-      "ingredientId": "oli-d\u0027oliva",
-      "alias": "Aceite de oliva"
+      "ingredientId": "oli-d-oliva",
+      "alias": "aceite"
     },
     {
-      "ingredientId": "all",
+      "ingredientId": "oli-d-oliva",
+      "alias": "aceite oliva"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "Aceituna"
+    },
+    {
+      "ingredientId": "bleda-cru",
+      "alias": "Acelga"
+    },
+    {
+      "ingredientId": "gelatina",
+      "alias": "agar agar"
+    },
+    {
+      "ingredientId": "all-cru",
       "alias": "Ajo"
     },
     {
-      "ingredientId": "alberginia",
-      "alias": "Alberginia"
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Albaricoque"
     },
     {
-      "ingredientId": "all",
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Albercoc"
+    },
+    {
+      "ingredientId": "alberginia-cru",
+      "alias": "Alberg\u00EDnia"
+    },
+    {
+      "ingredientId": "alberginia-cru",
+      "alias": "alberg\u00EDnies"
+    },
+    {
+      "ingredientId": "vi-de-cuina",
+      "alias": "Alcoholic beverage, wine, cooking"
+    },
+    {
+      "ingredientId": "vi-negre",
+      "alias": "Alcoholic beverage, wine, table, red"
+    },
+    {
+      "ingredientId": "vi-blanc",
+      "alias": "Alcoholic beverage, wine, table, white"
+    },
+    {
+      "ingredientId": "all-cru",
       "alias": "All"
     },
     {
-      "ingredientId": "mongetes",
+      "ingredientId": "all-cru",
+      "alias": "alls"
+    },
+    {
+      "ingredientId": "musclos",
+      "alias": "almeja"
+    },
+    {
+      "ingredientId": "xocolata-17",
+      "alias": "Almendra"
+    },
+    {
+      "ingredientId": "xocolata-17",
+      "alias": "almendras"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "almid\u00F3n"
+    },
+    {
+      "ingredientId": "cigrons-cru",
       "alias": "Alubias"
     },
     {
-      "ingredientId": "poma",
-      "alias": "Apple"
+      "ingredientId": "xocolata-17",
+      "alias": "Ametlla"
     },
     {
-      "ingredientId": "arros",
-      "alias": "Arros"
+      "ingredientId": "xocolata-17",
+      "alias": "ametlla molida"
     },
     {
-      "ingredientId": "arros",
+      "ingredientId": "xocolata-17",
+      "alias": "ametlles"
+    },
+    {
+      "ingredientId": "anxova-cru",
+      "alias": "Anchoa"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "anelles de calamar"
+    },
+    {
+      "ingredientId": "anis-verd",
+      "alias": "An\u00EDs"
+    },
+    {
+      "ingredientId": "anxova-cru",
+      "alias": "Anxova"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "AOVE"
+    },
+    {
+      "ingredientId": "tomaquet-en-conserva",
+      "alias": "Api"
+    },
+    {
+      "ingredientId": "tomaquet-en-conserva",
+      "alias": "Apio"
+    },
+    {
+      "ingredientId": "poma-cru",
+      "alias": "Apples, raw, without skin, cooked, boiled"
+    },
+    {
+      "ingredientId": "poma-cru-2",
+      "alias": "Apples, raw, without skin, cooked, microwave"
+    },
+    {
+      "ingredientId": "verat-cru",
+      "alias": "arengada"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "Arr\u00F2s"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "arr\u00F2s integral"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "arr\u00F2s llarg"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "arr\u00F2s rod\u00F3"
+    },
+    {
+      "ingredientId": "farina-3",
       "alias": "Arroz"
     },
     {
-      "ingredientId": "tonyina",
-      "alias": "Atun"
+      "ingredientId": "farina-3",
+      "alias": "arroz redondo"
     },
     {
-      "ingredientId": "alberginia",
-      "alias": "Aubergine"
+      "ingredientId": "tonyina-cru",
+      "alias": "At\u00FAn"
     },
     {
-      "ingredientId": "sucre",
-      "alias": "Azucar"
+      "ingredientId": "avellana",
+      "alias": "avellanas"
     },
     {
-      "ingredientId": "bacalla",
+      "ingredientId": "avellana",
+      "alias": "avellanes"
+    },
+    {
+      "ingredientId": "civada-cuit",
+      "alias": "Avena"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "Az\u00FAcar"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "az\u00FAcar moreno"
+    },
+    {
+      "ingredientId": "espinacs-cru",
+      "alias": "baby espinacs"
+    },
+    {
+      "ingredientId": "bacalla-cru",
       "alias": "Bacalao"
     },
     {
-      "ingredientId": "bacalla",
-      "alias": "Bacalla"
-    },
-    {
-      "ingredientId": "bacalla",
+      "ingredientId": "bacalla-cru",
       "alias": "Bacall\u00E0"
     },
     {
-      "ingredientId": "platan",
-      "alias": "Banana"
+      "ingredientId": "bacalla-cru",
+      "alias": "bacall\u00E0 dessalat"
     },
     {
-      "ingredientId": "mongetes",
-      "alias": "Beans"
+      "ingredientId": "farina-3",
+      "alias": "baguette"
     },
     {
-      "ingredientId": "vedella",
-      "alias": "Beef"
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "bajoqueta"
     },
     {
-      "ingredientId": "alberginia",
+      "ingredientId": "maduixa-cru",
+      "alias": "banana"
+    },
+    {
+      "ingredientId": "alfabrega-2",
+      "alias": "basil"
+    },
+    {
+      "ingredientId": "alfabrega",
+      "alias": "Basil, fresh"
+    },
+    {
+      "ingredientId": "alfabrega-2",
+      "alias": "basilic"
+    },
+    {
+      "ingredientId": "vedella-cru-24",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean and fat, trimmed to 0\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-18",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean and fat, trimmed to 0\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-19",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean and fat, trimmed to 0\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-20",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean only, trimmed to 0\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-15",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean only, trimmed to 0\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-14",
+      "alias": "Beef, bottom sirloin, tri-tip roast, separable lean only, trimmed to 0\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-4",
+      "alias": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "vedella-cru-29",
+      "alias": "Beef, loin, top sirloin cap steak, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-28",
+      "alias": "Beef, loin, top sirloin cap steak, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-30",
+      "alias": "Beef, loin, top sirloin cap steak, boneless, separable lean only, trimmed to 1/8\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-26",
+      "alias": "Beef, loin, top sirloin cap steak, boneless, separable lean only, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-27",
+      "alias": "Beef, loin, top sirloin cap steak, boneless, separable lean only, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-8",
+      "alias": "Beef, New Zealand, imported, tenderloin, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-5",
+      "alias": "Beef, New Zealand, imported, tenderloin, separable lean only, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-12",
+      "alias": "Beef, tenderloin, separable lean and fat, trimmed to 1/8\u0022 fat, prime, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-25",
+      "alias": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-22",
+      "alias": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-21",
+      "alias": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-23",
+      "alias": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-17",
+      "alias": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-16",
+      "alias": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-13",
+      "alias": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-9",
+      "alias": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-10",
+      "alias": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-11",
+      "alias": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\u0022 fat, all grades, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-7",
+      "alias": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-6",
+      "alias": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\u0022 fat, select, raw"
+    },
+    {
+      "ingredientId": "alberginia-cru",
       "alias": "Berenjena"
     },
     {
-      "ingredientId": "botifarra",
+      "ingredientId": "xocolata-18",
+      "alias": "Beverages, almond milk, chocolate, ready-to-drink"
+    },
+    {
+      "ingredientId": "xocolata-21",
+      "alias": "Beverages, chocolate almond milk, unsweetened, shelf-stable, fortified with vitamin D2 and E"
+    },
+    {
+      "ingredientId": "xocolata-15",
+      "alias": "Beverages, chocolate drink, milk and soy based, ready to drink, fortified"
+    },
+    {
+      "ingredientId": "bicarbonat",
+      "alias": "bicarbonat sodic"
+    },
+    {
+      "ingredientId": "bicarbonat",
+      "alias": "bicarbonato sodico"
+    },
+    {
+      "ingredientId": "mantega-9",
+      "alias": "Biscuits, plain or buttermilk, frozen, baked"
+    },
+    {
+      "ingredientId": "mantega-15",
+      "alias": "Biscuits, plain or buttermilk, refrigerated dough, higher fat"
+    },
+    {
+      "ingredientId": "mantega-17",
+      "alias": "Biscuits, plain or buttermilk, refrigerated dough, higher fat, baked"
+    },
+    {
+      "ingredientId": "mantega-14",
+      "alias": "Biscuits, plain or buttermilk, refrigerated dough, lower fat"
+    },
+    {
+      "ingredientId": "mantega-16",
+      "alias": "Biscuits, plain or buttermilk, refrigerated dough, lower fat, baked"
+    },
+    {
+      "ingredientId": "bleda-cru",
+      "alias": "Bleda"
+    },
+    {
+      "ingredientId": "llamantol-cru",
+      "alias": "Bogavante"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "Bolet"
+    },
+    {
+      "ingredientId": "anxova-cru",
+      "alias": "boquerones"
+    },
+    {
+      "ingredientId": "botifarra-cru",
       "alias": "Botifarra"
     },
     {
+      "ingredientId": "botifarra-cru",
+      "alias": "botifarra blanca"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "botifarra negra"
+    },
+    {
+      "ingredientId": "vedella-cru-10",
+      "alias": "bou"
+    },
+    {
       "ingredientId": "pa",
-      "alias": "Bread"
+      "alias": "Bread, cornbread, dry mix, prepared with 2% milk, 80% margarine, and eggs"
     },
     {
-      "ingredientId": "brocoli",
-      "alias": "Broccoli"
+      "ingredientId": "patata",
+      "alias": "Bread, gluten-free, white, made with potato extract, rice starch, and rice flour"
     },
     {
-      "ingredientId": "brocoli",
-      "alias": "Brocoli"
+      "ingredientId": "farina-5",
+      "alias": "Bread, gluten-free, white, made with rice flour, corn starch, and/or tapioca"
     },
     {
-      "ingredientId": "brocoli",
-      "alias": "Br\u00F2coli"
+      "ingredientId": "farina-3",
+      "alias": "Bread, gluten-free, white, made with tapioca starch and brown rice flour"
     },
     {
-      "ingredientId": "botifarra",
-      "alias": "Butifarra"
+      "ingredientId": "farina-6",
+      "alias": "Bread, gluten-free, whole grain, made with tapioca starch and brown rice flour"
     },
     {
-      "ingredientId": "mantega",
-      "alias": "Butter"
+      "ingredientId": "pa-ratllat",
+      "alias": "Bread, white, commercially prepared (includes soft bread crumbs)"
+    },
+    {
+      "ingredientId": "mongetes-cru-2",
+      "alias": "Broadbeans (fava beans), mature seeds, raw"
+    },
+    {
+      "ingredientId": "broquil-cuit",
+      "alias": "Broccoli, frozen, spears, cooked, boiled, drained, without salt"
+    },
+    {
+      "ingredientId": "broquil",
+      "alias": "Broccoli, frozen, spears, unprepared (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "brou-de-verdures",
+      "alias": "brou vegetal"
+    },
+    {
+      "ingredientId": "blat-sarrai",
+      "alias": "Buckwheat"
+    },
+    {
+      "ingredientId": "civada-cuit",
+      "alias": "Buckwheat groats, roasted, cooked"
+    },
+    {
+      "ingredientId": "civada-rostit",
+      "alias": "Buckwheat groats, roasted, dry"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "butifarra"
+    },
+    {
+      "ingredientId": "verat-cru",
+      "alias": "Caballa"
+    },
+    {
+      "ingredientId": "col-cru",
+      "alias": "Cabbage, common (danish, domestic, and pointed types), freshly harvest, raw"
+    },
+    {
+      "ingredientId": "xocolata-23",
+      "alias": "Cacao"
+    },
+    {
+      "ingredientId": "xocolata-2",
+      "alias": "cacau"
+    },
+    {
+      "ingredientId": "carbassa-cru",
+      "alias": "Calabaza"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "calamars"
+    },
+    {
+      "ingredientId": "brou-de-vedella",
+      "alias": "caldo de carne"
+    },
+    {
+      "ingredientId": "brou-de-peix",
+      "alias": "caldo de peix"
+    },
+    {
+      "ingredientId": "brou-de-pollastre",
+      "alias": "caldo de pollastre"
+    },
+    {
+      "ingredientId": "brou-de-vedella",
+      "alias": "caldo de vedella"
+    },
+    {
+      "ingredientId": "brou-de-verdures",
+      "alias": "caldo de verdures"
+    },
+    {
+      "ingredientId": "brou-de-verdures",
+      "alias": "caldo vegetal"
+    },
+    {
+      "ingredientId": "capipota-cru",
+      "alias": "Callos"
+    },
+    {
+      "ingredientId": "xocolata-5",
+      "alias": "Candies, HERSHEY, REESESTICKS crispy wafers, peanut butter, milk chocolate"
+    },
+    {
+      "ingredientId": "xocolata-19",
+      "alias": "Candies, HERSHEY\u0027S MILK CHOCOLATE WITH ALMOND BITES"
+    },
+    {
+      "ingredientId": "xocolata-31",
+      "alias": "Candies, MARS SNACKFOOD US, COCOAVIA Blueberry and Almond Chocolate Bar"
+    },
+    {
+      "ingredientId": "xocolata-30",
+      "alias": "Candies, MARS SNACKFOOD US, COCOAVIA Chocolate Covered Almonds"
+    },
+    {
+      "ingredientId": "marshmallows",
+      "alias": "Candies, marshmallows"
+    },
+    {
+      "ingredientId": "xocolata-8",
+      "alias": "Candies, milk chocolate coated coffee beans"
+    },
+    {
+      "ingredientId": "xocolata-17",
+      "alias": "Candies, milk chocolate, with almonds"
+    },
+    {
+      "ingredientId": "xocolata-14",
+      "alias": "Candies, milk chocolate, with rice cereal"
+    },
+    {
+      "ingredientId": "xocolata-7",
+      "alias": "Candies, REESE\u0027s Fast Break, milk chocolate, peanut butter, soft nougats, candy bar"
+    },
+    {
+      "ingredientId": "xocolata-6",
+      "alias": "Candies, REESE\u0027S, FAST BREAK, milk chocolate peanut butter and soft nougats"
+    },
+    {
+      "ingredientId": "xocolata-20",
+      "alias": "Candies, TOBLERONE, milk chocolate with honey and almond nougat"
+    },
+    {
+      "ingredientId": "canyella-picat",
+      "alias": "Canela"
+    },
+    {
+      "ingredientId": "canyella-picat",
+      "alias": "canela en rama"
+    },
+    {
+      "ingredientId": "cranc-cru",
+      "alias": "Cangrejo"
+    },
+    {
+      "ingredientId": "canyella-picat",
+      "alias": "Canyella"
+    },
+    {
+      "ingredientId": "canyella-picat",
+      "alias": "canyella en pols"
+    },
+    {
+      "ingredientId": "all-cru",
+      "alias": "cap d\u0027all"
+    },
+    {
+      "ingredientId": "capipota-cru",
+      "alias": "Capipota"
+    },
+    {
+      "ingredientId": "carbassa-cru",
+      "alias": "Carbassa"
+    },
+    {
+      "ingredientId": "carbassa-cru",
+      "alias": "carbasses"
     },
     {
       "ingredientId": "carbasso",
-      "alias": "Calabacin"
+      "alias": "carbassons"
     },
     {
-      "ingredientId": "carbasso",
-      "alias": "Carbasso"
+      "ingredientId": "botifarra-cru",
+      "alias": "carne de cerdo"
     },
     {
-      "ingredientId": "carbasso",
-      "alias": "Carbass\u00F3"
+      "ingredientId": "vedella-cru-10",
+      "alias": "carne de vaca"
     },
     {
-      "ingredientId": "pastanaga",
-      "alias": "Carrot"
+      "ingredientId": "pastanaga-cru-2",
+      "alias": "Carrots, baby, raw"
     },
     {
-      "ingredientId": "ceba",
-      "alias": "Ceba"
-    },
-    {
-      "ingredientId": "ceba",
-      "alias": "Cebes"
+      "ingredientId": "pastanaga-cru",
+      "alias": "Carrots, raw"
     },
     {
       "ingredientId": "ceba",
-      "alias": "Cebolla"
+      "alias": "ceba de Figueres"
     },
     {
-      "ingredientId": "porc",
+      "ingredientId": "ceba",
+      "alias": "ceba morada"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "ceba tendra"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "cebes"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "ceps"
+    },
+    {
+      "ingredientId": "botifarra-cru",
       "alias": "Cerdo"
     },
     {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Cereza"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "champi\u00F1\u00F3n"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "champi\u00F1ones"
+    },
+    {
+      "ingredientId": "bleda-cru",
+      "alias": "Chard, swiss, raw"
+    },
+    {
+      "ingredientId": "formatge-9",
+      "alias": "Cheese spread, cream cheese base"
+    },
+    {
+      "ingredientId": "mozzarella-5",
+      "alias": "Cheese substitute, mozzarella"
+    },
+    {
+      "ingredientId": "formatge-12",
+      "alias": "Cheese, cottage, creamed, large or small curd"
+    },
+    {
+      "ingredientId": "formatge-10",
+      "alias": "Cheese, cottage, creamed, with fruit"
+    },
+    {
+      "ingredientId": "formatge-2",
+      "alias": "Cheese, cottage, lowfat, 1% milkfat"
+    },
+    {
+      "ingredientId": "formatge-3",
+      "alias": "Cheese, cottage, lowfat, 1% milkfat, lactose reduced"
+    },
+    {
+      "ingredientId": "formatge-5",
+      "alias": "Cheese, cottage, lowfat, 1% milkfat, no sodium added"
+    },
+    {
+      "ingredientId": "formatge-4",
+      "alias": "Cheese, cottage, lowfat, 1% milkfat, with vegetables"
+    },
+    {
       "ingredientId": "formatge",
-      "alias": "Cheese"
+      "alias": "Cheese, cottage, lowfat, 2% milkfat"
     },
     {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Chicken breast"
+      "ingredientId": "formatge-14",
+      "alias": "Cheese, cottage, nonfat, uncreamed, dry, large or small curd"
     },
     {
-      "ingredientId": "cigrons",
-      "alias": "Chickpeas"
+      "ingredientId": "formatge-6",
+      "alias": "Cheese, cream"
     },
     {
-      "ingredientId": "xocolata",
-      "alias": "Chocolate"
+      "ingredientId": "formatge-8",
+      "alias": "Cheese, cream, fat free"
     },
     {
-      "ingredientId": "cigrons",
+      "ingredientId": "formatge-7",
+      "alias": "Cheese, cream, low fat"
+    },
+    {
+      "ingredientId": "mozzarella-6",
+      "alias": "Cheese, mozzarella, low sodium"
+    },
+    {
+      "ingredientId": "mozzarella-4",
+      "alias": "Cheese, mozzarella, nonfat"
+    },
+    {
+      "ingredientId": "mozzarella-2",
+      "alias": "Cheese, mozzarella, part skim milk"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "alias": "Cheese, mozzarella, whole milk"
+    },
+    {
+      "ingredientId": "mozzarella-3",
+      "alias": "Cheese, mozzarella, whole milk, low moisture"
+    },
+    {
+      "ingredientId": "parmesa-2",
+      "alias": "Cheese, parmesan, grated"
+    },
+    {
+      "ingredientId": "parmesa",
+      "alias": "Cheese, parmesan, hard"
+    },
+    {
+      "ingredientId": "parmesa-3",
+      "alias": "Cheese, parmesan, shredded"
+    },
+    {
+      "ingredientId": "ricotta-2",
+      "alias": "Cheese, ricotta, part skim milk"
+    },
+    {
+      "ingredientId": "ricotta",
+      "alias": "Cheese, ricotta, whole milk"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "cherry"
+    },
+    {
+      "ingredientId": "pollastre-cru",
+      "alias": "Chicken, skin (drumsticks and thighs), raw"
+    },
+    {
+      "ingredientId": "pollastre-cru-2",
+      "alias": "Chicken, skin (drumsticks and thighs), with added solution, raw"
+    },
+    {
+      "ingredientId": "cigrons-en-conserva",
+      "alias": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained solids"
+    },
+    {
+      "ingredientId": "cigrons-en-conserva-3",
+      "alias": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained, rinsed in tap water"
+    },
+    {
+      "ingredientId": "cigrons-en-conserva-2",
+      "alias": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, solids and liquids"
+    },
+    {
+      "ingredientId": "cigrons-en-conserva-4",
+      "alias": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, solids and liquids, low sodium"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "Chickpeas (garbanzo beans, bengal gram), mature seeds, raw"
+    },
+    {
+      "ingredientId": "blat-de-moro",
+      "alias": "choclo"
+    },
+    {
+      "ingredientId": "xocolata-negra",
+      "alias": "Chocolate, dark, 60-69% cacao solids"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "Chorizo"
+    },
+    {
+      "ingredientId": "cigrons-cru",
       "alias": "Cigrons"
     },
     {
-      "ingredientId": "bacalla",
-      "alias": "Cod"
+      "ingredientId": "coriandre",
+      "alias": "cilandro"
     },
     {
-      "ingredientId": "cogombre",
-      "alias": "Cogombre"
+      "ingredientId": "coriandre",
+      "alias": "cilantre"
     },
     {
-      "ingredientId": "carbasso",
-      "alias": "Courgette"
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Cirera"
     },
     {
-      "ingredientId": "nata",
-      "alias": "Cream"
+      "ingredientId": "civada-cuit",
+      "alias": "Civada"
     },
     {
-      "ingredientId": "nata",
-      "alias": "Crema de leche"
+      "ingredientId": "sucre-cru",
+      "alias": "clara"
     },
     {
-      "ingredientId": "cogombre",
-      "alias": "Cucumber"
+      "ingredientId": "clau-d-olor-picat",
+      "alias": "Clau d\u0027olor"
     },
     {
-      "ingredientId": "all",
-      "alias": "Dent d\u0027all"
+      "ingredientId": "clau-d-olor-picat",
+      "alias": "Clavo"
     },
     {
-      "ingredientId": "all",
-      "alias": "Dents d\u0027all"
+      "ingredientId": "musclos",
+      "alias": "clo\u00EFssa"
     },
     {
-      "ingredientId": "ou",
-      "alias": "Egg"
+      "ingredientId": "musclos",
+      "alias": "clo\u00EFsses"
     },
     {
-      "ingredientId": "alberginia",
-      "alias": "Eggplant"
+      "ingredientId": "coco-ratllat",
+      "alias": "coco"
     },
     {
-      "ingredientId": "ou",
-      "alias": "Eggs"
+      "ingredientId": "cacau-pur",
+      "alias": "Cocoa, dry powder, unsweetened"
     },
     {
-      "ingredientId": "enciam",
+      "ingredientId": "col-cru",
+      "alias": "Col"
+    },
+    {
+      "ingredientId": "col-cru",
+      "alias": "col llombarda"
+    },
+    {
+      "ingredientId": "col-cru",
+      "alias": "col rizada"
+    },
+    {
+      "ingredientId": "gelatina",
+      "alias": "cola de peix"
+    },
+    {
+      "ingredientId": "comi",
+      "alias": "comins"
+    },
+    {
+      "ingredientId": "xocolata-25",
+      "alias": "Cookie, butter or sugar, with chocolate icing or filling"
+    },
+    {
+      "ingredientId": "civada-cuit",
+      "alias": "copos de avena"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "corder"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "Cordero"
+    },
+    {
+      "ingredientId": "blat-de-moro",
+      "alias": "corn"
+    },
+    {
+      "ingredientId": "blat-de-moro",
+      "alias": "Corn, sweet, yellow, raw"
+    },
+    {
+      "ingredientId": "farina-7",
+      "alias": "Cornmeal, white, self-rising, bolted, with wheat flour added, enriched"
+    },
+    {
+      "ingredientId": "farina-8",
+      "alias": "Cornmeal, yellow, self-rising, bolted, with wheat flour added, enriched"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "Cornstarch"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "costella de porc"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "costella de xai"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "costilla"
+    },
+    {
+      "ingredientId": "cuscus",
+      "alias": "cous cous"
+    },
+    {
+      "ingredientId": "cuscus",
+      "alias": "couscous"
+    },
+    {
+      "ingredientId": "cuscus",
+      "alias": "Couscous, dry"
+    },
+    {
+      "ingredientId": "formatge-13",
+      "alias": "Crackers, cheese, sandwich-type with peanut butter filling"
+    },
+    {
+      "ingredientId": "cranc-cru",
+      "alias": "Cranc"
+    },
+    {
+      "ingredientId": "nata-per-muntar",
+      "alias": "Cream, fluid, heavy whipping"
+    },
+    {
+      "ingredientId": "mantega",
+      "alias": "Creamy dressing, made with sour cream and/or buttermilk and oil, reduced calorie"
+    },
+    {
+      "ingredientId": "mantega-3",
+      "alias": "Creamy dressing, made with sour cream and/or buttermilk and oil, reduced calorie, cholesterol-free"
+    },
+    {
+      "ingredientId": "mantega-2",
+      "alias": "Creamy dressing, made with sour cream and/or buttermilk and oil, reduced calorie, fat-free"
+    },
+    {
+      "ingredientId": "coco-ratllat",
+      "alias": "crema de coco"
+    },
+    {
+      "ingredientId": "formatge-10",
+      "alias": "crema de leche"
+    },
+    {
+      "ingredientId": "formatge-10",
+      "alias": "cr\u00E8me fra\u00EEche"
+    },
+    {
+      "ingredientId": "cranc-cru-4",
+      "alias": "Crustaceans, crab, alaska king, raw"
+    },
+    {
+      "ingredientId": "cranc-cru",
+      "alias": "Crustaceans, crab, blue, raw"
+    },
+    {
+      "ingredientId": "cranc-cru-3",
+      "alias": "Crustaceans, crab, dungeness, raw"
+    },
+    {
+      "ingredientId": "cranc-cru-2",
+      "alias": "Crustaceans, crab, queen, raw"
+    },
+    {
+      "ingredientId": "llamantol-cru",
+      "alias": "Crustaceans, lobster, northern, raw"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "Crustaceans, shrimp, raw"
+    },
+    {
+      "ingredientId": "rap-cru",
+      "alias": "cua de rap"
+    },
+    {
+      "ingredientId": "pollastre-cru",
+      "alias": "cuixa de pollastre"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "cuixa de xai"
+    },
+    {
+      "ingredientId": "conill",
+      "alias": "cuixes de conill"
+    },
+    {
+      "ingredientId": "curcuma-picat",
+      "alias": "C\u00FArcuma"
+    },
+    {
+      "ingredientId": "curri",
+      "alias": "curri en pols"
+    },
+    {
+      "ingredientId": "curri",
+      "alias": "curry en polvo"
+    },
+    {
+      "ingredientId": "anet",
+      "alias": "Dill weed, fresh"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "Egg, yolk, raw, frozen, sugared, pasteurized"
+    },
+    {
+      "ingredientId": "alberginia-cru",
+      "alias": "Eggplant, raw"
+    },
+    {
+      "ingredientId": "blat-de-moro",
+      "alias": "elote"
+    },
+    {
+      "ingredientId": "enciam-cru",
       "alias": "Enciam"
     },
     {
-      "ingredientId": "pasta",
-      "alias": "Espaguetis"
+      "ingredientId": "enciam-cru",
+      "alias": "encians"
     },
     {
-      "ingredientId": "espinacs",
+      "ingredientId": "pasta-cuit",
+      "alias": "espaguetis"
+    },
+    {
+      "ingredientId": "espinacs-cru",
       "alias": "Espinacas"
     },
     {
-      "ingredientId": "espinacs",
+      "ingredientId": "espinacs-cru",
       "alias": "Espinacs"
     },
     {
-      "ingredientId": "farina",
-      "alias": "Farina"
+      "ingredientId": "extracte-de-vainilla",
+      "alias": "extracte vainilla"
     },
     {
-      "ingredientId": "farina",
-      "alias": "Farina de blat"
+      "ingredientId": "farina-3",
+      "alias": "farina de blat"
     },
     {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Filet de pollastre"
+      "ingredientId": "farina-3",
+      "alias": "farina de for\u00E7a"
     },
     {
-      "ingredientId": "farina",
-      "alias": "Flour"
+      "ingredientId": "farina-3",
+      "alias": "farina integral"
+    },
+    {
+      "ingredientId": "xocolata-27",
+      "alias": "Fat free ice cream, no sugar added, flavors other than chocolate"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "f\u00E8cula"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "f\u00E9cula de ma\u00EDz"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "fideus"
+    },
+    {
+      "ingredientId": "anxova-cru",
+      "alias": "Fish, anchovy, european, raw"
+    },
+    {
+      "ingredientId": "fish-bass-fresh-water",
+      "alias": "Fish, bass, fresh water, mixed species, raw"
+    },
+    {
+      "ingredientId": "capipota-cru",
+      "alias": "Fish, bass, striped, raw"
+    },
+    {
+      "ingredientId": "bacalla-cuit-3",
+      "alias": "Fish, cod, Atlantic, cooked, dry heat"
+    },
+    {
+      "ingredientId": "bacalla-cru-2",
+      "alias": "Fish, cod, Atlantic, raw"
+    },
+    {
+      "ingredientId": "bacalla-cuit",
+      "alias": "Fish, cod, Pacific, cooked"
+    },
+    {
+      "ingredientId": "bacalla-cru-3",
+      "alias": "Fish, cod, Pacific, raw (may have been previously frozen)"
+    },
+    {
+      "ingredientId": "llenguado-cuit",
+      "alias": "Fish, flatfish (flounder and sole species), cooked, dry heat"
+    },
+    {
+      "ingredientId": "llenguado-cru",
+      "alias": "Fish, flatfish (flounder and sole species), raw"
+    },
+    {
+      "ingredientId": "fish-halibut-atlantic-and-pacific",
+      "alias": "Fish, halibut, Atlantic and Pacific, raw"
+    },
+    {
+      "ingredientId": "fish-halibut-greenland",
+      "alias": "Fish, halibut, Greenland, raw"
+    },
+    {
+      "ingredientId": "bacalla-cuit-2",
+      "alias": "Fish, lingcod, cooked, dry heat"
+    },
+    {
+      "ingredientId": "bacalla-cru",
+      "alias": "Fish, lingcod, raw"
+    },
+    {
+      "ingredientId": "verat-cru-3",
+      "alias": "Fish, mackerel, Atlantic, raw"
+    },
+    {
+      "ingredientId": "verat-cru",
+      "alias": "Fish, mackerel, king, raw"
+    },
+    {
+      "ingredientId": "verat-cru-2",
+      "alias": "Fish, mackerel, spanish, raw"
+    },
+    {
+      "ingredientId": "rap-cru",
+      "alias": "Fish, monkfish, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-8",
+      "alias": "Fish, salmon, Atlantic, farmed, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-7",
+      "alias": "Fish, salmon, Atlantic, wild, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-3",
+      "alias": "Fish, salmon, chinook, raw"
+    },
+    {
+      "ingredientId": "salmo-cru",
+      "alias": "Fish, salmon, chum, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-6",
+      "alias": "Fish, salmon, coho, farmed, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-5",
+      "alias": "Fish, salmon, coho, wild, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-2",
+      "alias": "Fish, salmon, pink, raw"
+    },
+    {
+      "ingredientId": "salmo-cru-4",
+      "alias": "Fish, salmon, sockeye, raw"
+    },
+    {
+      "ingredientId": "sardina-en-conserva",
+      "alias": "Fish, sardine, Atlantic, canned in oil, drained solids with bone"
+    },
+    {
+      "ingredientId": "llobarro-cuit",
+      "alias": "Fish, sea bass, mixed species, cooked, dry heat"
+    },
+    {
+      "ingredientId": "llobarro-cru",
+      "alias": "Fish, sea bass, mixed species, raw"
+    },
+    {
+      "ingredientId": "peix-espasa-cru",
+      "alias": "Fish, swordfish, raw"
+    },
+    {
+      "ingredientId": "truita-de-riu-cru-3",
+      "alias": "Fish, trout, brook, raw, New York State"
+    },
+    {
+      "ingredientId": "truita-de-riu-cru-2",
+      "alias": "Fish, trout, rainbow, farmed, raw"
+    },
+    {
+      "ingredientId": "truita-de-riu-cru",
+      "alias": "Fish, trout, rainbow, wild, raw"
+    },
+    {
+      "ingredientId": "tonyina-cuit",
+      "alias": "Fish, tuna, fresh, bluefin, cooked, dry heat"
+    },
+    {
+      "ingredientId": "tonyina-cru",
+      "alias": "Fish, tuna, fresh, bluefin, raw"
+    },
+    {
+      "ingredientId": "tonyina-cru-2",
+      "alias": "Fish, tuna, fresh, skipjack, raw"
+    },
+    {
+      "ingredientId": "tonyina-cru-3",
+      "alias": "Fish, tuna, fresh, yellowfin, raw"
+    },
+    {
+      "ingredientId": "tonyina-cuit-2",
+      "alias": "Fish, tuna, skipjack, fresh, cooked, dry heat"
+    },
+    {
+      "ingredientId": "tonyina-cuit-3",
+      "alias": "Fish, tuna, yellowfin, fresh, cooked, dry heat"
+    },
+    {
+      "ingredientId": "civada-cuit",
+      "alias": "flocs de civada"
     },
     {
       "ingredientId": "formatge",
-      "alias": "Formatge"
-    },
-    {
-      "ingredientId": "gambes",
-      "alias": "Gamba"
-    },
-    {
-      "ingredientId": "gambes",
-      "alias": "Gambes"
-    },
-    {
-      "ingredientId": "cigrons",
-      "alias": "Garbanzos"
-    },
-    {
-      "ingredientId": "all",
-      "alias": "Garlic"
-    },
-    {
-      "ingredientId": "lluca",
-      "alias": "Hake"
-    },
-    {
-      "ingredientId": "farina",
-      "alias": "Harina"
-    },
-    {
-      "ingredientId": "ou",
-      "alias": "Huevo"
-    },
-    {
-      "ingredientId": "ou",
-      "alias": "Huevos"
-    },
-    {
-      "ingredientId": "iogurt",
-      "alias": "Iogurt"
-    },
-    {
-      "ingredientId": "mongetes",
-      "alias": "Judias"
-    },
-    {
-      "ingredientId": "gambes",
-      "alias": "Langostino"
-    },
-    {
-      "ingredientId": "llet",
-      "alias": "Leche"
-    },
-    {
-      "ingredientId": "enciam",
-      "alias": "Lechuga"
-    },
-    {
-      "ingredientId": "llimona",
-      "alias": "Lemon"
-    },
-    {
-      "ingredientId": "llenties",
-      "alias": "Lentejas"
-    },
-    {
-      "ingredientId": "llenties",
-      "alias": "Lentils"
-    },
-    {
-      "ingredientId": "enciam",
-      "alias": "Lettuce"
-    },
-    {
-      "ingredientId": "llimona",
-      "alias": "Limon"
-    },
-    {
-      "ingredientId": "gambes",
-      "alias": "Llagosti"
-    },
-    {
-      "ingredientId": "llenties",
-      "alias": "Llenties"
-    },
-    {
-      "ingredientId": "llet",
-      "alias": "Llet"
-    },
-    {
-      "ingredientId": "llimona",
-      "alias": "Llimona"
-    },
-    {
-      "ingredientId": "lluca",
-      "alias": "Lluc"
-    },
-    {
-      "ingredientId": "lluca",
-      "alias": "Lluca"
-    },
-    {
-      "ingredientId": "pasta",
-      "alias": "Macaroni"
-    },
-    {
-      "ingredientId": "pasta",
-      "alias": "Macarrons"
-    },
-    {
-      "ingredientId": "mantega",
-      "alias": "Mantega"
-    },
-    {
-      "ingredientId": "mantega",
-      "alias": "Mantequilla"
-    },
-    {
-      "ingredientId": "poma",
-      "alias": "Manzana"
-    },
-    {
-      "ingredientId": "lluca",
-      "alias": "Merluza"
-    },
-    {
-      "ingredientId": "llet",
-      "alias": "Milk"
-    },
-    {
-      "ingredientId": "mongetes",
-      "alias": "Mongetes"
-    },
-    {
-      "ingredientId": "mozzarella",
-      "alias": "Mozzarella"
-    },
-    {
-      "ingredientId": "mozzarella",
-      "alias": "Mozzarella cheese"
-    },
-    {
-      "ingredientId": "nata",
-      "alias": "Nata"
-    },
-    {
-      "ingredientId": "oli-d\u0027oliva",
-      "alias": "Oli"
-    },
-    {
-      "ingredientId": "oli-d\u0027oliva",
-      "alias": "Oli d\u0027oliva"
-    },
-    {
-      "ingredientId": "oli-d\u0027oliva",
-      "alias": "Olive oil"
-    },
-    {
-      "ingredientId": "ceba",
-      "alias": "Onion"
-    },
-    {
-      "ingredientId": "ou",
-      "alias": "Ou"
-    },
-    {
-      "ingredientId": "ou",
-      "alias": "Ous"
-    },
-    {
-      "ingredientId": "pa",
-      "alias": "Pa"
-    },
-    {
-      "ingredientId": "pa",
-      "alias": "Pan"
-    },
-    {
-      "ingredientId": "pasta",
-      "alias": "Pasta"
-    },
-    {
-      "ingredientId": "pastanaga",
-      "alias": "Pastanaga"
-    },
-    {
-      "ingredientId": "pastanaga",
-      "alias": "Pastanagues"
-    },
-    {
-      "ingredientId": "patata",
-      "alias": "Patata"
-    },
-    {
-      "ingredientId": "patata",
-      "alias": "Patates"
-    },
-    {
-      "ingredientId": "pebrot",
-      "alias": "Pebrot"
-    },
-    {
-      "ingredientId": "pebrot",
-      "alias": "Pebrots"
-    },
-    {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Pechuga de pollo"
-    },
-    {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Pechugas de pollo"
-    },
-    {
-      "ingredientId": "cogombre",
-      "alias": "Pepino"
-    },
-    {
-      "ingredientId": "pebrot",
-      "alias": "Pepper"
-    },
-    {
-      "ingredientId": "pebrot",
-      "alias": "Pimiento"
-    },
-    {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Pit de pollastre"
-    },
-    {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Pits de pollastre"
-    },
-    {
-      "ingredientId": "platan",
-      "alias": "Platan"
-    },
-    {
-      "ingredientId": "platan",
-      "alias": "Pl\u00E0tan"
-    },
-    {
-      "ingredientId": "platan",
-      "alias": "Platano"
-    },
-    {
-      "ingredientId": "pit-de-pollastre",
-      "alias": "Pollastre"
-    },
-    {
-      "ingredientId": "poma",
-      "alias": "Poma"
-    },
-    {
-      "ingredientId": "porc",
-      "alias": "Porc"
-    },
-    {
-      "ingredientId": "porc",
-      "alias": "Pork"
-    },
-    {
-      "ingredientId": "patata",
-      "alias": "Potato"
-    },
-    {
-      "ingredientId": "patata",
-      "alias": "Potatoes"
+      "alias": "formatge fresc"
     },
     {
       "ingredientId": "formatge",
-      "alias": "Queso"
+      "alias": "formatge ratllat"
     },
     {
-      "ingredientId": "arros",
-      "alias": "Rice"
+      "ingredientId": "maduixa-cru",
+      "alias": "Fresa"
     },
     {
-      "ingredientId": "salmo",
-      "alias": "Salmo"
+      "ingredientId": "maduixa-cru",
+      "alias": "fresas"
     },
     {
-      "ingredientId": "salmo",
-      "alias": "Salm\u00F3"
+      "ingredientId": "maduixa-cru",
+      "alias": "fres\u00F3n"
     },
     {
-      "ingredientId": "salmo",
-      "alias": "Salmon"
+      "ingredientId": "xocolata-32",
+      "alias": "Frostings, chocolate, creamy, dry mix, prepared with butter"
     },
     {
-      "ingredientId": "salsa-de-soja",
-      "alias": "Salsa de soja"
+      "ingredientId": "formatge-11",
+      "alias": "Frostings, cream cheese-flavor, ready-to-eat"
     },
     {
-      "ingredientId": "salsa-de-soja",
-      "alias": "Salsa soja"
-    },
-    {
-      "ingredientId": "botifarra",
-      "alias": "Salsitxa"
-    },
-    {
-      "ingredientId": "botifarra",
-      "alias": "Sausage"
-    },
-    {
-      "ingredientId": "gambes",
-      "alias": "Shrimp"
-    },
-    {
-      "ingredientId": "salsa-de-soja",
-      "alias": "Soy sauce"
-    },
-    {
-      "ingredientId": "pasta",
-      "alias": "Spaghetti"
-    },
-    {
-      "ingredientId": "espinacs",
-      "alias": "Spinach"
-    },
-    {
-      "ingredientId": "sucre",
-      "alias": "Sucre"
-    },
-    {
-      "ingredientId": "sucre",
-      "alias": "Sugar"
-    },
-    {
-      "ingredientId": "vedella",
-      "alias": "Ternera"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tomaquet"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tom\u00E0quet"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tomaquets"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tomate"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tomates"
-    },
-    {
-      "ingredientId": "tomaquet",
-      "alias": "Tomato"
-    },
-    {
-      "ingredientId": "tonyina",
-      "alias": "Tonyina"
-    },
-    {
-      "ingredientId": "tonyina",
-      "alias": "Tuna"
-    },
-    {
-      "ingredientId": "vedella",
-      "alias": "Vedella"
+      "ingredientId": "xocolata-29",
+      "alias": "Frozen novelties, ice cream type, vanilla ice cream, light, no sugar added, chocolate coated"
     },
     {
       "ingredientId": "xocolata",
-      "alias": "Xocolata"
+      "alias": "Frozen yogurts, chocolate, nonfat milk, sweetened without sugar"
+    },
+    {
+      "ingredientId": "cirera-en-conserva-6",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, extra heavy syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "cirera-en-conserva-5",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, extra light syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "cirera-en-conserva-4",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, heavy syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "cirera-en-conserva-2",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, juice pack, solids and liquids"
+    },
+    {
+      "ingredientId": "cirera-en-conserva-3",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, light syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "cirera-en-conserva",
+      "alias": "Fruit cocktail, (peach and pineapple and pear and grape and cherry), canned, water pack, solids and liquids"
+    },
+    {
+      "ingredientId": "maduixa-cru-3",
+      "alias": "Fruit juice smoothie, BOLTHOUSE FARMS, strawberry banana"
+    },
+    {
+      "ingredientId": "maduixa-cru-2",
+      "alias": "Fruit juice smoothie, NAKED JUICE, strawberry banana"
+    },
+    {
+      "ingredientId": "maduixa-cru",
+      "alias": "Fruit juice smoothie, ODWALLA, strawberry banana"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva-4",
+      "alias": "Fruit salad, (peach and pear and apricot and pineapple and cherry), canned, extra heavy syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva-2",
+      "alias": "Fruit salad, (peach and pear and apricot and pineapple and cherry), canned, juice pack, solids and liquids"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva-3",
+      "alias": "Fruit salad, (peach and pear and apricot and pineapple and cherry), canned, light syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Fruit salad, (peach and pear and apricot and pineapple and cherry), canned, water pack, solids and liquids"
+    },
+    {
+      "ingredientId": "platan-en-conserva",
+      "alias": "Fruit salad, (pineapple and papaya and banana and guava), tropical, canned, heavy syrup, solids and liquids"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "fuet"
+    },
+    {
+      "ingredientId": "llorer",
+      "alias": "fulla de llorer"
+    },
+    {
+      "ingredientId": "brou-de-peix",
+      "alias": "fumet"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "Gamba"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "gamba pelada"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "gambas"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "gambes"
+    },
+    {
+      "ingredientId": "conill",
+      "alias": "Game meat, rabbit, domesticated, composite of cuts, raw"
+    },
+    {
+      "ingredientId": "curri",
+      "alias": "garam masala"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "garbanzo"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "Garbanzos"
+    },
+    {
+      "ingredientId": "all-cru",
+      "alias": "Garlic, raw"
+    },
+    {
+      "ingredientId": "vi-de-cuina",
+      "alias": "garnatxa"
+    },
+    {
+      "ingredientId": "gelatina",
+      "alias": "gelatina en fulles"
+    },
+    {
+      "ingredientId": "gelatina",
+      "alias": "gelatina neutra"
+    },
+    {
+      "ingredientId": "gelatina",
+      "alias": "Gelatins, dry powder, unsweetened"
+    },
+    {
+      "ingredientId": "gingebre-picat",
+      "alias": "Gingebre"
+    },
+    {
+      "ingredientId": "gingebre-fresc",
+      "alias": "Ginger root, raw"
+    },
+    {
+      "ingredientId": "xocolata-negra",
+      "alias": "gotes de xocolata"
+    },
+    {
+      "ingredientId": "all-cru",
+      "alias": "gra d\u0027all"
+    },
+    {
+      "ingredientId": "parmesa",
+      "alias": "grana padano"
+    },
+    {
+      "ingredientId": "raim",
+      "alias": "Grapefruit juice, pink or red, with added calcium"
+    },
+    {
+      "ingredientId": "raim-cru",
+      "alias": "Grapefruit juice, pink, raw"
+    },
+    {
+      "ingredientId": "raim-2",
+      "alias": "Grapefruit juice, white, bottled, unsweetened, OCEAN SPRAY"
+    },
+    {
+      "ingredientId": "raim-en-conserva-2",
+      "alias": "Grapefruit juice, white, canned or bottled, unsweetened"
+    },
+    {
+      "ingredientId": "raim-en-conserva",
+      "alias": "Grapefruit juice, white, canned, sweetened"
+    },
+    {
+      "ingredientId": "raim-4",
+      "alias": "Grapefruit juice, white, frozen concentrate, unsweetened, diluted with 3 volume water"
+    },
+    {
+      "ingredientId": "raim-3",
+      "alias": "Grapefruit juice, white, frozen concentrate, unsweetened, undiluted"
+    },
+    {
+      "ingredientId": "raim-cru-2",
+      "alias": "Grapefruit juice, white, raw"
+    },
+    {
+      "ingredientId": "raim-cru-8",
+      "alias": "Grapefruit, raw, pink and red and white, all areas"
+    },
+    {
+      "ingredientId": "raim-cru-7",
+      "alias": "Grapefruit, raw, pink and red, all areas"
+    },
+    {
+      "ingredientId": "raim-cru-9",
+      "alias": "Grapefruit, raw, pink and red, California and Arizona"
+    },
+    {
+      "ingredientId": "raim-cru-6",
+      "alias": "Grapefruit, raw, pink and red, Florida"
+    },
+    {
+      "ingredientId": "raim-cru-4",
+      "alias": "Grapefruit, raw, white, all areas"
+    },
+    {
+      "ingredientId": "raim-cru-5",
+      "alias": "Grapefruit, raw, white, California"
+    },
+    {
+      "ingredientId": "raim-cru-3",
+      "alias": "Grapefruit, raw, white, Florida"
+    },
+    {
+      "ingredientId": "raim-en-conserva-4",
+      "alias": "Grapefruit, sections, canned, juice pack, solids and liquids"
+    },
+    {
+      "ingredientId": "raim-en-conserva-5",
+      "alias": "Grapefruit, sections, canned, light syrup pack, solids and liquids"
+    },
+    {
+      "ingredientId": "raim-en-conserva-3",
+      "alias": "Grapefruit, sections, canned, water pack, solids and liquids"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "Guisantes"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "guisants"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "harina de trigo"
+    },
+    {
+      "ingredientId": "nata-per-muntar",
+      "alias": "heavy cream"
+    },
+    {
+      "ingredientId": "menta",
+      "alias": "hierbabuena"
+    },
+    {
+      "ingredientId": "mel",
+      "alias": "Honey"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "Huevo"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "huevos"
+    },
+    {
+      "ingredientId": "xocolata-28",
+      "alias": "Ice cream, lowfat, no sugar added, cone, added peanuts and chocolate sauce"
+    },
+    {
+      "ingredientId": "maduixa-cru-7",
+      "alias": "Ice creams, BREYERS, All Natural Light Vanilla Chocolate Strawberry"
+    },
+    {
+      "ingredientId": "mantega-4",
+      "alias": "Ice creams, BREYERS, No Sugar Added, Butter Pecan"
+    },
+    {
+      "ingredientId": "xocolata-26",
+      "alias": "Ice creams, BREYERS, No Sugar Added, Chocolate Caramel"
+    },
+    {
+      "ingredientId": "maduixa-cru-4",
+      "alias": "Ice creams, BREYERS, No Sugar Added, Vanilla Chocolate Strawberry"
+    },
+    {
+      "ingredientId": "xocolata-24",
+      "alias": "Ice creams, chocolate, light, no sugar added"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "impulsor"
     },
     {
       "ingredientId": "iogurt",
-      "alias": "Yoghurt"
+      "alias": "iogurt grec"
     },
     {
       "ingredientId": "iogurt",
-      "alias": "Yogur"
+      "alias": "iogurt natural"
     },
     {
-      "ingredientId": "iogurt",
-      "alias": "Yogurt"
+      "ingredientId": "jalapeno",
+      "alias": "jalapenos"
+    },
+    {
+      "ingredientId": "porc-cru-16",
+      "alias": "Jam\u00F3n"
+    },
+    {
+      "ingredientId": "porc-cru-16",
+      "alias": "jamon serrano"
+    },
+    {
+      "ingredientId": "gingebre-picat",
+      "alias": "Jengibre"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "Jud\u00EDa verde"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "judias verdes"
+    },
+    {
+      "ingredientId": "poma-3",
+      "alias": "Juice, apple and grape blend, with added ascorbic acid"
+    },
+    {
+      "ingredientId": "poma",
+      "alias": "Juice, apple, grape and pear blend, with added ascorbic acid and calcium"
+    },
+    {
+      "ingredientId": "julivert-sec",
+      "alias": "Julivert"
+    },
+    {
+      "ingredientId": "col-cru",
+      "alias": "kale"
+    },
+    {
+      "ingredientId": "xai-cru-19",
+      "alias": "Lamb, Australian, imported, fresh, leg, hindshank, heel on, bone-in, separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-18",
+      "alias": "Lamb, Australian, imported, fresh, leg, hindshank, heel on, bone-in, separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-15",
+      "alias": "Lamb, Australian, imported, fresh, leg, shank half, separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-14",
+      "alias": "Lamb, Australian, imported, fresh, leg, shank half, separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cuit-4",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin chops, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, cooked, broiled"
+    },
+    {
+      "ingredientId": "xai-cru-10",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin chops, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cuit-3",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin chops, boneless, separable lean only, trimmed to 1/8\u0022 fat, cooked, broiled"
+    },
+    {
+      "ingredientId": "xai-cru-8",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin chops, boneless, separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-9",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin half, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-7",
+      "alias": "Lamb, Australian, imported, fresh, leg, sirloin half, boneless, separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-2",
+      "alias": "Lamb, Australian, imported, fresh, leg, whole (shank and sirloin), separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "Lamb, Australian, imported, fresh, leg, whole (shank and sirloin), separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-17",
+      "alias": "Lamb, Australian, imported, fresh, tenderloin, boneless, separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-16",
+      "alias": "Lamb, Australian, imported, fresh, tenderloin, boneless, separable lean only, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-20",
+      "alias": "Lamb, cubed for stew or kabob (leg and shoulder), separable lean only, trimmed to 1/4\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cru-12",
+      "alias": "Lamb, leg, sirloin half, separable lean and fat, trimmed to 1/4\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cru-13",
+      "alias": "Lamb, leg, sirloin half, separable lean and fat, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cru-11",
+      "alias": "Lamb, leg, sirloin half, separable lean only, trimmed to 1/4\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cru-4",
+      "alias": "Lamb, leg, whole (shank and sirloin), separable lean and fat, trimmed to 1/4\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cru-5",
+      "alias": "Lamb, leg, whole (shank and sirloin), separable lean and fat, trimmed to 1/8\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cru-3",
+      "alias": "Lamb, leg, whole (shank and sirloin), separable lean only, trimmed to 1/4\u0022 fat, choice, raw"
+    },
+    {
+      "ingredientId": "xai-cuit-2",
+      "alias": "Lamb, New Zealand, imported, frozen, leg, whole (shank and sirloin), separable lean and fat, cooked, roasted"
+    },
+    {
+      "ingredientId": "xai-cru-6",
+      "alias": "Lamb, New Zealand, imported, frozen, leg, whole (shank and sirloin), separable lean and fat, trimmed to 1/8\u0022 fat, raw"
+    },
+    {
+      "ingredientId": "xai-cuit",
+      "alias": "Lamb, New Zealand, imported, frozen, leg, whole (shank and sirloin), separable lean only, cooked, roasted"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "langostino"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "Leavening agents, baking powder, double-acting, straight phosphate"
+    },
+    {
+      "ingredientId": "bicarbonat",
+      "alias": "Leavening agents, baking soda"
+    },
+    {
+      "ingredientId": "llevat-sec",
+      "alias": "Leavening agents, yeast, baker\u0027s, active dry"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "Leche"
+    },
+    {
+      "ingredientId": "coco-ratllat",
+      "alias": "leche de coco"
+    },
+    {
+      "ingredientId": "enciam-cru",
+      "alias": "Lechuga"
+    },
+    {
+      "ingredientId": "enciam-cru",
+      "alias": "lechugas"
+    },
+    {
+      "ingredientId": "porro",
+      "alias": "Leeks, (bulb and lower leaf-portion), raw"
+    },
+    {
+      "ingredientId": "llenguado-cru",
+      "alias": "Lenguado"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "lenteja"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "Lentils, raw"
+    },
+    {
+      "ingredientId": "enciam-cru-2",
+      "alias": "Lettuce, green leaf, raw"
+    },
+    {
+      "ingredientId": "enciam-cru",
+      "alias": "Lettuce, red leaf, raw"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "levadura"
+    },
+    {
+      "ingredientId": "llima",
+      "alias": "Limes, raw"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "Lim\u00F3n"
+    },
+    {
+      "ingredientId": "gamba-cru",
+      "alias": "llagost\u00ED"
+    },
+    {
+      "ingredientId": "llamantol-cru",
+      "alias": "Llam\u00E0ntol"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "llavors de s\u00E8sam"
+    },
+    {
+      "ingredientId": "llenguado-cru",
+      "alias": "Llenguado"
+    },
+    {
+      "ingredientId": "llenties",
+      "alias": "llentia"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "Llet"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "llet d\u0027ametlla"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "llet d\u0027avena"
+    },
+    {
+      "ingredientId": "coco-ratllat",
+      "alias": "llet de coco"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "llet desnatada"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "llet semi"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "llet sencera"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "llevadura quimica"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "llevat"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "llevat de forner"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "Llimona"
+    },
+    {
+      "ingredientId": "llobarro-cru",
+      "alias": "Llobarro"
+    },
+    {
+      "ingredientId": "bacalla-cru",
+      "alias": "llom de bacall\u00E0"
+    },
+    {
+      "ingredientId": "llom-de-porc",
+      "alias": "llom porc"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "llonganissa"
+    },
+    {
+      "ingredientId": "llobarro-cru",
+      "alias": "llop de mar"
+    },
+    {
+      "ingredientId": "llom-de-porc",
+      "alias": "lomo cerdo"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "longaniza"
+    },
+    {
+      "ingredientId": "llobarro-cru",
+      "alias": "Lubina"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "macarrons"
+    },
+    {
+      "ingredientId": "maduixa-cru",
+      "alias": "Maduixa"
+    },
+    {
+      "ingredientId": "maduixa-cru",
+      "alias": "maduixes"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "maicena"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "maizena"
+    },
+    {
+      "ingredientId": "mango",
+      "alias": "Mangos, raw"
+    },
+    {
+      "ingredientId": "mantega-10",
+      "alias": "mantega salada"
+    },
+    {
+      "ingredientId": "mantega-10",
+      "alias": "mantega sense sal"
+    },
+    {
+      "ingredientId": "anis-verd",
+      "alias": "matafaluga"
+    },
+    {
+      "ingredientId": "ricotta",
+      "alias": "mat\u00F3"
+    },
+    {
+      "ingredientId": "maionesa",
+      "alias": "mayo"
+    },
+    {
+      "ingredientId": "musclos",
+      "alias": "Mejill\u00F3n"
+    },
+    {
+      "ingredientId": "sindria-cru",
+      "alias": "Mel\u00F3"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Melocot\u00F3n"
+    },
+    {
+      "ingredientId": "sindria-cru",
+      "alias": "Mel\u00F3n"
+    },
+    {
+      "ingredientId": "menta",
+      "alias": "menta fresca"
+    },
+    {
+      "ingredientId": "mido-de-blat-de-moro",
+      "alias": "mid\u00F3 blat de moro"
+    },
+    {
+      "ingredientId": "mantega-sec",
+      "alias": "Milk, buttermilk, dried"
+    },
+    {
+      "ingredientId": "mantega-7",
+      "alias": "Milk, buttermilk, fluid, cultured, lowfat"
+    },
+    {
+      "ingredientId": "mantega-10",
+      "alias": "Milk, buttermilk, fluid, cultured, reduced fat"
+    },
+    {
+      "ingredientId": "mantega-5",
+      "alias": "Milk, buttermilk, fluid, whole"
+    },
+    {
+      "ingredientId": "xocolata-23",
+      "alias": "Milk, chocolate beverage, hot cocoa, homemade"
+    },
+    {
+      "ingredientId": "xocolata-22",
+      "alias": "Milk, chocolate, lowfat, reduced sugar"
+    },
+    {
+      "ingredientId": "marshmallows",
+      "alias": "mini marshmallows"
+    },
+    {
+      "ingredientId": "musclos",
+      "alias": "Mollusks, mussel, blue, raw"
+    },
+    {
+      "ingredientId": "pop-cru",
+      "alias": "Mollusks, octopus, common, raw"
+    },
+    {
+      "ingredientId": "ostra-cru-3",
+      "alias": "Mollusks, oyster, eastern, farmed, raw"
+    },
+    {
+      "ingredientId": "ostra-cru-2",
+      "alias": "Mollusks, oyster, eastern, wild, raw"
+    },
+    {
+      "ingredientId": "ostra-cru",
+      "alias": "Mollusks, oyster, Pacific, raw"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "Mollusks, squid, mixed species, raw"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "Mongeta verda"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "Mongetes"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "mongetes verdes"
+    },
+    {
+      "ingredientId": "mostassa-picat",
+      "alias": "Mostassa"
+    },
+    {
+      "ingredientId": "mostassa-picat",
+      "alias": "mostassa de Dijon"
+    },
+    {
+      "ingredientId": "mostassa-picat",
+      "alias": "Mostaza"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "alias": "mozarella"
+    },
+    {
+      "ingredientId": "mozzarella",
+      "alias": "mozzarella fresca"
+    },
+    {
+      "ingredientId": "musclos",
+      "alias": "Musclo"
+    },
+    {
+      "ingredientId": "espinacs-cru-4",
+      "alias": "Mustard spinach, (tendergreen), raw"
+    },
+    {
+      "ingredientId": "formatge-10",
+      "alias": "nata l\u00EDquida"
+    },
+    {
+      "ingredientId": "nata-per-muntar",
+      "alias": "nata muntar"
+    },
+    {
+      "ingredientId": "formatge-10",
+      "alias": "nata per cuinar"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "nectarina"
+    },
+    {
+      "ingredientId": "espinacs-cru-2",
+      "alias": "New Zealand spinach, raw"
+    },
+    {
+      "ingredientId": "nou-moscada-picat",
+      "alias": "Nou moscada"
+    },
+    {
+      "ingredientId": "nou-moscada-picat",
+      "alias": "Nuez moscada"
+    },
+    {
+      "ingredientId": "coco-ratllat",
+      "alias": "Nuts, coconut meat, dried (desiccated), not sweetened"
+    },
+    {
+      "ingredientId": "avellana",
+      "alias": "Nuts, hazelnuts or filberts"
+    },
+    {
+      "ingredientId": "pinyons",
+      "alias": "Nuts, pine nuts, dried"
+    },
+    {
+      "ingredientId": "marshmallows",
+      "alias": "nuvols"
+    },
+    {
+      "ingredientId": "oli-de-coco",
+      "alias": "Oil, coconut"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "Oil, olive, salad or cooking"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "oli"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "oli d\u0027oliva verge extra"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "oli oliva"
+    },
+    {
+      "ingredientId": "oli-d-oliva",
+      "alias": "Oliva"
+    },
+    {
+      "ingredientId": "ceba-cru",
+      "alias": "Onions, raw"
+    },
+    {
+      "ingredientId": "ceba-cru-4",
+      "alias": "Onions, spring or scallions (includes tops and bulb), raw"
+    },
+    {
+      "ingredientId": "ceba-cru-3",
+      "alias": "Onions, sweet, raw"
+    },
+    {
+      "ingredientId": "ceba-cru-2",
+      "alias": "Onions, welsh, raw"
+    },
+    {
+      "ingredientId": "taronja",
+      "alias": "Orange Pineapple Juice Blend"
+    },
+    {
+      "ingredientId": "taronja-en-conserva",
+      "alias": "Orange-grapefruit juice, canned or bottled, unsweetened"
+    },
+    {
+      "ingredientId": "orenga-sec",
+      "alias": "Or\u00E9gano"
+    },
+    {
+      "ingredientId": "orenga-sec",
+      "alias": "Orenga"
+    },
+    {
+      "ingredientId": "ostra-cru",
+      "alias": "Ostra"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "Ou"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "ou de gallina"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "ous"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "pa de motlle"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "pa de pag\u00E8s"
+    },
+    {
+      "ingredientId": "pa-ratllat",
+      "alias": "pa sec ratllat"
+    },
+    {
+      "ingredientId": "farina-3",
+      "alias": "pan de molde"
+    },
+    {
+      "ingredientId": "farina-4",
+      "alias": "Pan Dulce, La Ricura, Salpora de Arroz con Azucar, cookie-like, contains wheat flour and rice flour"
+    },
+    {
+      "ingredientId": "mantega-13",
+      "alias": "Pancakes plain, frozen, ready-to-heat (includes buttermilk)"
+    },
+    {
+      "ingredientId": "mantega-18",
+      "alias": "Pancakes, plain, frozen, ready-to-heat, microwave (includes buttermilk)"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "panela"
+    },
+    {
+      "ingredientId": "pa-ratllat",
+      "alias": "panko"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "papa"
+    },
+    {
+      "ingredientId": "pebre-vermell",
+      "alias": "paprika"
+    },
+    {
+      "ingredientId": "parmesa",
+      "alias": "parmigiano"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "passata"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "Pasta"
+    },
+    {
+      "ingredientId": "pasta-filo",
+      "alias": "pasta fullada grega"
+    },
+    {
+      "ingredientId": "pasta-cuita",
+      "alias": "Pasta, cooked, unenriched, without added salt"
+    },
+    {
+      "ingredientId": "pasta-cuit-2",
+      "alias": "Pasta, gluten-free, brown rice flour, cooked, TINKYADA"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "Pasta, gluten-free, corn and rice flour, cooked"
+    },
+    {
+      "ingredientId": "pasta-cuit-6",
+      "alias": "Pasta, gluten-free, corn flour and quinoa flour, cooked, ANCIENT HARVEST"
+    },
+    {
+      "ingredientId": "pasta-cuit-3",
+      "alias": "Pasta, gluten-free, rice flour and rice bran extract, cooked, DE BOLES"
+    },
+    {
+      "ingredientId": "pasta-cuit-4",
+      "alias": "Pasta, homemade, made with egg, cooked"
+    },
+    {
+      "ingredientId": "semola-cuit-2",
+      "alias": "Pasta, whole grain, 51% whole wheat, remaining enriched semolina, cooked (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "semola-2",
+      "alias": "Pasta, whole grain, 51% whole wheat, remaining enriched semolina, dry (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "semola-cuit",
+      "alias": "Pasta, whole grain, 51% whole wheat, remaining unenriched semolina, cooked"
+    },
+    {
+      "ingredientId": "semola",
+      "alias": "Pasta, whole grain, 51% whole wheat, remaining unenriched semolina, dry"
+    },
+    {
+      "ingredientId": "pasta-cuit-5",
+      "alias": "Pasta, whole-wheat, cooked (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "pastanagues"
+    },
+    {
+      "ingredientId": "brou-de-pollastre",
+      "alias": "pastilla de caldo"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "patatas"
+    },
+    {
+      "ingredientId": "patata",
+      "alias": "patates"
+    },
+    {
+      "ingredientId": "mantega-19",
+      "alias": "Peanut butter with omega-3, creamy"
+    },
+    {
+      "ingredientId": "pastanaga-en-conserva-2",
+      "alias": "Peas and carrots, canned, no salt added, solids and liquids"
+    },
+    {
+      "ingredientId": "pastanaga-en-conserva",
+      "alias": "Peas and carrots, canned, regular pack, solids and liquids"
+    },
+    {
+      "ingredientId": "pastanaga-cuit",
+      "alias": "Peas and carrots, frozen, cooked, boiled, drained, without salt"
     },
     {
       "ingredientId": "pastanaga",
-      "alias": "Zanahoria"
+      "alias": "Peas and carrots, frozen, unprepared"
+    },
+    {
+      "ingredientId": "ceba-en-conserva",
+      "alias": "Peas and onions, canned, solids and liquids"
+    },
+    {
+      "ingredientId": "ceba-cuit",
+      "alias": "Peas and onions, frozen, cooked, boiled, drained, without salt"
+    },
+    {
+      "ingredientId": "ceba",
+      "alias": "Peas and onions, frozen, unprepared"
+    },
+    {
+      "ingredientId": "pebre-negre",
+      "alias": "pebre"
+    },
+    {
+      "ingredientId": "pebre-negre",
+      "alias": "pebre blanc"
+    },
+    {
+      "ingredientId": "pebre-negre",
+      "alias": "pebre de Jamaica"
+    },
+    {
+      "ingredientId": "pebre-vermell",
+      "alias": "pebre vermell dol\u00E7"
+    },
+    {
+      "ingredientId": "pebre-vermell",
+      "alias": "pebre vermell fumat"
+    },
+    {
+      "ingredientId": "pebre-vermell",
+      "alias": "pebre vermell picant"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "pebrot groc"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "pebrot verd"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "pebrot vermell"
+    },
+    {
+      "ingredientId": "peix-espasa-cru",
+      "alias": "Peix espasa"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "pell de llimona"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "penne"
+    },
+    {
+      "ingredientId": "pebrot-cru",
+      "alias": "Pepper, banana, raw"
+    },
+    {
+      "ingredientId": "pebrot",
+      "alias": "Peppermint, fresh"
+    },
+    {
+      "ingredientId": "pebrot-cru-8",
+      "alias": "Peppers, hot chili, green, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-7",
+      "alias": "Peppers, hot chili, red, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-3",
+      "alias": "Peppers, hungarian, raw"
+    },
+    {
+      "ingredientId": "jalapeno",
+      "alias": "Peppers, jalapeno, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-2",
+      "alias": "Peppers, serrano, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-5",
+      "alias": "Peppers, sweet, green, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-4",
+      "alias": "Peppers, sweet, red, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru-6",
+      "alias": "Peppers, sweet, yellow, raw"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Pera"
+    },
+    {
+      "ingredientId": "julivert-sec",
+      "alias": "Perejil"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "peres"
+    },
+    {
+      "ingredientId": "porc-cru-16",
+      "alias": "Pernil"
+    },
+    {
+      "ingredientId": "porc-cru-16",
+      "alias": "pernil salat"
+    },
+    {
+      "ingredientId": "julivert-sec",
+      "alias": "persil"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "p\u00E8sol"
+    },
+    {
+      "ingredientId": "cigrons-cru",
+      "alias": "P\u00E8sols"
+    },
+    {
+      "ingredientId": "peix-espasa-cru",
+      "alias": "Pez espada"
+    },
+    {
+      "ingredientId": "pasta-filo",
+      "alias": "phyllo"
+    },
+    {
+      "ingredientId": "pasta-filo",
+      "alias": "Phyllo dough"
+    },
+    {
+      "ingredientId": "coliflor",
+      "alias": "Pickles, chowchow, with cauliflower onion mustard, sweet"
+    },
+    {
+      "ingredientId": "pebre-negre",
+      "alias": "pimienta"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "pimiento rojo"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "pimiento verde"
+    },
+    {
+      "ingredientId": "pinya",
+      "alias": "pineapple"
+    },
+    {
+      "ingredientId": "pinya",
+      "alias": "Pineapple, raw, all varieties"
+    },
+    {
+      "ingredientId": "pinyons",
+      "alias": "Pi\u00F1\u00F3n"
+    },
+    {
+      "ingredientId": "pinyons",
+      "alias": "Piny\u00F3"
+    },
+    {
+      "ingredientId": "pollastre-cru",
+      "alias": "pit de pollastre"
+    },
+    {
+      "ingredientId": "maduixa-cru",
+      "alias": "Pl\u00E0tan"
+    },
+    {
+      "ingredientId": "maduixa-cru",
+      "alias": "Pl\u00E1tano"
+    },
+    {
+      "ingredientId": "pollastre-cru",
+      "alias": "pollastre sencer"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "pomes"
+    },
+    {
+      "ingredientId": "pop-cru",
+      "alias": "Pop"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "Porc"
+    },
+    {
+      "ingredientId": "porc-cru-7",
+      "alias": "Pork loin, fresh, backribs, bone-in, raw, lean only"
+    },
+    {
+      "ingredientId": "porc-cru-2",
+      "alias": "Pork, fresh, composite of trimmed leg, loin, shoulder, and spareribs, (includes cuts to be cured), separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cuit",
+      "alias": "Pork, fresh, composite of trimmed retail cuts (leg, loin, and shoulder), separable lean only, cooked"
+    },
+    {
+      "ingredientId": "porc-cru",
+      "alias": "Pork, fresh, composite of trimmed retail cuts (leg, loin, shoulder, and spareribs), separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-3",
+      "alias": "Pork, fresh, composite of trimmed retail cuts (leg, loin, shoulder), separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-6",
+      "alias": "Pork, fresh, composite of trimmed retail cuts (loin and shoulder blade), separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-5",
+      "alias": "Pork, fresh, composite of trimmed retail cuts (loin and shoulder blade), separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-18",
+      "alias": "Pork, fresh, enhanced, loin, tenderloin, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-24",
+      "alias": "Pork, fresh, leg (ham), rump half, separable lean only, raw (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "porc-cru-17",
+      "alias": "Pork, fresh, leg (ham), shank half, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-16",
+      "alias": "Pork, fresh, leg (ham), shank half, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-12",
+      "alias": "Pork, fresh, loin, center rib (chops or roasts), bone-in, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-10",
+      "alias": "Pork, fresh, loin, center rib (chops or roasts), bone-in, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-13",
+      "alias": "Pork, fresh, loin, center rib (chops or roasts), boneless, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-11",
+      "alias": "Pork, fresh, loin, center rib (chops or roasts), boneless, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-9",
+      "alias": "Pork, fresh, loin, country-style ribs, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-8",
+      "alias": "Pork, fresh, loin, country-style ribs, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-21",
+      "alias": "Pork, fresh, loin, sirloin (chops or roasts), bone-in, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-19",
+      "alias": "Pork, fresh, loin, sirloin (chops or roasts), bone-in, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-22",
+      "alias": "Pork, fresh, loin, sirloin (chops or roasts), boneless, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-20",
+      "alias": "Pork, fresh, loin, sirloin (chops or roasts), boneless, separable lean only, raw"
+    },
+    {
+      "ingredientId": "porc-cru-15",
+      "alias": "Pork, fresh, loin, tenderloin, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-23",
+      "alias": "Pork, fresh, loin, tenderloin, separable lean and fat, with added solution, raw"
+    },
+    {
+      "ingredientId": "porc-cru-14",
+      "alias": "Pork, fresh, loin, tenderloin, separable lean only, raw"
+    },
+    {
+      "ingredientId": "llom-de-porc",
+      "alias": "Pork, fresh, loin, whole, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cuit-2",
+      "alias": "Pork, Leg sirloin tip roast, boneless, separable lean and fat, cooked, braised"
+    },
+    {
+      "ingredientId": "porc-cru-4",
+      "alias": "Pork, Leg sirloin tip roast, boneless, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porc-cru-25",
+      "alias": "Pork, Shoulder breast, boneless, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "porro",
+      "alias": "porros"
+    },
+    {
+      "ingredientId": "patata-cru-2",
+      "alias": "Potatoes, flesh and skin, raw"
+    },
+    {
+      "ingredientId": "patata-cru",
+      "alias": "Potatoes, raw, skin"
+    },
+    {
+      "ingredientId": "patata-cru-3",
+      "alias": "Potatoes, red, flesh and skin, raw"
+    },
+    {
+      "ingredientId": "patata-cru-5",
+      "alias": "Potatoes, russet, flesh and skin, raw (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "patata-cru-4",
+      "alias": "Potatoes, white, flesh and skin, raw"
+    },
+    {
+      "ingredientId": "albercoc-en-conserva",
+      "alias": "Pr\u00E9ssec"
+    },
+    {
+      "ingredientId": "porro",
+      "alias": "puerros"
+    },
+    {
+      "ingredientId": "pop-cru",
+      "alias": "Pulpo"
+    },
+    {
+      "ingredientId": "carbassa-cru-7",
+      "alias": "Pumpkin flowers, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-6",
+      "alias": "Pumpkin leaves, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru",
+      "alias": "Pumpkin, raw"
+    },
+    {
+      "ingredientId": "formatge",
+      "alias": "queso rallado"
+    },
+    {
+      "ingredientId": "rap-cru",
+      "alias": "Rap"
+    },
+    {
+      "ingredientId": "rap-cru",
+      "alias": "Rape"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "ratlladura de llimona"
+    },
+    {
+      "ingredientId": "col-cru",
+      "alias": "Repollo"
+    },
+    {
+      "ingredientId": "ricotta",
+      "alias": "ricota"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "rigatoni"
+    },
+    {
+      "ingredientId": "romani",
+      "alias": "rosemary"
+    },
+    {
+      "ingredientId": "romani",
+      "alias": "Rosemary, fresh"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "rovell"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "rovellons"
+    },
+    {
+      "ingredientId": "llevat-quimic",
+      "alias": "royal"
+    },
+    {
+      "ingredientId": "poma-2",
+      "alias": "Ruby Red grapefruit juice blend (grapefruit, grape, apple), OCEAN SPRAY, bottled, with added vitamin C"
+    },
+    {
+      "ingredientId": "enciam-cru",
+      "alias": "rucula"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "sal de taula"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "sal fina"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "sal gruesa"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "sal maldon"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "sal marina"
+    },
+    {
+      "ingredientId": "mantega-6",
+      "alias": "Salad dressing, buttermilk, lite"
+    },
+    {
+      "ingredientId": "nata-2",
+      "alias": "Salad dressing, mayonnaise, imitation, milk cream"
+    },
+    {
+      "ingredientId": "maionesa",
+      "alias": "Salad dressing, mayonnaise, regular"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "salami"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "Salchicha"
+    },
+    {
+      "ingredientId": "salmo-cru",
+      "alias": "Salm\u00F3"
+    },
+    {
+      "ingredientId": "salmo-cru",
+      "alias": "salm\u00F3 fumat"
+    },
+    {
+      "ingredientId": "salmo-cru",
+      "alias": "Salm\u00F3n"
+    },
+    {
+      "ingredientId": "salmo-cru",
+      "alias": "salm\u00F3n ahumado"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "salsa tomaquet"
+    },
+    {
+      "ingredientId": "sal",
+      "alias": "Salt, table"
+    },
+    {
+      "ingredientId": "sindria-cru",
+      "alias": "Sand\u00EDa"
+    },
+    {
+      "ingredientId": "sardina-en-conserva",
+      "alias": "Sardina"
+    },
+    {
+      "ingredientId": "sardina-en-conserva",
+      "alias": "sardinas"
+    },
+    {
+      "ingredientId": "sardina-en-conserva",
+      "alias": "sardines"
+    },
+    {
+      "ingredientId": "pebrot-en-conserva-2",
+      "alias": "Sauce, chili, peppers, hot, immature green, canned"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "Sauce, peanut, made from peanut butter, water, soy sauce"
+    },
+    {
+      "ingredientId": "pebrot-en-conserva",
+      "alias": "Sauce, peppers, hot, chili, mature red, canned"
+    },
+    {
+      "ingredientId": "alfabrega-3",
+      "alias": "Sauce, pesto, BUITONI, pesto with basil, ready-to-serve, refrigerated"
+    },
+    {
+      "ingredientId": "alfabrega-2",
+      "alias": "Sauce, pesto, CLASSICO, basil pesto, ready-to-serve"
+    },
+    {
+      "ingredientId": "alfabrega-4",
+      "alias": "Sauce, pesto, MEZZETTA, NAPA VALLEY BISTRO, basil pesto, ready-to-serve"
+    },
+    {
+      "ingredientId": "pebrot-4",
+      "alias": "Sauce, ready-to-serve, pepper or hot"
+    },
+    {
+      "ingredientId": "pebrot-5",
+      "alias": "Sauce, ready-to-serve, pepper, TABASCO"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "Sausage, pork, chorizo, link or ground, raw"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "Seeds, sesame butter, tahini, from raw and stone ground kernels"
+    },
+    {
+      "ingredientId": "mantega-rostit",
+      "alias": "Seeds, sesame butter, tahini, from roasted and toasted kernels (most common type)"
+    },
+    {
+      "ingredientId": "mantega-rostit-2",
+      "alias": "Seeds, sesame butter, tahini, from unroasted kernels (non-chemically removed seed coat)"
+    },
+    {
+      "ingredientId": "anxova-cru",
+      "alias": "seit\u00F3"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "sepia"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "S\u00E8sam"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "S\u00E9samo"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "Seta"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "shiitake"
+    },
+    {
+      "ingredientId": "maduixa-cru-6",
+      "alias": "SILK Banana-Strawberry soy yogurt"
+    },
+    {
+      "ingredientId": "xocolata-9",
+      "alias": "SILK Chocolate, soymilk"
+    },
+    {
+      "ingredientId": "xocolata-10",
+      "alias": "SILK Light Chocolate, soymilk"
+    },
+    {
+      "ingredientId": "maduixa-cru-5",
+      "alias": "SILK Strawberry soy yogurt"
+    },
+    {
+      "ingredientId": "sindria-cru",
+      "alias": "S\u00EDndria"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "s\u00EDpia"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "sofregit"
+    },
+    {
+      "ingredientId": "tofu",
+      "alias": "soja"
+    },
+    {
+      "ingredientId": "vedella-3",
+      "alias": "Soup, beef broth or bouillon, powder, dry"
+    },
+    {
+      "ingredientId": "vedella",
+      "alias": "Soup, beef broth, cubed, dry"
+    },
+    {
+      "ingredientId": "vedella-4",
+      "alias": "Soup, beef broth, less/reduced sodium, ready to serve"
+    },
+    {
+      "ingredientId": "pollastre",
+      "alias": "Soup, chicken broth cubes, dry"
+    },
+    {
+      "ingredientId": "pollastre-3",
+      "alias": "Soup, chicken broth or bouillon, dry"
+    },
+    {
+      "ingredientId": "pollastre-en-conserva",
+      "alias": "Soup, chicken broth, canned, condensed"
+    },
+    {
+      "ingredientId": "pollastre-4",
+      "alias": "Soup, chicken broth, less/reduced sodium, ready to serve"
+    },
+    {
+      "ingredientId": "pollastre-en-conserva-2",
+      "alias": "Soup, chicken broth, low sodium, canned"
+    },
+    {
+      "ingredientId": "pollastre-2",
+      "alias": "Soup, chicken broth, ready-to-serve"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "Soup, mushroom with beef stock, canned, condensed"
+    },
+    {
+      "ingredientId": "brou-de-vedella",
+      "alias": "Soup, stock, beef, home-prepared"
+    },
+    {
+      "ingredientId": "brou-de-pollastre",
+      "alias": "Soup, stock, chicken, home-prepared"
+    },
+    {
+      "ingredientId": "brou-de-peix",
+      "alias": "Soup, stock, fish, home-prepared"
+    },
+    {
+      "ingredientId": "vedella-2",
+      "alias": "Soup, SWANSON, beef broth, lower sodium"
+    },
+    {
+      "ingredientId": "brou-de-verdures",
+      "alias": "Soup, vegetable broth, ready to serve"
+    },
+    {
+      "ingredientId": "farina-cru",
+      "alias": "Soy flour, full-fat, raw"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "soya"
+    },
+    {
+      "ingredientId": "mongetes-cuit",
+      "alias": "Soybeans, mature cooked, boiled, without salt"
+    },
+    {
+      "ingredientId": "mongetes-rostit",
+      "alias": "Soybeans, mature seeds, dry roasted"
+    },
+    {
+      "ingredientId": "mongetes-cru",
+      "alias": "Soybeans, mature seeds, raw"
+    },
+    {
+      "ingredientId": "mongetes-rostit-3",
+      "alias": "Soybeans, mature seeds, roasted, no salt added"
+    },
+    {
+      "ingredientId": "mongetes-rostit-2",
+      "alias": "Soybeans, mature seeds, roasted, salted"
+    },
+    {
+      "ingredientId": "xocolata-16",
+      "alias": "Soymilk, chocolate and other flavors, light, with added calcium, vitamins A and D"
+    },
+    {
+      "ingredientId": "xocolata-13",
+      "alias": "Soymilk, chocolate, nonfat, with added calcium, vitamins A and D"
+    },
+    {
+      "ingredientId": "xocolata-11",
+      "alias": "Soymilk, chocolate, unfortified"
+    },
+    {
+      "ingredientId": "xocolata-12",
+      "alias": "Soymilk, chocolate, with added calcium, vitamins A and D"
+    },
+    {
+      "ingredientId": "menta-sec",
+      "alias": "Spearmint, dried"
+    },
+    {
+      "ingredientId": "menta",
+      "alias": "Spearmint, fresh"
+    },
+    {
+      "ingredientId": "anis-verd",
+      "alias": "Spices, anise seed"
+    },
+    {
+      "ingredientId": "alfabrega-sec",
+      "alias": "Spices, basil, dried"
+    },
+    {
+      "ingredientId": "llorer",
+      "alias": "Spices, bay leaf"
+    },
+    {
+      "ingredientId": "cardamom",
+      "alias": "Spices, cardamom"
+    },
+    {
+      "ingredientId": "canyella-picat",
+      "alias": "Spices, cinnamon, ground"
+    },
+    {
+      "ingredientId": "clau-d-olor-picat",
+      "alias": "Spices, cloves, ground"
+    },
+    {
+      "ingredientId": "coriandre-sec",
+      "alias": "Spices, coriander leaf, dried"
+    },
+    {
+      "ingredientId": "coriandre",
+      "alias": "Spices, coriander seed"
+    },
+    {
+      "ingredientId": "comi",
+      "alias": "Spices, cumin seed"
+    },
+    {
+      "ingredientId": "curri",
+      "alias": "Spices, curry powder"
+    },
+    {
+      "ingredientId": "anet-2",
+      "alias": "Spices, dill seed"
+    },
+    {
+      "ingredientId": "anet-sec",
+      "alias": "Spices, dill weed, dried"
+    },
+    {
+      "ingredientId": "fonoll",
+      "alias": "Spices, fennel seed"
+    },
+    {
+      "ingredientId": "gingebre-picat",
+      "alias": "Spices, ginger, ground"
+    },
+    {
+      "ingredientId": "mostassa-picat",
+      "alias": "Spices, mustard seed, ground"
+    },
+    {
+      "ingredientId": "nou-moscada-picat",
+      "alias": "Spices, nutmeg, ground"
+    },
+    {
+      "ingredientId": "orenga-sec",
+      "alias": "Spices, oregano, dried"
+    },
+    {
+      "ingredientId": "pebre-vermell",
+      "alias": "Spices, paprika"
+    },
+    {
+      "ingredientId": "julivert-sec",
+      "alias": "Spices, parsley, dried"
+    },
+    {
+      "ingredientId": "pebre-negre",
+      "alias": "Spices, pepper, black"
+    },
+    {
+      "ingredientId": "pebrot-3",
+      "alias": "Spices, pepper, red or cayenne"
+    },
+    {
+      "ingredientId": "pebrot-2",
+      "alias": "Spices, pepper, white"
+    },
+    {
+      "ingredientId": "romani-sec",
+      "alias": "Spices, rosemary, dried"
+    },
+    {
+      "ingredientId": "safra",
+      "alias": "Spices, saffron"
+    },
+    {
+      "ingredientId": "farigola-sec",
+      "alias": "Spices, thyme, dried"
+    },
+    {
+      "ingredientId": "curcuma-picat",
+      "alias": "Spices, turmeric, ground"
+    },
+    {
+      "ingredientId": "espinacs-cru",
+      "alias": "Spinach, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-8",
+      "alias": "Squash, summer, all varieties, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-10",
+      "alias": "Squash, summer, crookneck and straightneck, raw"
+    },
+    {
+      "ingredientId": "vieira-cru",
+      "alias": "Squash, summer, scallop, raw"
+    },
+    {
+      "ingredientId": "carbasso-cuit",
+      "alias": "Squash, summer, zucchini, includes skin, cooked, boiled, drained, without salt"
+    },
+    {
+      "ingredientId": "carbasso-cuit-2",
+      "alias": "Squash, summer, zucchini, includes skin, frozen, cooked, boiled, drained, without salt"
     },
     {
       "ingredientId": "carbasso",
-      "alias": "Zucchini"
+      "alias": "Squash, summer, zucchini, includes skin, frozen, unprepared"
+    },
+    {
+      "ingredientId": "carbasso-cru-2",
+      "alias": "Squash, summer, zucchini, includes skin, raw"
+    },
+    {
+      "ingredientId": "carbasso-en-conserva",
+      "alias": "Squash, summer, zucchini, italian style, canned"
+    },
+    {
+      "ingredientId": "carbassa-cru-2",
+      "alias": "Squash, winter, acorn, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-9",
+      "alias": "Squash, winter, all varieties, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-4",
+      "alias": "Squash, winter, butternut, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-3",
+      "alias": "Squash, winter, hubbard, raw"
+    },
+    {
+      "ingredientId": "carbassa-cru-5",
+      "alias": "Squash, winter, spaghetti, raw"
+    },
+    {
+      "ingredientId": "carbasso-cru",
+      "alias": "Squash, zucchini, baby, raw"
+    },
+    {
+      "ingredientId": "calamar",
+      "alias": "squid"
+    },
+    {
+      "ingredientId": "brou-de-pollastre",
+      "alias": "stock de pollastre"
+    },
+    {
+      "ingredientId": "llima",
+      "alias": "suc de llima"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "suc de llimona"
+    },
+    {
+      "ingredientId": "taronja",
+      "alias": "suc de taronja"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "Sucre"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "sucre blanc"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "sucre glas"
+    },
+    {
+      "ingredientId": "sucre-cru",
+      "alias": "sucre mor\u00E8"
+    },
+    {
+      "ingredientId": "moniato-cru",
+      "alias": "Sweet potato leaves, raw"
+    },
+    {
+      "ingredientId": "moniato-2",
+      "alias": "Sweet Potato puffs, frozen, unprepared"
+    },
+    {
+      "ingredientId": "moniato-en-conserva",
+      "alias": "Sweet potato, canned, mashed"
+    },
+    {
+      "ingredientId": "moniato-en-conserva-3",
+      "alias": "Sweet potato, canned, syrup pack, drained solids"
+    },
+    {
+      "ingredientId": "moniato-en-conserva-4",
+      "alias": "Sweet potato, canned, syrup pack, solids and liquids"
+    },
+    {
+      "ingredientId": "moniato-en-conserva-2",
+      "alias": "Sweet potato, canned, vacuum pack"
+    },
+    {
+      "ingredientId": "moniato-cuit-3",
+      "alias": "Sweet potato, cooked, baked in skin, flesh, without salt"
+    },
+    {
+      "ingredientId": "moniato-cuit",
+      "alias": "Sweet potato, cooked, boiled, without skin"
+    },
+    {
+      "ingredientId": "moniato-cuit-4",
+      "alias": "Sweet potato, cooked, candied, home-prepared"
+    },
+    {
+      "ingredientId": "moniato-cuit-2",
+      "alias": "Sweet potato, frozen, cooked, baked, without salt"
+    },
+    {
+      "ingredientId": "moniato-4",
+      "alias": "Sweet potato, frozen, unprepared (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "moniato-cru-2",
+      "alias": "Sweet potato, raw, unprepared (Includes foods for USDA\u0027s Food Distribution Program)"
+    },
+    {
+      "ingredientId": "moniato-3",
+      "alias": "Sweet Potatoes, french fried, crosscut, frozen, unprepared"
+    },
+    {
+      "ingredientId": "moniato",
+      "alias": "Sweet Potatoes, french fried, frozen as packaged, salt added in processing"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "tahina"
+    },
+    {
+      "ingredientId": "mantega-cru",
+      "alias": "tahini"
+    },
+    {
+      "ingredientId": "pasta-cuit",
+      "alias": "tallarines"
+    },
+    {
+      "ingredientId": "salsa-de-soja",
+      "alias": "tamari"
+    },
+    {
+      "ingredientId": "taronja-en-conserva-2",
+      "alias": "Tangerines, (mandarin oranges), canned, juice pack"
+    },
+    {
+      "ingredientId": "taronja-en-conserva-4",
+      "alias": "Tangerines, (mandarin oranges), canned, juice pack, drained"
+    },
+    {
+      "ingredientId": "taronja-en-conserva-3",
+      "alias": "Tangerines, (mandarin oranges), canned, light syrup pack"
+    },
+    {
+      "ingredientId": "taronja-cru",
+      "alias": "Tangerines, (mandarin oranges), raw"
+    },
+    {
+      "ingredientId": "taronja",
+      "alias": "taronges"
+    },
+    {
+      "ingredientId": "pop-cru",
+      "alias": "tentacle de pop"
+    },
+    {
+      "ingredientId": "farigola",
+      "alias": "thyme"
+    },
+    {
+      "ingredientId": "farigola",
+      "alias": "Thyme, fresh"
+    },
+    {
+      "ingredientId": "tomaquet-en-conserva",
+      "alias": "tiges d\u0027api"
+    },
+    {
+      "ingredientId": "tofu",
+      "alias": "tofu ferm"
+    },
+    {
+      "ingredientId": "tofu",
+      "alias": "tofu ferme"
+    },
+    {
+      "ingredientId": "tofu",
+      "alias": "tofu seda"
+    },
+    {
+      "ingredientId": "tofu",
+      "alias": "Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari)"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "Tom\u00E0quet"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "tom\u00E0quet fregit"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "tom\u00E0quet triturat"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "tom\u00E0quets"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "tomata"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "Tomate"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "tomate frito"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "tomates"
+    },
+    {
+      "ingredientId": "bolet-en-conserva",
+      "alias": "Tomato products, canned, sauce, with mushrooms"
+    },
+    {
+      "ingredientId": "tomaquet-en-conserva-2",
+      "alias": "Tomato products, canned, sauce, with onions"
+    },
+    {
+      "ingredientId": "tomaquet-en-conserva",
+      "alias": "Tomato products, canned, sauce, with onions, green peppers, and celery"
+    },
+    {
+      "ingredientId": "salsa-de-tomaquet",
+      "alias": "Tomato sauce, canned, no salt added"
+    },
+    {
+      "ingredientId": "tomaquet-cru-2",
+      "alias": "Tomatoes, green, raw"
+    },
+    {
+      "ingredientId": "tomaquet-cru",
+      "alias": "Tomatoes, orange, raw"
+    },
+    {
+      "ingredientId": "tomaquet-cru-4",
+      "alias": "Tomatoes, red, ripe, raw, year round average"
+    },
+    {
+      "ingredientId": "tomaquet-cru-3",
+      "alias": "Tomatoes, yellow, raw"
+    },
+    {
+      "ingredientId": "tonyina-cru",
+      "alias": "Tonyina"
+    },
+    {
+      "ingredientId": "tonyina-cru",
+      "alias": "tonyina en llauna"
+    },
+    {
+      "ingredientId": "truita-de-riu-cru",
+      "alias": "Trucha"
+    },
+    {
+      "ingredientId": "truita-de-riu-cru",
+      "alias": "Truita de riu"
+    },
+    {
+      "ingredientId": "curcuma-picat",
+      "alias": "turmeric"
+    },
+    {
+      "ingredientId": "cirera-en-conserva",
+      "alias": "uvas"
+    },
+    {
+      "ingredientId": "vedella-cru-10",
+      "alias": "vaca"
+    },
+    {
+      "ingredientId": "extracte-de-vainilla",
+      "alias": "vainilla"
+    },
+    {
+      "ingredientId": "extracte-de-vainilla",
+      "alias": "Vanilla extract"
+    },
+    {
+      "ingredientId": "vedella-cru",
+      "alias": "Veal, cubed for stew (leg and shoulder), separable lean only, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-3",
+      "alias": "Veal, sirloin, separable lean and fat, raw"
+    },
+    {
+      "ingredientId": "vedella-cru-2",
+      "alias": "Veal, sirloin, separable lean only, raw"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "Vegetables, mixed (corn, lima beans, peas, green beans, carrots) canned, no salt added"
+    },
+    {
+      "ingredientId": "tonyina-cru",
+      "alias": "ventresca de tonyina"
+    },
+    {
+      "ingredientId": "verat-cru",
+      "alias": "Verat"
+    },
+    {
+      "ingredientId": "vieira-cru",
+      "alias": "Vieira"
+    },
+    {
+      "ingredientId": "vinagre",
+      "alias": "vinagre bals\u00E0mic"
+    },
+    {
+      "ingredientId": "vinagre",
+      "alias": "vinagre de manzana"
+    },
+    {
+      "ingredientId": "vinagre",
+      "alias": "vinagre de poma"
+    },
+    {
+      "ingredientId": "vinagre",
+      "alias": "vinagre de vi"
+    },
+    {
+      "ingredientId": "vinagre-3",
+      "alias": "Vinegar, balsamic"
+    },
+    {
+      "ingredientId": "vinagre",
+      "alias": "Vinegar, cider"
+    },
+    {
+      "ingredientId": "vinagre-4",
+      "alias": "Vinegar, distilled"
+    },
+    {
+      "ingredientId": "vinagre-2",
+      "alias": "Vinegar, red wine"
+    },
+    {
+      "ingredientId": "espinacs-cru-3",
+      "alias": "Vinespinach, (basella), raw"
+    },
+    {
+      "ingredientId": "vi-negre",
+      "alias": "vino negro"
+    },
+    {
+      "ingredientId": "nata",
+      "alias": "Vitasoy USA, Vitasoy Organic Creamy Original Soymilk"
+    },
+    {
+      "ingredientId": "mantega-12",
+      "alias": "Waffle, buttermilk, frozen, ready-to-heat, microwaved"
+    },
+    {
+      "ingredientId": "mantega-11",
+      "alias": "Waffle, buttermilk, frozen, ready-to-heat, toasted"
+    },
+    {
+      "ingredientId": "mantega-8",
+      "alias": "Waffles, buttermilk, frozen, ready-to-heat"
+    },
+    {
+      "ingredientId": "sindria-cru",
+      "alias": "Watermelon, raw"
+    },
+    {
+      "ingredientId": "farina-2",
+      "alias": "Wheat flour, white, bread, enriched"
+    },
+    {
+      "ingredientId": "farina",
+      "alias": "Wheat flours, bread, unenriched"
+    },
+    {
+      "ingredientId": "xai-cru",
+      "alias": "Xai"
+    },
+    {
+      "ingredientId": "bolet-en-conserva-2",
+      "alias": "xampiny\u00F3"
+    },
+    {
+      "ingredientId": "xocolata-2",
+      "alias": "xocolata amb llet"
+    },
+    {
+      "ingredientId": "xocolata-negra",
+      "alias": "xocolata de cobertura"
+    },
+    {
+      "ingredientId": "botifarra-cru",
+      "alias": "Xori\u00E7o"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "yogurt"
+    },
+    {
+      "ingredientId": "xocolata-2",
+      "alias": "Yogurt, chocolate, nonfat milk"
+    },
+    {
+      "ingredientId": "xocolata-3",
+      "alias": "Yogurt, chocolate, nonfat milk, fortified with vitamin D"
+    },
+    {
+      "ingredientId": "xocolata-4",
+      "alias": "Yogurt, frozen, flavors not chocolate, nonfat milk, with low-calorie sweetener"
+    },
+    {
+      "ingredientId": "iogurt-3",
+      "alias": "Yogurt, Greek, fruit, whole milk"
+    },
+    {
+      "ingredientId": "iogurt-4",
+      "alias": "Yogurt, Greek, plain, whole milk"
+    },
+    {
+      "ingredientId": "iogurt",
+      "alias": "Yogurt, plain, skim milk"
+    },
+    {
+      "ingredientId": "iogurt-2",
+      "alias": "Yogurt, plain, whole milk"
+    },
+    {
+      "ingredientId": "iogurt-5",
+      "alias": "Yogurt, vanilla flavor, lowfat milk, sweetened with low calorie sweetener"
+    },
+    {
+      "ingredientId": "iogurt-6",
+      "alias": "Yogurt, vanilla or lemon flavor, nonfat milk, sweetened with low-calorie sweetener"
+    },
+    {
+      "ingredientId": "iogurt-7",
+      "alias": "Yogurt, vanilla or lemon flavor, nonfat milk, sweetened with low-calorie sweetener, fortified with vitamin D"
+    },
+    {
+      "ingredientId": "mongeta-verda-en-conserva",
+      "alias": "zanahorias"
+    },
+    {
+      "ingredientId": "carbasso",
+      "alias": "zucchini"
     }
   ]
 }

@@ -22,8 +22,11 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
         Id = ingredient.Id,
         KnowledgeId = ingredient.KnowledgeId,
         Name = ingredient.Name,
+        CatalanName = ingredient.CatalanName,
+        SpanishName = ingredient.SpanishName,
         Aliases = ingredient.Aliases.ToList(),
         Category = ingredient.Category,
+        Subcategory = ingredient.Subcategory,
         DefaultUnit = ingredient.DefaultUnit,
         PantryCategory = ingredient.PantryCategory,
         CanFreeze = ingredient.CanFreeze,
@@ -37,9 +40,12 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
                 CarbohydrateGrams = ingredient.NutritionPer100Grams.CarbohydrateGrams,
                 FatGrams = ingredient.NutritionPer100Grams.FatGrams,
                 FibreGrams = ingredient.NutritionPer100Grams.FibreGrams,
-                SugarGrams = ingredient.NutritionPer100Grams.SugarGrams,
-                SaltGrams = ingredient.NutritionPer100Grams.SaltGrams
-            },
-        NutritionSource = ingredient.NutritionSource
+                    SugarGrams = ingredient.NutritionPer100Grams.SugarGrams,
+                    SaltGrams = ingredient.NutritionPer100Grams.SaltGrams
+                },
+        NutritionState = ingredient.NutritionState,
+        NutritionSource = ingredient.NutritionSource,
+        NutritionSourceId = ingredient.NutritionSourceId,
+        NutritionLastUpdated = ingredient.NutritionLastUpdated
     };
 }

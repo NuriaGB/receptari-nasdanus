@@ -1,9 +1,16 @@
 {
-  "generatedAt": "2026-07-01T16:03:27.0948133+00:00",
+  "generatedAt": "2026-07-16T10:18:32.8930106+00:00",
   "unknownCategories": [],
   "duplicateAliases": [],
   "missingNutrition": [],
   "missingUnits": [],
   "duplicateIngredients": [],
-  "hasIssues": false
+  "missingTranslations": [],
+  "missingSourceInformation": [],
+  "recipesUsingUnresolvedIngredients": [
+    "Bunyols de l\u2019Empord\u00E0: aigua d\u0027azahar\u0027",
+    "Cookies d\u2019Oreo i formatge crema: Oreo galetes normals",
+    "Plumcake de lacasitos: Lacasitos"
+  ],
+  "hasIssues": true
 }

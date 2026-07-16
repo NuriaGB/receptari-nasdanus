@@ -344,6 +344,10 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         SchemaVersion = source.SchemaVersion,
         NextId = source.NextId,
+        PlanningSettings = ClonePlanningSettings(source.PlanningSettings),
+        HouseholdIngredientPreferences = source.HouseholdIngredientPreferences
+            .Select(CloneHouseholdIngredientPreference)
+            .ToList(),
         Ingredients = source.Ingredients.Select(CreateIngredientSnapshot).ToList(),
         Products = source.Products.Select(CreateProductSnapshot).ToList(),
         Recipes = source.Recipes.Select(CreateRecipeSnapshot).ToList(),
@@ -536,6 +540,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             AssignId(appState, ingredient.Id, value => ingredient.Id = value, ref maxId);
             ingredient.KnowledgeId = ingredient.KnowledgeId.Trim();
             ingredient.Name = ingredient.Name.Trim();
+            ingredient.CatalanName = ingredient.CatalanName.Trim();
+            ingredient.SpanishName = ingredient.SpanishName.Trim();
             ingredient.Aliases ??= [];
             ingredient.Aliases = ingredient.Aliases
                 .Where(alias => !string.IsNullOrWhiteSpace(alias))
@@ -544,9 +550,21 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 .OrderBy(alias => alias)
                 .ToList();
             ingredient.Category = NormalizeIngredientCategory(ingredient.Category);
+            ingredient.Subcategory = ingredient.Subcategory.Trim();
+            ingredient.NutritionState = NormalizeNutritionState(ingredient.NutritionState);
             ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
+            ingredient.NutritionSource = ingredient.NutritionSource.Trim();
+            ingredient.NutritionSourceId = ingredient.NutritionSourceId.Trim();
             EnrichIngredientNutrition(ingredient);
         }
+
+        appState.HouseholdIngredientPreferences = appState.HouseholdIngredientPreferences
+            .Select(NormalizeHouseholdIngredientPreference)
+            .Where(preference => !string.IsNullOrWhiteSpace(preference.IngredientKnowledgeId))
+            .GroupBy(preference => preference.IngredientKnowledgeId, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .OrderBy(preference => preference.IngredientKnowledgeId, StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
         foreach (var product in appState.Products)
         {
@@ -687,6 +705,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         appState.RecipeIdeas ??= [];
         appState.ProductBacklogItems ??= [];
         appState.ShoppingLists ??= [];
+        appState.HouseholdIngredientPreferences ??= [];
+        appState.PlanningSettings ??= new HouseholdPlanningSettings();
+        NormalizePlanningSettings(appState.PlanningSettings);
 
         foreach (var slot in appState.MealPlanSlots)
         {
@@ -806,14 +827,20 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         Id = ingredient.Id,
         KnowledgeId = ingredient.KnowledgeId,
         Name = ingredient.Name,
+        CatalanName = ingredient.CatalanName,
+        SpanishName = ingredient.SpanishName,
         Aliases = ingredient.Aliases.ToList(),
         Category = ingredient.Category,
+        Subcategory = ingredient.Subcategory,
         DefaultUnit = ingredient.DefaultUnit,
         PantryCategory = ingredient.PantryCategory,
         CanFreeze = ingredient.CanFreeze,
         Seasonality = ingredient.Seasonality,
         NutritionPer100Grams = CloneNutrition(ingredient.NutritionPer100Grams),
-        NutritionSource = ingredient.NutritionSource
+        NutritionState = ingredient.NutritionState,
+        NutritionSource = ingredient.NutritionSource,
+        NutritionSourceId = ingredient.NutritionSourceId,
+        NutritionLastUpdated = ingredient.NutritionLastUpdated
     };
 
     private static IngredientNutrition? CloneNutrition(IngredientNutrition? nutrition) => nutrition is null
@@ -906,7 +933,22 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         }
 
         return appState.Ingredients.FirstOrDefault(ingredient =>
-            IngredientKeysFor(ingredient).Any(key => key == normalizedName));
+            IngredientKeysFor(ingredient).Any(key => IsIngredientNameMatch(normalizedName, key)));
+    }
+
+    private static bool IsIngredientNameMatch(string normalizedName, string normalizedKnownKey)
+    {
+        if (string.Equals(normalizedName, normalizedKnownKey, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(normalizedKnownKey) || normalizedKnownKey.Length < 5)
+        {
+            return false;
+        }
+
+        return $" {normalizedName} ".Contains($" {normalizedKnownKey} ", StringComparison.OrdinalIgnoreCase);
     }
 
     private static IEnumerable<string> IngredientKeysFor(Ingredient ingredient)
@@ -915,6 +957,18 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         if (!string.IsNullOrWhiteSpace(name))
         {
             yield return name;
+        }
+
+        var catalanName = IngredientNameNormalizer.Normalize(ingredient.CatalanName);
+        if (!string.IsNullOrWhiteSpace(catalanName))
+        {
+            yield return catalanName;
+        }
+
+        var spanishName = IngredientNameNormalizer.Normalize(ingredient.SpanishName);
+        if (!string.IsNullOrWhiteSpace(spanishName))
+        {
+            yield return spanishName;
         }
 
         foreach (var alias in ingredient.Aliases ?? Enumerable.Empty<string>())
@@ -935,6 +989,18 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             yield return name;
         }
 
+        var catalanName = IngredientNameNormalizer.Normalize(item.CatalanName);
+        if (!string.IsNullOrWhiteSpace(catalanName))
+        {
+            yield return catalanName;
+        }
+
+        var spanishName = IngredientNameNormalizer.Normalize(item.SpanishName);
+        if (!string.IsNullOrWhiteSpace(spanishName))
+        {
+            yield return spanishName;
+        }
+
         foreach (var alias in item.Aliases ?? Enumerable.Empty<string>())
         {
             var normalized = IngredientNameNormalizer.Normalize(alias);
@@ -953,9 +1019,10 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ingredient.Name = item.Name.Trim();
         }
 
+        ingredient.CatalanName = item.CatalanName.Trim();
+        ingredient.SpanishName = item.SpanishName.Trim();
         ingredient.Aliases = ingredient.Aliases
             .Concat(item.Aliases ?? Enumerable.Empty<string>())
-            .Append(item.Name)
             .Where(alias => !string.IsNullOrWhiteSpace(alias))
             .Select(alias => alias.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -963,11 +1030,13 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             .ToList();
 
         ingredient.Category = MapKnowledgeIngredientCategory(item.Category);
+        ingredient.Subcategory = item.Subcategory.Trim();
         ingredient.DefaultUnit = string.IsNullOrWhiteSpace(item.DefaultUnit)
             ? ingredient.DefaultUnit
             : item.DefaultUnit.Trim();
         ingredient.PantryCategory = MapKnowledgeShoppingCategory(item.PantryCategory, item.Category);
         ingredient.CanFreeze = item.CanFreeze;
+        ingredient.NutritionState = NormalizeNutritionState(item.NutritionState);
 
         if (item.Nutrition is not null)
         {
@@ -984,6 +1053,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ingredient.NutritionSource = string.IsNullOrWhiteSpace(item.Source)
                 ? "Nasdanus Knowledge"
                 : item.Source.Trim();
+            ingredient.NutritionSourceId = item.SourceId.Trim();
+            ingredient.NutritionLastUpdated = item.LastUpdated;
         }
     }
 
@@ -998,6 +1069,110 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         NutritionPer100Grams = CloneNutrition(product.NutritionPer100Grams),
         NutritionSource = product.NutritionSource
     };
+
+    private static HouseholdIngredientPreference CloneHouseholdIngredientPreference(
+        HouseholdIngredientPreference preference) => new()
+    {
+        IngredientKnowledgeId = preference.IngredientKnowledgeId,
+        IsFrequentlyUsed = preference.IsFrequentlyUsed,
+        IsUsuallyAvailable = preference.IsUsuallyAvailable,
+        UseFrequency = preference.UseFrequency,
+        PreferredAlias = preference.PreferredAlias,
+        HouseholdNotes = preference.HouseholdNotes
+    };
+
+    private static HouseholdIngredientPreference NormalizeHouseholdIngredientPreference(
+        HouseholdIngredientPreference preference)
+    {
+        var normalized = CloneHouseholdIngredientPreference(preference);
+        normalized.IngredientKnowledgeId = normalized.IngredientKnowledgeId.Trim();
+        normalized.UseFrequency = IngredientUseFrequency.All.Contains(normalized.UseFrequency)
+            ? normalized.UseFrequency
+            : IngredientUseFrequency.Occasional;
+        normalized.PreferredAlias = normalized.PreferredAlias.Trim();
+        normalized.HouseholdNotes = normalized.HouseholdNotes.Trim();
+        return normalized;
+    }
+
+    private static HouseholdPlanningSettings ClonePlanningSettings(HouseholdPlanningSettings? settings)
+    {
+        var clone = new HouseholdPlanningSettings
+        {
+            NutritionGoals = new HouseholdNutritionGoals
+            {
+                TargetCaloriesPerPerson = settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000,
+                MinimumProteinGramsPerPerson = settings?.NutritionGoals?.MinimumProteinGramsPerPerson ?? 85,
+                TargetCarbohydrateGramsPerPerson = settings?.NutritionGoals?.TargetCarbohydrateGramsPerPerson ?? 240,
+                TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 70
+            },
+            WeeklyFoodRules = new WeeklyFoodRules
+            {
+                MinimumFishMeals = settings?.WeeklyFoodRules?.MinimumFishMeals ?? 2,
+                MinimumLegumeMeals = settings?.WeeklyFoodRules?.MinimumLegumeMeals ?? 1,
+                MaximumRedMeatMeals = settings?.WeeklyFoodRules?.MaximumRedMeatMeals ?? 1,
+                MinimumVegetableRichMeals = settings?.WeeklyFoodRules?.MinimumVegetableRichMeals ?? 7,
+                DayRules = settings?.WeeklyFoodRules?.DayRules
+                    ?.Select(rule => new DayFoodRule
+                    {
+                        DayOfWeek = rule.DayOfWeek,
+                        FoodGroup = rule.FoodGroup
+                    })
+                    .ToList() ?? []
+            }
+        };
+
+        NormalizePlanningSettings(clone);
+        return clone;
+    }
+
+    private static void NormalizePlanningSettings(HouseholdPlanningSettings settings)
+    {
+        settings.NutritionGoals ??= new HouseholdNutritionGoals();
+        settings.WeeklyFoodRules ??= new WeeklyFoodRules();
+        settings.NutritionGoals.TargetCaloriesPerPerson = Math.Max(0, settings.NutritionGoals.TargetCaloriesPerPerson);
+        settings.NutritionGoals.MinimumProteinGramsPerPerson = Math.Max(0, settings.NutritionGoals.MinimumProteinGramsPerPerson);
+        settings.NutritionGoals.TargetCarbohydrateGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetCarbohydrateGramsPerPerson);
+        settings.NutritionGoals.TargetFatGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetFatGramsPerPerson);
+        settings.WeeklyFoodRules.MinimumFishMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumFishMeals);
+        settings.WeeklyFoodRules.MinimumLegumeMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumLegumeMeals);
+        settings.WeeklyFoodRules.MaximumRedMeatMeals = Math.Max(0, settings.WeeklyFoodRules.MaximumRedMeatMeals);
+        settings.WeeklyFoodRules.MinimumVegetableRichMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumVegetableRichMeals);
+
+        var dayRules = settings.WeeklyFoodRules.DayRules ?? [];
+        settings.WeeklyFoodRules.DayRules = Enum.GetValues<DayOfWeek>()
+            .OrderBy(PlannerDaySortOrder)
+            .Select(day =>
+            {
+                var existing = dayRules.FirstOrDefault(rule => rule.DayOfWeek == day);
+                return new DayFoodRule
+                {
+                    DayOfWeek = day,
+                    FoodGroup = NormalizeFoodGroup(existing?.FoodGroup ?? DefaultFoodGroupFor(day))
+                };
+            })
+            .ToList();
+    }
+
+    private static int PlannerDaySortOrder(DayOfWeek day) =>
+        day == DayOfWeek.Sunday ? 6 : (int)day - 1;
+
+    private static string DefaultFoodGroupFor(DayOfWeek day) => day switch
+    {
+        DayOfWeek.Tuesday => FoodGroupKind.Fish,
+        DayOfWeek.Wednesday => FoodGroupKind.Legumes,
+        DayOfWeek.Thursday => FoodGroupKind.Fish,
+        _ => FoodGroupKind.None
+    };
+
+    private static string NormalizeFoodGroup(string? foodGroup) =>
+        FoodGroupKind.PlanningGroups.Contains(foodGroup)
+            ? foodGroup!
+            : FoodGroupKind.None;
+
+    private static string NormalizeNutritionState(string? nutritionState) =>
+        NutritionRecordState.All.Contains(nutritionState ?? string.Empty)
+            ? nutritionState!
+            : NutritionRecordState.Unspecified;
 
     private static string NormalizeIngredientCategory(string category) =>
         IngredientCategory.All.Contains(category)
@@ -1315,14 +1490,19 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string CatalanName { get; set; } = string.Empty;
+        public string SpanishName { get; set; } = string.Empty;
         public List<string> Aliases { get; set; } = [];
         public string Category { get; set; } = string.Empty;
+        public string Subcategory { get; set; } = string.Empty;
         public string DefaultUnit { get; set; } = string.Empty;
         public bool CanFreeze { get; set; }
         public string PantryCategory { get; set; } = string.Empty;
+        public string NutritionState { get; set; } = string.Empty;
         public IngredientKnowledgeNutrition? Nutrition { get; set; }
         public string Source { get; set; } = string.Empty;
         public string SourceId { get; set; } = string.Empty;
+        public DateTimeOffset? LastUpdated { get; set; }
     }
 
     private sealed class IngredientKnowledgeNutrition
@@ -1379,6 +1559,8 @@ public sealed class LocalAppState
 {
     public int SchemaVersion { get; set; } = 1;
     public int NextId { get; set; } = 1000;
+    public HouseholdPlanningSettings PlanningSettings { get; set; } = new();
+    public List<HouseholdIngredientPreference> HouseholdIngredientPreferences { get; set; } = [];
     public List<Ingredient> Ingredients { get; set; } = [];
     public List<Product> Products { get; set; } = [];
     public List<Recipe> Recipes { get; set; } = [];
@@ -1410,6 +1592,7 @@ public sealed class DataBackupSummary
     public int ShoppingLists { get; set; }
     public int ShoppingItems { get; set; }
     public int PantryItems { get; set; }
+    public int HouseholdIngredientPreferences { get; set; }
     public int RecipeIdeas { get; set; }
     public int ProductBacklogItems { get; set; }
 
@@ -1424,6 +1607,7 @@ public sealed class DataBackupSummary
         ShoppingLists = state.ShoppingLists.Count,
         ShoppingItems = state.ShoppingLists.Sum(list => list.Items.Count),
         PantryItems = state.PantryItems.Count,
+        HouseholdIngredientPreferences = state.HouseholdIngredientPreferences.Count,
         RecipeIdeas = state.RecipeIdeas.Count,
         ProductBacklogItems = state.ProductBacklogItems.Count
     };

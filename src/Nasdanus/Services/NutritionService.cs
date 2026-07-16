@@ -84,6 +84,36 @@ public sealed class NutritionService(BrowserAppStore store)
     public static NutritionTotals AveragePerDay(WeekNutritionSummary week) =>
         week.Totals.DivideBy(7);
 
+    public static NutritionTotals AveragePerPersonPerDay(WeekNutritionSummary week)
+    {
+        var totals = new NutritionTotals();
+        foreach (var day in week.Days)
+        {
+            totals.Add(PerPersonDay(day));
+        }
+
+        return totals.DivideBy(7);
+    }
+
+    public static NutritionTotals PerPersonDay(DayNutritionSummary day)
+    {
+        var totals = new NutritionTotals();
+        totals.Add(PerPersonMeal(day.Lunch));
+        totals.Add(PerPersonMeal(day.Dinner));
+        return totals;
+    }
+
+    public static NutritionTotals PerPersonMeal(MealNutritionSummary meal)
+    {
+        var totals = new NutritionTotals();
+        foreach (var recipe in meal.Recipes)
+        {
+            totals.Add(PerServing(recipe.Totals, recipe.PlannedServings));
+        }
+
+        return totals;
+    }
+
     public static string CompactNutritionText(NutritionTotals totals)
     {
         if (!totals.HasKnownNutrition)
@@ -96,13 +126,15 @@ public sealed class NutritionService(BrowserAppStore store)
 
     private static void AddIngredientNutrition(NutritionTotals totals, RecipeIngredient ingredient, decimal scale)
     {
+        totals.TotalIngredientCount++;
         var linkedIngredient = ingredient.Ingredient;
-        if (linkedIngredient is null || string.IsNullOrWhiteSpace(linkedIngredient.KnowledgeId))
+        if (linkedIngredient is null)
         {
             totals.UnknownNutritionCount++;
             return;
         }
 
+        totals.LinkedIngredientCount++;
         var nutrition = linkedIngredient.NutritionPer100Grams;
         if (nutrition is null || !nutrition.HasAnyValue)
         {
@@ -185,6 +217,21 @@ public sealed class NutritionService(BrowserAppStore store)
     private static decimal? UnitWeightInGrams(string ingredientName)
     {
         var name = FoodText.Normalize(ingredientName);
+        if (ContainsAny(name, "zanui", "zanuy"))
+        {
+            return 62.5m;
+        }
+
+        if (ContainsAny(name, "durum"))
+        {
+            return 63m;
+        }
+
+        if (ContainsAny(name, "tortita", "tortilla", "wrap"))
+        {
+            return 63m;
+        }
+
         if (ContainsAny(name, "ou", "egg"))
         {
             return 50m;

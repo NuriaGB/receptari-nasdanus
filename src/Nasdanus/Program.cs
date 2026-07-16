@@ -24,6 +24,9 @@ builder.Services.AddScoped<PantryService>();
 builder.Services.AddScoped<ProductBacklogService>();
 builder.Services.AddScoped<NutritionService>();
 builder.Services.AddScoped<IngredientKnowledgeService>();
+builder.Services.AddScoped<HouseholdIngredientPreferenceService>();
+builder.Services.AddScoped<PlanningSettingsService>();
+builder.Services.AddScoped<RecipeSuggestionService>();
 builder.Services.AddScoped<IIngredientNutritionImportService, IngredientNutritionImportService>();
 
 await builder.Build().RunAsync();

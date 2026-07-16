@@ -18,15 +18,29 @@
 
         <div class="nutrition-summary-grid">
             @Metric("kcal", Totals.CaloriesKcal, "kcal")
-            @Metric("Protein", Totals.ProteinGrams, "g")
+            @Metric("Protein", Totals.ProteinGrams, "g", true)
             @Metric("Carbs", Totals.CarbohydrateGrams, "g")
             @Metric("Fat", Totals.FatGrams, "g")
         </div>
 
+        @if (ShowApproximateNote)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Approximate values from linked ingredients and planned servings.
+            </MudText>
+        }
+
+        @if (ShowCoverage && Totals.TotalIngredientCount > 0)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                @CoverageText
+            </MudText>
+        }
+
         @if (ShowWarning && Totals.HasMissingData)
         {
             <MudText Typo="Typo.caption" Class="nutrition-warning">
-                Some ingredients are missing nutrition data.
+                @MissingDataText
             </MudText>
         }
     </MudStack>
@@ -49,17 +63,32 @@
     public bool ShowWarning { get; set; } = true;
 
     [Parameter]
+    public bool ShowCoverage { get; set; } = true;
+
+    [Parameter]
+    public bool ShowApproximateNote { get; set; }
+
+    [Parameter]
     public string Class { get; set; } = string.Empty;
+
+    private string CoverageText =>
+        $"{Totals.ResolvedIngredientPercent.ToString("0", CultureInfo.InvariantCulture)}% of recipe ingredients resolved";
+
+    private string MissingDataText =>
+        $"{Totals.MissingNutritionDataCount} ingredients missing nutrition or usable quantity data.";
 
     private string CssClass => string.Join(
         " ",
         new[] { "nutrition-summary-card", Dense ? "is-dense" : string.Empty, Class }
             .Where(value => !string.IsNullOrWhiteSpace(value)));
 
-    private static RenderFragment Metric(string label, decimal value, string unit) => @<div class="nutrition-summary-metric">
+    private static RenderFragment Metric(string label, decimal value, string unit, bool isPrimary = false) => @<div class="@MetricClass(isPrimary)">
         <MudText Typo="Typo.caption" Color="Color.Secondary">@label</MudText>
         <MudText Typo="Typo.subtitle2">@Format(value, unit)</MudText>
     </div>;
+
+    private static string MetricClass(bool isPrimary) =>
+        isPrimary ? "nutrition-summary-metric is-primary" : "nutrition-summary-metric";
 
     private static string Format(decimal value, string unit) =>
         unit == "kcal"

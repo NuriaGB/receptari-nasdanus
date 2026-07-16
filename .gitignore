@@ -9,3 +9,5 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+src/Nasdanus.KnowledgeImporter/Data/FoodData_Central_sr_legacy_food_csv_2018-04.zip
+src/Nasdanus.KnowledgeImporter/Data/FoodData_Central_sr_legacy_food_csv_2018-04/
