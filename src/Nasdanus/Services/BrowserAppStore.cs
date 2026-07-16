@@ -1223,7 +1223,8 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                     ?.Select(rule => new DayFoodRule
                     {
                         DayOfWeek = rule.DayOfWeek,
-                        FoodGroup = rule.FoodGroup
+                        FoodGroup = rule.FoodGroup,
+                        FoodGroups = rule.FoodGroups?.ToList() ?? []
                     })
                     .ToList() ?? []
             },
@@ -1238,14 +1239,20 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 PreferFavouriteRecipes = settings?.CookingPreferences?.PreferFavouriteRecipes ?? true,
                 PreferSuccessfullyCookedRecipes = settings?.CookingPreferences?.PreferSuccessfullyCookedRecipes ?? true,
                 AllowLeftovers = settings?.CookingPreferences?.AllowLeftovers ?? true,
-                MinimumVarietyMealsPerWeek = settings?.CookingPreferences?.MinimumVarietyMealsPerWeek ?? 7
+                MinimumVarietyMealsPerWeek = settings?.CookingPreferences?.MinimumVarietyMealsPerWeek ?? 7,
+                DesiredVarietyWindowDays = settings?.CookingPreferences?.DesiredVarietyWindowDays ?? 14,
+                PrioritizeAvailableFreezerIngredients = settings?.CookingPreferences?.PrioritizeAvailableFreezerIngredients ?? true,
+                PrioritizePantryIngredients = settings?.CookingPreferences?.PrioritizePantryIngredients ?? true,
+                PreferBatchFriendlyPreparations = settings?.CookingPreferences?.PreferBatchFriendlyPreparations ?? true
             },
             KitchenPantry = new HouseholdKitchenPantrySettings
             {
                 AlwaysAvailableIngredients = settings?.KitchenPantry?.AlwaysAvailableIngredients ?? string.Empty,
+                FridgeInventoryNotes = settings?.KitchenPantry?.FridgeInventoryNotes ?? string.Empty,
                 FreezerInventoryNotes = settings?.KitchenPantry?.FreezerInventoryNotes ?? string.Empty,
                 PantryStaplesNotes = settings?.KitchenPantry?.PantryStaplesNotes ?? string.Empty,
                 PreferredBrands = settings?.KitchenPantry?.PreferredBrands ?? string.Empty,
+                FreezerItems = settings?.KitchenPantry?.FreezerItems?.Select(CloneFreezerInventoryItem).ToList() ?? [],
                 Appliances = new KitchenApplianceSettings
                 {
                     AirFryer = settings?.KitchenPantry?.Appliances?.AirFryer ?? false,
@@ -1262,8 +1269,12 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 SortBySupermarketOrder = settings?.Shopping?.SortBySupermarketOrder ?? true,
                 IgnorePantryItems = settings?.Shopping?.IgnorePantryItems ?? true,
                 IgnoreAlwaysAvailableIngredients = settings?.Shopping?.IgnoreAlwaysAvailableIngredients ?? true,
+                DeductAvailableFreezerItems = settings?.Shopping?.DeductAvailableFreezerItems ?? false,
                 AutomaticQuantityAggregation = settings?.Shopping?.AutomaticQuantityAggregation ?? true,
-                PreferredUnits = settings?.Shopping?.PreferredUnits ?? PreferredUnitMode.RecipeUnits
+                PreferredUnits = settings?.Shopping?.PreferredUnits ?? PreferredUnitMode.RecipeUnits,
+                DefaultFreshShoppingDay = settings?.Shopping?.DefaultFreshShoppingDay ?? DayOfWeek.Saturday,
+                DefaultGeneralShoppingDay = settings?.Shopping?.DefaultGeneralShoppingDay ?? DayOfWeek.Saturday,
+                PreserveManualItemsWhenRegenerating = settings?.Shopping?.PreserveManualItemsWhenRegenerating ?? true
             }
         };
 
@@ -1283,8 +1294,10 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         Id = member.Id,
         Name = member.Name,
         DateOfBirth = member.DateOfBirth,
+        MeasurementDate = member.MeasurementDate,
         HeightCentimeters = member.HeightCentimeters,
         WeightKilograms = member.WeightKilograms,
+        BodyFatPercentage = member.BodyFatPercentage,
         Sex = member.Sex,
         CurrentLifeStage = member.CurrentLifeStage,
         ActivityLevel = member.ActivityLevel,
@@ -1297,7 +1310,29 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         SpiceTolerance = member.SpiceTolerance,
         CookingPreferences = member.CookingPreferences,
         NutritionGoals = member.NutritionGoals.ToList(),
-        CustomNutritionGoals = member.CustomNutritionGoals
+        CustomNutritionGoals = member.CustomNutritionGoals,
+        MeasurementHistory = member.MeasurementHistory?.Select(CloneBodyMeasurement).ToList() ?? []
+    };
+
+    private static BodyMeasurement CloneBodyMeasurement(BodyMeasurement measurement) => new()
+    {
+        Id = measurement.Id,
+        Date = measurement.Date,
+        WeightKilograms = measurement.WeightKilograms,
+        HeightCentimeters = measurement.HeightCentimeters,
+        BodyFatPercentage = measurement.BodyFatPercentage,
+        Notes = measurement.Notes
+    };
+
+    private static FreezerInventoryItem CloneFreezerInventoryItem(FreezerInventoryItem item) => new()
+    {
+        Id = item.Id,
+        Name = item.Name,
+        Quantity = item.Quantity,
+        Unit = item.Unit,
+        FrozenDate = item.FrozenDate,
+        BestBeforeDate = item.BestBeforeDate,
+        Notes = item.Notes
     };
 
     private static void NormalizePlanningSettings(HouseholdPlanningSettings settings)
@@ -1354,10 +1389,18 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             .Select(day =>
             {
                 var existing = dayRules.FirstOrDefault(rule => rule.DayOfWeek == day);
+                var groups = NormalizeFoodGroups(existing?.FoodGroups ?? []);
+                var fallbackGroup = NormalizeFoodGroup(existing?.FoodGroup ?? DefaultFoodGroupFor(day));
+                if (groups.Count == 0 && !string.IsNullOrWhiteSpace(fallbackGroup))
+                {
+                    groups.Add(fallbackGroup);
+                }
+
                 return new DayFoodRule
                 {
                     DayOfWeek = day,
-                    FoodGroup = NormalizeFoodGroup(existing?.FoodGroup ?? DefaultFoodGroupFor(day))
+                    FoodGroup = groups.FirstOrDefault() ?? FoodGroupKind.None,
+                    FoodGroups = groups
                 };
             })
             .ToList();
@@ -1366,15 +1409,30 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         settings.CookingPreferences.MaximumWeekendCookingMinutes = Math.Clamp(settings.CookingPreferences.MaximumWeekendCookingMinutes, 0, 360);
         settings.CookingPreferences.AvoidRepeatingRecipesWithinDays = Math.Clamp(settings.CookingPreferences.AvoidRepeatingRecipesWithinDays, 0, 90);
         settings.CookingPreferences.MinimumVarietyMealsPerWeek = Math.Clamp(settings.CookingPreferences.MinimumVarietyMealsPerWeek, 0, 14);
+        settings.CookingPreferences.DesiredVarietyWindowDays = Math.Clamp(settings.CookingPreferences.DesiredVarietyWindowDays, 0, 90);
 
         settings.KitchenPantry.AlwaysAvailableIngredients = settings.KitchenPantry.AlwaysAvailableIngredients.Trim();
+        settings.KitchenPantry.FridgeInventoryNotes = settings.KitchenPantry.FridgeInventoryNotes.Trim();
         settings.KitchenPantry.FreezerInventoryNotes = settings.KitchenPantry.FreezerInventoryNotes.Trim();
         settings.KitchenPantry.PantryStaplesNotes = settings.KitchenPantry.PantryStaplesNotes.Trim();
         settings.KitchenPantry.PreferredBrands = settings.KitchenPantry.PreferredBrands.Trim();
+        settings.KitchenPantry.FreezerItems = (settings.KitchenPantry.FreezerItems ?? [])
+            .Select(NormalizeFreezerInventoryItem)
+            .Where(item => !string.IsNullOrWhiteSpace(item.Name))
+            .ToList();
 
         settings.Shopping.PreferredUnits = PreferredUnitMode.All.Contains(settings.Shopping.PreferredUnits)
             ? settings.Shopping.PreferredUnits
             : PreferredUnitMode.RecipeUnits;
+        if (!Enum.IsDefined(settings.Shopping.DefaultFreshShoppingDay))
+        {
+            settings.Shopping.DefaultFreshShoppingDay = DayOfWeek.Saturday;
+        }
+
+        if (!Enum.IsDefined(settings.Shopping.DefaultGeneralShoppingDay))
+        {
+            settings.Shopping.DefaultGeneralShoppingDay = DayOfWeek.Saturday;
+        }
     }
 
     private static HouseholdMemberProfile NormalizeHouseholdMemberProfile(HouseholdMemberProfile member)
@@ -1386,6 +1444,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         normalized.Name = normalized.Name.Trim();
         normalized.HeightCentimeters = Math.Clamp(normalized.HeightCentimeters, 0, 260);
         normalized.WeightKilograms = Math.Clamp(normalized.WeightKilograms, 0, 400);
+        normalized.BodyFatPercentage = normalized.BodyFatPercentage is null
+            ? null
+            : Math.Clamp(normalized.BodyFatPercentage.Value, 0, 100);
         normalized.Sex = MemberSex.All.Contains(normalized.Sex) ? normalized.Sex : MemberSex.Unspecified;
         normalized.CurrentLifeStage = normalized.CurrentLifeStage.Trim();
         normalized.ActivityLevel = MemberActivityLevel.All.Contains(normalized.ActivityLevel)
@@ -1406,6 +1467,73 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         normalized.CustomNutritionGoals = normalized.CustomNutritionGoals.Trim();
+        normalized.MeasurementHistory = normalized.MeasurementHistory
+            .Select(NormalizeBodyMeasurement)
+            .Where(measurement => measurement.WeightKilograms > 0)
+            .OrderByDescending(measurement => measurement.Date)
+            .ToList();
+
+        if (normalized.MeasurementHistory.Count == 0 && normalized.WeightKilograms > 0)
+        {
+            normalized.MeasurementHistory.Add(new BodyMeasurement
+            {
+                Date = normalized.MeasurementDate ?? DateTime.Today,
+                WeightKilograms = normalized.WeightKilograms,
+                HeightCentimeters = normalized.HeightCentimeters > 0 ? normalized.HeightCentimeters : null,
+                BodyFatPercentage = normalized.BodyFatPercentage
+            });
+        }
+
+        var latestMeasurement = normalized.MeasurementHistory
+            .OrderByDescending(measurement => measurement.Date)
+            .FirstOrDefault();
+        if (latestMeasurement is not null)
+        {
+            normalized.MeasurementDate = latestMeasurement.Date;
+            normalized.WeightKilograms = latestMeasurement.WeightKilograms;
+            if (latestMeasurement.HeightCentimeters is > 0)
+            {
+                normalized.HeightCentimeters = latestMeasurement.HeightCentimeters.Value;
+            }
+
+            normalized.BodyFatPercentage = latestMeasurement.BodyFatPercentage;
+        }
+
+        return normalized;
+    }
+
+    private static BodyMeasurement NormalizeBodyMeasurement(BodyMeasurement measurement)
+    {
+        var normalized = CloneBodyMeasurement(measurement);
+        normalized.Id = string.IsNullOrWhiteSpace(normalized.Id)
+            ? Guid.NewGuid().ToString("N")
+            : normalized.Id.Trim();
+        normalized.Date = normalized.Date == default ? DateTime.Today : normalized.Date.Date;
+        normalized.WeightKilograms = Math.Clamp(normalized.WeightKilograms, 0, 400);
+        normalized.HeightCentimeters = normalized.HeightCentimeters is null
+            ? null
+            : Math.Clamp(normalized.HeightCentimeters.Value, 0, 260);
+        normalized.BodyFatPercentage = normalized.BodyFatPercentage is null
+            ? null
+            : Math.Clamp(normalized.BodyFatPercentage.Value, 0, 100);
+        normalized.Notes = normalized.Notes.Trim();
+        return normalized;
+    }
+
+    private static FreezerInventoryItem NormalizeFreezerInventoryItem(FreezerInventoryItem item)
+    {
+        var normalized = CloneFreezerInventoryItem(item);
+        normalized.Id = string.IsNullOrWhiteSpace(normalized.Id)
+            ? Guid.NewGuid().ToString("N")
+            : normalized.Id.Trim();
+        normalized.Name = normalized.Name.Trim();
+        normalized.Quantity = normalized.Quantity is null
+            ? null
+            : Math.Max(0, normalized.Quantity.Value);
+        normalized.Unit = normalized.Unit.Trim();
+        normalized.FrozenDate = normalized.FrozenDate?.Date;
+        normalized.BestBeforeDate = normalized.BestBeforeDate?.Date;
+        normalized.Notes = normalized.Notes.Trim();
         return normalized;
     }
 
@@ -1438,14 +1566,16 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.BlueFish, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.WhiteFish, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 1 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Seafood, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 0 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Legumes, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = Math.Max(2, rules.MinimumLegumeMeals) };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Eggs, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Poultry, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 3 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.RedMeat, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = Math.Max(1, rules.MaximumRedMeatMeals) };
-        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.WhiteMeat, RuleType = WeeklyFoodRuleType.Target, MealsPerWeek = 3 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Vegetables, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 7 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Vegetarian, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Pasta, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Rice, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
-        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.FastFood, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 1 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.HomemadeFastFood, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 1 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Desserts, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
         yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.VegetableRich, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = Math.Max(7, rules.MinimumVegetableRichMeals) };
     }
@@ -1477,14 +1607,16 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     [
         FoodGroupKind.BlueFish,
         FoodGroupKind.WhiteFish,
+        FoodGroupKind.Seafood,
         FoodGroupKind.Legumes,
         FoodGroupKind.Eggs,
+        FoodGroupKind.Poultry,
         FoodGroupKind.RedMeat,
-        FoodGroupKind.WhiteMeat,
+        FoodGroupKind.Vegetables,
         FoodGroupKind.Vegetarian,
         FoodGroupKind.Pasta,
         FoodGroupKind.Rice,
-        FoodGroupKind.FastFood,
+        FoodGroupKind.HomemadeFastFood,
         FoodGroupKind.Desserts,
         FoodGroupKind.VegetableRich
     ];
@@ -1504,6 +1636,13 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         FoodGroupKind.PlanningGroups.Contains(foodGroup)
             ? foodGroup!
             : FoodGroupKind.None;
+
+    private static List<string> NormalizeFoodGroups(IEnumerable<string> foodGroups) =>
+        foodGroups
+            .Select(NormalizeFoodGroup)
+            .Where(group => !string.IsNullOrWhiteSpace(group))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
     private static string NormalizeNutritionState(string? nutritionState) =>
         NutritionRecordState.All.Contains(nutritionState ?? string.Empty)
@@ -1940,13 +2079,18 @@ public sealed class DataBackupSummary
     public int Recipes { get; set; }
     public int DraftRecipes { get; set; }
     public int Ingredients { get; set; }
+    public int LinkedIngredients { get; set; }
+    public int UnresolvedIngredients { get; set; }
     public int Products { get; set; }
     public int MealPlanSlots { get; set; }
     public int PlannedRecipes { get; set; }
     public int ShoppingLists { get; set; }
     public int ShoppingItems { get; set; }
     public int PantryItems { get; set; }
+    public int FreezerItems { get; set; }
     public int HouseholdIngredientPreferences { get; set; }
+    public int HouseholdMembers { get; set; }
+    public int Measurements { get; set; }
     public int RecipeIdeas { get; set; }
     public int ProductBacklogItems { get; set; }
 
@@ -1955,13 +2099,20 @@ public sealed class DataBackupSummary
         Recipes = state.Recipes.Count,
         DraftRecipes = state.Recipes.Count(recipe => recipe.IsDraft),
         Ingredients = state.Ingredients.Count,
+        LinkedIngredients = state.Recipes.Sum(recipe => recipe.Ingredients.Count(ingredient =>
+            !string.IsNullOrWhiteSpace(ingredient.Ingredient?.KnowledgeId))),
+        UnresolvedIngredients = state.Recipes.Sum(recipe => recipe.Ingredients.Count(ingredient =>
+            string.IsNullOrWhiteSpace(ingredient.Ingredient?.KnowledgeId))),
         Products = state.Products.Count,
         MealPlanSlots = state.MealPlanSlots.Count,
         PlannedRecipes = state.MealPlanSlots.Sum(slot => slot.PlannedRecipes.Count),
         ShoppingLists = state.ShoppingLists.Count,
         ShoppingItems = state.ShoppingLists.Sum(list => list.Items.Count),
         PantryItems = state.PantryItems.Count,
+        FreezerItems = state.PlanningSettings?.KitchenPantry?.FreezerItems?.Count ?? 0,
         HouseholdIngredientPreferences = state.HouseholdIngredientPreferences.Count,
+        HouseholdMembers = state.PlanningSettings?.Members?.Count ?? 0,
+        Measurements = state.PlanningSettings?.Members?.Sum(member => member.MeasurementHistory?.Count ?? 0) ?? 0,
         RecipeIdeas = state.RecipeIdeas.Count,
         ProductBacklogItems = state.ProductBacklogItems.Count
     };

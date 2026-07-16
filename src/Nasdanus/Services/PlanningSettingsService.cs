@@ -33,8 +33,10 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
                 Id = member.Id,
                 Name = member.Name,
                 DateOfBirth = member.DateOfBirth,
+                MeasurementDate = member.MeasurementDate,
                 HeightCentimeters = member.HeightCentimeters,
                 WeightKilograms = member.WeightKilograms,
+                BodyFatPercentage = member.BodyFatPercentage,
                 Sex = member.Sex,
                 CurrentLifeStage = member.CurrentLifeStage,
                 ActivityLevel = member.ActivityLevel,
@@ -47,7 +49,18 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
                 SpiceTolerance = member.SpiceTolerance,
                 CookingPreferences = member.CookingPreferences,
                 NutritionGoals = member.NutritionGoals.ToList(),
-                CustomNutritionGoals = member.CustomNutritionGoals
+                CustomNutritionGoals = member.CustomNutritionGoals,
+                MeasurementHistory = member.MeasurementHistory?
+                    .Select(measurement => new BodyMeasurement
+                    {
+                        Id = measurement.Id,
+                        Date = measurement.Date,
+                        WeightKilograms = measurement.WeightKilograms,
+                        HeightCentimeters = measurement.HeightCentimeters,
+                        BodyFatPercentage = measurement.BodyFatPercentage,
+                        Notes = measurement.Notes
+                    })
+                    .ToList() ?? []
             })
             .ToList() ?? HouseholdMemberDefaults.Create(),
         NutritionGoals = new HouseholdNutritionGoals
@@ -77,14 +90,15 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
                     MealsPerWeek = target.MealsPerWeek
                 })
                 .ToList() ?? [],
-            DayRules = settings?.WeeklyFoodRules?.DayRules
-                ?.Select(rule => new DayFoodRule
-                {
-                    DayOfWeek = rule.DayOfWeek,
-                    FoodGroup = rule.FoodGroup
-                })
-                .ToList() ?? []
-        },
+                DayRules = settings?.WeeklyFoodRules?.DayRules
+                    ?.Select(rule => new DayFoodRule
+                    {
+                        DayOfWeek = rule.DayOfWeek,
+                        FoodGroup = rule.FoodGroup,
+                        FoodGroups = rule.FoodGroups?.ToList() ?? []
+                    })
+                    .ToList() ?? []
+            },
         CookingPreferences = new HouseholdCookingPreferences
         {
             MaximumWeekdayCookingMinutes = settings?.CookingPreferences?.MaximumWeekdayCookingMinutes ?? 45,
@@ -96,14 +110,31 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
             PreferFavouriteRecipes = settings?.CookingPreferences?.PreferFavouriteRecipes ?? true,
             PreferSuccessfullyCookedRecipes = settings?.CookingPreferences?.PreferSuccessfullyCookedRecipes ?? true,
             AllowLeftovers = settings?.CookingPreferences?.AllowLeftovers ?? true,
-            MinimumVarietyMealsPerWeek = settings?.CookingPreferences?.MinimumVarietyMealsPerWeek ?? 7
+            MinimumVarietyMealsPerWeek = settings?.CookingPreferences?.MinimumVarietyMealsPerWeek ?? 7,
+            DesiredVarietyWindowDays = settings?.CookingPreferences?.DesiredVarietyWindowDays ?? 14,
+            PrioritizeAvailableFreezerIngredients = settings?.CookingPreferences?.PrioritizeAvailableFreezerIngredients ?? true,
+            PrioritizePantryIngredients = settings?.CookingPreferences?.PrioritizePantryIngredients ?? true,
+            PreferBatchFriendlyPreparations = settings?.CookingPreferences?.PreferBatchFriendlyPreparations ?? true
         },
         KitchenPantry = new HouseholdKitchenPantrySettings
         {
             AlwaysAvailableIngredients = settings?.KitchenPantry?.AlwaysAvailableIngredients ?? string.Empty,
+            FridgeInventoryNotes = settings?.KitchenPantry?.FridgeInventoryNotes ?? string.Empty,
             FreezerInventoryNotes = settings?.KitchenPantry?.FreezerInventoryNotes ?? string.Empty,
             PantryStaplesNotes = settings?.KitchenPantry?.PantryStaplesNotes ?? string.Empty,
             PreferredBrands = settings?.KitchenPantry?.PreferredBrands ?? string.Empty,
+            FreezerItems = settings?.KitchenPantry?.FreezerItems?
+                .Select(item => new FreezerInventoryItem
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Quantity = item.Quantity,
+                    Unit = item.Unit,
+                    FrozenDate = item.FrozenDate,
+                    BestBeforeDate = item.BestBeforeDate,
+                    Notes = item.Notes
+                })
+                .ToList() ?? [],
             Appliances = new KitchenApplianceSettings
             {
                 AirFryer = settings?.KitchenPantry?.Appliances?.AirFryer ?? false,
@@ -120,8 +151,12 @@ public sealed class PlanningSettingsService(BrowserAppStore store)
             SortBySupermarketOrder = settings?.Shopping?.SortBySupermarketOrder ?? true,
             IgnorePantryItems = settings?.Shopping?.IgnorePantryItems ?? true,
             IgnoreAlwaysAvailableIngredients = settings?.Shopping?.IgnoreAlwaysAvailableIngredients ?? true,
+            DeductAvailableFreezerItems = settings?.Shopping?.DeductAvailableFreezerItems ?? false,
             AutomaticQuantityAggregation = settings?.Shopping?.AutomaticQuantityAggregation ?? true,
-            PreferredUnits = settings?.Shopping?.PreferredUnits ?? PreferredUnitMode.RecipeUnits
+            PreferredUnits = settings?.Shopping?.PreferredUnits ?? PreferredUnitMode.RecipeUnits,
+            DefaultFreshShoppingDay = settings?.Shopping?.DefaultFreshShoppingDay ?? DayOfWeek.Saturday,
+            DefaultGeneralShoppingDay = settings?.Shopping?.DefaultGeneralShoppingDay ?? DayOfWeek.Saturday,
+            PreserveManualItemsWhenRegenerating = settings?.Shopping?.PreserveManualItemsWhenRegenerating ?? true
         }
     };
 }

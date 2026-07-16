@@ -20,9 +20,9 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
             .Select(plannedRecipe => plannedRecipe.RecipeId)
             .ToHashSet();
         var status = BuildStatus(state, weekStart);
-        var targetGroup = settings.WeeklyFoodRules.DayRules
+        var targetGroups = settings.WeeklyFoodRules.DayRules
             .FirstOrDefault(rule => rule.DayOfWeek == date.DayOfWeek)
-            ?.FoodGroup ?? FoodGroupKind.None;
+            ?.FoodGroups ?? [];
         var recentGroups = RecentPrimaryGroups(state, date).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         return state.Recipes
@@ -33,7 +33,7 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
                 mealKind,
                 settings,
                 status,
-                targetGroup,
+                targetGroups,
                 plannedRecipeIds,
                 recentGroups))
             .OrderByDescending(suggestion => suggestion.Score)
@@ -55,7 +55,7 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
         MealKind mealKind,
         HouseholdPlanningSettings settings,
         WeeklyNutritionGoalStatus status,
-        string targetGroup,
+        IReadOnlyList<string> targetGroups,
         HashSet<int> plannedRecipeIds,
         HashSet<string> recentGroups)
     {
@@ -70,10 +70,14 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
         var isQuickMeal = TotalMinutes(recipe) <= 30;
         var alreadyPlanned = plannedRecipeIds.Contains(recipe.Id);
 
-        if (!string.IsNullOrWhiteSpace(targetGroup) && profile.Matches(targetGroup))
+        var matchedDayGroups = targetGroups
+            .Where(group => profile.Matches(group))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (matchedDayGroups.Count > 0)
         {
             score += 35;
-            reasons.Add($"{FoodGroupKind.ToDisplayName(targetGroup)} for this day");
+            reasons.Add($"{string.Join(", ", matchedDayGroups.Select(FoodGroupKind.ToDisplayName))} for this day");
         }
 
         var proteinTarget = settings.NutritionGoals.MinimumProteinGramsPerPerson;

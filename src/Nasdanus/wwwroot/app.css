@@ -325,6 +325,15 @@ h3:focus {
     gap: 0.75rem;
 }
 
+.settings-day-card {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
 .settings-divider {
     margin: 0.25rem 0;
 }
@@ -360,6 +369,62 @@ h3:focus {
     gap: 1rem;
 }
 
+.member-measurement-panel,
+.source-priority-panel {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.member-bmi-summary,
+.member-history-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.measurement-history-wrap {
+    overflow-x: auto;
+}
+
+.measurement-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 44rem;
+}
+
+.measurement-history-table th,
+.measurement-history-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--nas-border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.measurement-actions {
+    white-space: nowrap;
+}
+
+.freezer-inventory-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.freezer-inventory-row {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) minmax(6rem, 0.5fr) minmax(6rem, 0.5fr) minmax(9rem, 0.7fr) minmax(9rem, 0.7fr) minmax(10rem, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
 .ingredient-preference-list {
     display: grid;
     gap: 0.75rem;
@@ -393,8 +458,12 @@ h3:focus {
     .ingredient-preference-row,
     .ingredient-preference-controls,
     .settings-grid-four,
-    .settings-target-row {
+    .settings-target-row,
+    .freezer-inventory-row,
+    .member-bmi-summary,
+    .member-history-heading {
         grid-template-columns: 1fr;
+        flex-direction: column;
     }
 }
 

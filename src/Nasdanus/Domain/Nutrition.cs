@@ -134,8 +134,10 @@ public sealed class HouseholdMemberProfile
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string Name { get; set; } = string.Empty;
     public DateTime? DateOfBirth { get; set; }
+    public DateTime? MeasurementDate { get; set; }
     public decimal HeightCentimeters { get; set; }
     public decimal WeightKilograms { get; set; }
+    public decimal? BodyFatPercentage { get; set; }
     public string Sex { get; set; } = MemberSex.Unspecified;
     public string CurrentLifeStage { get; set; } = string.Empty;
     public string ActivityLevel { get; set; } = MemberActivityLevel.Moderate;
@@ -149,6 +151,17 @@ public sealed class HouseholdMemberProfile
     public string CookingPreferences { get; set; } = string.Empty;
     public List<string> NutritionGoals { get; set; } = [];
     public string CustomNutritionGoals { get; set; } = string.Empty;
+    public List<BodyMeasurement> MeasurementHistory { get; set; } = [];
+}
+
+public sealed class BodyMeasurement
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    public DateTime Date { get; set; } = DateTime.Today;
+    public decimal WeightKilograms { get; set; }
+    public decimal? HeightCentimeters { get; set; }
+    public decimal? BodyFatPercentage { get; set; }
+    public string Notes { get; set; } = string.Empty;
 }
 
 public static class HouseholdMemberDefaults
@@ -160,6 +173,7 @@ public static class HouseholdMemberDefaults
             Id = "nuria",
             Name = "Núria",
             DateOfBirth = new DateTime(1981, 5, 15),
+            MeasurementDate = DateTime.Today,
             HeightCentimeters = 167,
             WeightKilograms = 91,
             Sex = MemberSex.Female,
@@ -175,13 +189,25 @@ public static class HouseholdMemberDefaults
                 MemberNutritionGoal.IncreaseProtein,
                 MemberNutritionGoal.ImproveOverallDiet
             ],
-            CustomNutritionGoals = "Improve meal balance across the week and maintain a sustainable, healthy diet."
+            CustomNutritionGoals = "Improve meal balance across the week and maintain a sustainable, healthy diet.",
+            MeasurementHistory =
+            [
+                new BodyMeasurement
+                {
+                    Id = "nuria-initial",
+                    Date = DateTime.Today,
+                    WeightKilograms = 91,
+                    HeightCentimeters = 167,
+                    Notes = "Initial household profile measurement."
+                }
+            ]
         },
         new HouseholdMemberProfile
         {
             Id = "alex",
             Name = "Alex",
             DateOfBirth = new DateTime(1979, 1, 17),
+            MeasurementDate = DateTime.Today,
             HeightCentimeters = 183,
             WeightKilograms = 105,
             Sex = MemberSex.Male,
@@ -197,13 +223,25 @@ public static class HouseholdMemberDefaults
                 MemberNutritionGoal.ImproveOverallDiet,
                 MemberNutritionGoal.IncreaseProtein
             ],
-            CustomNutritionGoals = "Support training while keeping sodium moderate."
+            CustomNutritionGoals = "Support training while keeping sodium moderate.",
+            MeasurementHistory =
+            [
+                new BodyMeasurement
+                {
+                    Id = "alex-initial",
+                    Date = DateTime.Today,
+                    WeightKilograms = 105,
+                    HeightCentimeters = 183,
+                    Notes = "Initial household profile measurement."
+                }
+            ]
         },
         new HouseholdMemberProfile
         {
             Id = "cora",
             Name = "Cora",
             DateOfBirth = new DateTime(2014, 11, 21),
+            MeasurementDate = DateTime.Today,
             HeightCentimeters = 156,
             WeightKilograms = 56.5m,
             Sex = MemberSex.Female,
@@ -217,7 +255,18 @@ public static class HouseholdMemberDefaults
             [
                 MemberNutritionGoal.ImproveOverallDiet
             ],
-            CustomNutritionGoals = "Support healthy growth, school, sport and development with enough daily energy."
+            CustomNutritionGoals = "Support healthy growth, school, sport and development with enough daily energy.",
+            MeasurementHistory =
+            [
+                new BodyMeasurement
+                {
+                    Id = "cora-initial",
+                    Date = DateTime.Today,
+                    WeightKilograms = 56.5m,
+                    HeightCentimeters = 156,
+                    Notes = "Initial household profile measurement."
+                }
+            ]
         }
     ];
 }
@@ -257,6 +306,7 @@ public sealed class DayFoodRule
 {
     public DayOfWeek DayOfWeek { get; set; }
     public string FoodGroup { get; set; } = FoodGroupKind.None;
+    public List<string> FoodGroups { get; set; } = [];
 }
 
 public sealed class HouseholdCookingPreferences
@@ -271,15 +321,32 @@ public sealed class HouseholdCookingPreferences
     public bool PreferSuccessfullyCookedRecipes { get; set; } = true;
     public bool AllowLeftovers { get; set; } = true;
     public int MinimumVarietyMealsPerWeek { get; set; } = 7;
+    public int DesiredVarietyWindowDays { get; set; } = 14;
+    public bool PrioritizeAvailableFreezerIngredients { get; set; } = true;
+    public bool PrioritizePantryIngredients { get; set; } = true;
+    public bool PreferBatchFriendlyPreparations { get; set; } = true;
 }
 
 public sealed class HouseholdKitchenPantrySettings
 {
     public string AlwaysAvailableIngredients { get; set; } = string.Empty;
+    public string FridgeInventoryNotes { get; set; } = string.Empty;
     public string FreezerInventoryNotes { get; set; } = string.Empty;
     public string PantryStaplesNotes { get; set; } = string.Empty;
     public string PreferredBrands { get; set; } = string.Empty;
+    public List<FreezerInventoryItem> FreezerItems { get; set; } = [];
     public KitchenApplianceSettings Appliances { get; set; } = new();
+}
+
+public sealed class FreezerInventoryItem
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    public string Name { get; set; } = string.Empty;
+    public decimal? Quantity { get; set; }
+    public string Unit { get; set; } = string.Empty;
+    public DateTime? FrozenDate { get; set; }
+    public DateTime? BestBeforeDate { get; set; }
+    public string Notes { get; set; } = string.Empty;
 }
 
 public sealed class KitchenApplianceSettings
@@ -298,8 +365,12 @@ public sealed class HouseholdShoppingSettings
     public bool SortBySupermarketOrder { get; set; } = true;
     public bool IgnorePantryItems { get; set; } = true;
     public bool IgnoreAlwaysAvailableIngredients { get; set; } = true;
+    public bool DeductAvailableFreezerItems { get; set; } = false;
     public bool AutomaticQuantityAggregation { get; set; } = true;
     public string PreferredUnits { get; set; } = PreferredUnitMode.RecipeUnits;
+    public DayOfWeek DefaultFreshShoppingDay { get; set; } = DayOfWeek.Saturday;
+    public DayOfWeek DefaultGeneralShoppingDay { get; set; } = DayOfWeek.Saturday;
+    public bool PreserveManualItemsWhenRegenerating { get; set; } = true;
 }
 
 public static class HouseholdLanguage
@@ -432,9 +503,9 @@ public static class NutritionGoalScope
 
     public static string ToDisplayName(string scope) => scope switch
     {
-        Daily => "Objectius diaris",
-        WeeklyAverage => "Mitjana setmanal",
-        Meal => "Objectius per apat",
+        Daily => "Daily target",
+        WeeklyAverage => "Weekly daily average",
+        Meal => "Meal goals",
         _ => scope
     };
 }
@@ -448,8 +519,8 @@ public static class NutritionMacroMode
 
     public static string ToDisplayName(string mode) => mode switch
     {
-        AbsoluteGrams => "Grams absoluts",
-        PercentageDistribution => "Percentatge",
+        AbsoluteGrams => "Grams per person per day",
+        PercentageDistribution => "Percentage of calories",
         _ => mode
     };
 }
@@ -464,9 +535,9 @@ public static class WeeklyFoodRuleType
 
     public static string ToDisplayName(string ruleType) => ruleType switch
     {
-        Minimum => "Minim",
-        Maximum => "Maxim",
-        Target => "Objectiu",
+        Minimum => "Minimum meals/week",
+        Maximum => "Maximum meals/week",
+        Target => "Target meals/week",
         _ => ruleType
     };
 }
@@ -494,10 +565,12 @@ public static class FoodGroupKind
     public const string BlueFish = "BlueFish";
     public const string WhiteFish = "WhiteFish";
     public const string Fish = "Fish";
+    public const string Seafood = "Seafood";
     public const string Legumes = "Legumes";
     public const string VegetableRich = "VegetableRich";
     public const string RedMeat = "RedMeat";
     public const string WhiteMeat = "WhiteMeat";
+    public const string Poultry = "Poultry";
     public const string Chicken = "Chicken";
     public const string Meat = "Meat";
     public const string Eggs = "Eggs";
@@ -505,18 +578,22 @@ public static class FoodGroupKind
     public const string Rice = "Rice";
     public const string Vegetarian = "Vegetarian";
     public const string FastFood = "FastFood";
+    public const string HomemadeFastFood = "HomemadeFastFood";
     public const string Desserts = "Desserts";
     public const string Vegetables = "Vegetables";
+    public const string HighProtein = "HighProtein";
 
     public static readonly string[] PlanningGroups =
     [
         BlueFish,
         WhiteFish,
         Fish,
+        Seafood,
         Legumes,
         VegetableRich,
         RedMeat,
         WhiteMeat,
+        Poultry,
         Chicken,
         Meat,
         Eggs,
@@ -524,8 +601,10 @@ public static class FoodGroupKind
         Rice,
         Vegetarian,
         FastFood,
+        HomemadeFastFood,
         Desserts,
-        Vegetables
+        Vegetables,
+        HighProtein
     ];
 
     public static string ToDisplayName(string foodGroup) => foodGroup switch
@@ -533,10 +612,12 @@ public static class FoodGroupKind
         BlueFish => "Peix blau",
         WhiteFish => "Peix blanc",
         Fish => "Peix",
+        Seafood => "Marisc",
         Legumes => "Llegums",
         VegetableRich => "Ric en verdures",
         RedMeat => "Carn vermella",
         WhiteMeat => "Carn blanca",
+        Poultry => "Aus",
         Chicken => "Pollastre",
         Meat => "Carn",
         Eggs => "Ous",
@@ -544,8 +625,10 @@ public static class FoodGroupKind
         Rice => "Arros",
         Vegetarian => "Vegetaria",
         FastFood => "Fast food",
+        HomemadeFastFood => "Fast food casola",
         Desserts => "Postres",
         Vegetables => "Verdures",
+        HighProtein => "Alt en proteina",
         _ => "Sense regla"
     };
 }
@@ -571,10 +654,12 @@ public sealed record RecipeFoodProfile(
         FoodGroupKind.BlueFish => IsFish,
         FoodGroupKind.WhiteFish => IsFish,
         FoodGroupKind.Fish => IsFish,
+        FoodGroupKind.Seafood => IsFish,
         FoodGroupKind.Legumes => IsLegume,
         FoodGroupKind.VegetableRich => IsVegetableRich,
         FoodGroupKind.RedMeat => IsRedMeat,
         FoodGroupKind.WhiteMeat => IsChicken,
+        FoodGroupKind.Poultry => IsChicken,
         FoodGroupKind.Chicken => IsChicken,
         FoodGroupKind.Meat => IsMeat,
         FoodGroupKind.Eggs => HasEggs,
@@ -582,8 +667,10 @@ public sealed record RecipeFoodProfile(
         FoodGroupKind.Rice => IsRice,
         FoodGroupKind.Vegetarian => IsVegetarian,
         FoodGroupKind.FastFood => IsFastFood,
+        FoodGroupKind.HomemadeFastFood => IsFastFood,
         FoodGroupKind.Desserts => IsDessert,
         FoodGroupKind.Vegetables => VegetableIngredientCount > 0 || IsVegetableRich,
+        FoodGroupKind.HighProtein => IsFish || IsMeat || HasEggs || IsLegume,
         _ => false
     };
 }

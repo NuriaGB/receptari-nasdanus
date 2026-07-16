@@ -1,0 +1,120 @@
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                @if (IsChild)
+                {
+                    <span>Mesura informativa per a menor: Nasdanus calcula el valor, pero no aplica classificacions adultes.</span>
+                }
+                else
+                {
+                    <span>Mesura informativa per seguir evolucio. No es una valoracio medica.</span>
+                }
+            </MudText>
+
+            <MudDatePicker Label="Data de la mesura"
+                           Date="@_date"
+                           DateChanged="OnDateChanged"
+                           DateFormat="dd/MM/yyyy"
+                           Variant="Variant.Outlined"
+                           Margin="Margin.Dense" />
+
+            <MudNumericField T="decimal"
+                             Label="Pes kg"
+                             @bind-Value="_measurement.WeightKilograms"
+                             Min="0"
+                             Max="400"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense" />
+
+            @if (IsChild)
+            {
+                <MudNumericField T="decimal?"
+                                 Label="Alcada cm"
+                                 @bind-Value="_measurement.HeightCentimeters"
+                                 Min="0"
+                                 Max="260"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+            }
+            else
+            {
+                <MudNumericField T="decimal?"
+                                 Label="Greix corporal % opcional"
+                                 @bind-Value="_measurement.BodyFatPercentage"
+                                 Min="0"
+                                 Max="100"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+            }
+
+            <MudTextField T="string"
+                          Label="Notes opcionals"
+                          @bind-Value="_measurement.Notes"
+                          Lines="3"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
+        <MudButton OnClick="Save"
+                   Disabled="@(!CanSave)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public BodyMeasurement? Measurement { get; set; }
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    private BodyMeasurement _measurement = new();
+    private DateTime? _date = DateTime.Today;
+
+    private bool CanSave =>
+        _date is not null
+        && _measurement.WeightKilograms > 0
+        && (!IsChild || _measurement.HeightCentimeters is > 0);
+
+    protected override void OnParametersSet()
+    {
+        _measurement = Measurement is null
+            ? new BodyMeasurement { Date = DateTime.Today }
+            : new BodyMeasurement
+            {
+                Id = Measurement.Id,
+                Date = Measurement.Date,
+                WeightKilograms = Measurement.WeightKilograms,
+                HeightCentimeters = Measurement.HeightCentimeters,
+                BodyFatPercentage = Measurement.BodyFatPercentage,
+                Notes = Measurement.Notes
+            };
+        _date = _measurement.Date == default ? DateTime.Today : _measurement.Date;
+    }
+
+    private void OnDateChanged(DateTime? value)
+    {
+        _date = value;
+        _measurement.Date = (value ?? DateTime.Today).Date;
+    }
+
+    private void Save()
+    {
+        _measurement.Date = (_date ?? DateTime.Today).Date;
+        MudDialog.Close(DialogResult.Ok(_measurement));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
