@@ -81,8 +81,11 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
     private static HouseholdIngredientPreference Normalize(HouseholdIngredientPreference preference) => new()
     {
         IngredientKnowledgeId = preference.IngredientKnowledgeId.Trim(),
+        IsFavourite = preference.IsFavourite,
         IsFrequentlyUsed = preference.IsFrequentlyUsed,
         IsUsuallyAvailable = preference.IsUsuallyAvailable,
+        IsAlwaysInPantry = preference.IsAlwaysInPantry,
+        IsNormallyFrozen = preference.IsNormallyFrozen,
         UseFrequency = IngredientUseFrequency.All.Contains(preference.UseFrequency)
             ? preference.UseFrequency
             : IngredientUseFrequency.Occasional,
@@ -91,8 +94,11 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
     };
 
     private static bool IsDefault(HouseholdIngredientPreference preference) =>
-        !preference.IsFrequentlyUsed
+        !preference.IsFavourite
+        && !preference.IsFrequentlyUsed
         && !preference.IsUsuallyAvailable
+        && !preference.IsAlwaysInPantry
+        && !preference.IsNormallyFrozen
         && preference.UseFrequency == IngredientUseFrequency.Occasional
         && string.IsNullOrWhiteSpace(preference.PreferredAlias)
         && string.IsNullOrWhiteSpace(preference.HouseholdNotes);
@@ -100,8 +106,11 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
     private static HouseholdIngredientPreference ClonePreference(HouseholdIngredientPreference preference) => new()
     {
         IngredientKnowledgeId = preference.IngredientKnowledgeId,
+        IsFavourite = preference.IsFavourite,
         IsFrequentlyUsed = preference.IsFrequentlyUsed,
         IsUsuallyAvailable = preference.IsUsuallyAvailable,
+        IsAlwaysInPantry = preference.IsAlwaysInPantry,
+        IsNormallyFrozen = preference.IsNormallyFrozen,
         UseFrequency = preference.UseFrequency,
         PreferredAlias = preference.PreferredAlias,
         HouseholdNotes = preference.HouseholdNotes
@@ -119,6 +128,18 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
         Subcategory = ingredient.Subcategory,
         DefaultUnit = ingredient.DefaultUnit,
         PantryCategory = ingredient.PantryCategory,
+        NutritionPer100Grams = ingredient.NutritionPer100Grams is null
+            ? null
+            : new IngredientNutrition
+            {
+                CaloriesKcal = ingredient.NutritionPer100Grams.CaloriesKcal,
+                ProteinGrams = ingredient.NutritionPer100Grams.ProteinGrams,
+                CarbohydrateGrams = ingredient.NutritionPer100Grams.CarbohydrateGrams,
+                FatGrams = ingredient.NutritionPer100Grams.FatGrams,
+                FibreGrams = ingredient.NutritionPer100Grams.FibreGrams,
+                SugarGrams = ingredient.NutritionPer100Grams.SugarGrams,
+                SaltGrams = ingredient.NutritionPer100Grams.SaltGrams
+            },
         NutritionState = ingredient.NutritionState,
         NutritionSource = ingredient.NutritionSource,
         NutritionSourceId = ingredient.NutritionSourceId,

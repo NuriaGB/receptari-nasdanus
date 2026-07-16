@@ -22,6 +22,10 @@ public static class RecipeFoodClassifier
             || ContainsAny(text, "truita", "omelette");
         var isPasta = ingredientNames.Any(name => ContainsAny(name, "pasta", "macarro", "espagueti", "noodle", "tallarina", "ravioli"))
             || ContainsAny(text, "pasta", "macarro", "espagueti", "noodle", "tallarina", "ravioli");
+        var isRice = ingredientNames.Any(name => ContainsAny(name, "arros", "rice", "risotto"))
+            || ContainsAny(text, "arros", "rice", "risotto");
+        var isFastFood = ContainsAny(text, "fast food", "pizza", "burger", "hamburguesa", "hot dog", "fregit");
+        var isDessert = ContainsAny(text, "postres", "dessert", "pastis", "coca", "cookie", "galeta", "magdalena", "flam", "crema catalana", "brownie");
         var vegetableIngredientCount = recipe.Ingredients.Count(ingredient =>
             ingredient.Ingredient?.Category == IngredientCategory.Vegetables
             || ContainsAny(
@@ -44,6 +48,7 @@ public static class RecipeFoodClassifier
             || isRedMeat
             || HasIngredientCategory(recipe, IngredientCategory.Meat)
             || ContainsAny(text, "carn", "meat");
+        var isVegetarian = !isMeat && !isFish;
 
         return new RecipeFoodProfile(
             isFish,
@@ -54,8 +59,12 @@ public static class RecipeFoodClassifier
             isMeat,
             hasEggs,
             isPasta,
+            isRice,
+            isVegetarian,
+            isFastFood,
+            isDessert,
             vegetableIngredientCount,
-            PrimaryGroup(isFish, isLegume, isChicken, isRedMeat, hasEggs, isPasta, isVegetableRich, isMeat));
+            PrimaryGroup(isFish, isLegume, isChicken, isRedMeat, hasEggs, isPasta, isRice, isDessert, isFastFood, isVegetableRich, isMeat));
     }
 
     private static string PrimaryGroup(
@@ -65,6 +74,9 @@ public static class RecipeFoodClassifier
         bool isRedMeat,
         bool hasEggs,
         bool isPasta,
+        bool isRice,
+        bool isDessert,
+        bool isFastFood,
         bool isVegetableRich,
         bool isMeat)
     {
@@ -96,6 +108,21 @@ public static class RecipeFoodClassifier
         if (isPasta)
         {
             return FoodGroupKind.Pasta;
+        }
+
+        if (isRice)
+        {
+            return FoodGroupKind.Rice;
+        }
+
+        if (isDessert)
+        {
+            return FoodGroupKind.Desserts;
+        }
+
+        if (isFastFood)
+        {
+            return FoodGroupKind.FastFood;
         }
 
         if (isVegetableRich)

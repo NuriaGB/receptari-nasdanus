@@ -250,13 +250,25 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
         }
 
         var week = new WeekNutritionSummary(weekStart, days, weekTotals);
-        var targets = new List<FoodGroupTargetStatus>
+        var targets = state.PlanningSettings.WeeklyFoodRules.Targets
+            .Where(target => !string.IsNullOrWhiteSpace(target.FoodGroup))
+            .Select(target => new FoodGroupTargetStatus(
+                target.FoodGroup,
+                CountMealsForGroup(state, weekStart, target.FoodGroup),
+                target.MealsPerWeek,
+                target.RuleType == WeeklyFoodRuleType.Maximum))
+            .ToList();
+
+        if (targets.Count == 0)
         {
-            new(FoodGroupKind.Fish, CountMealsForGroup(state, weekStart, FoodGroupKind.Fish), state.PlanningSettings.WeeklyFoodRules.MinimumFishMeals, false),
-            new(FoodGroupKind.Legumes, CountMealsForGroup(state, weekStart, FoodGroupKind.Legumes), state.PlanningSettings.WeeklyFoodRules.MinimumLegumeMeals, false),
-            new(FoodGroupKind.RedMeat, CountMealsForGroup(state, weekStart, FoodGroupKind.RedMeat), state.PlanningSettings.WeeklyFoodRules.MaximumRedMeatMeals, true),
-            new(FoodGroupKind.VegetableRich, CountMealsForGroup(state, weekStart, FoodGroupKind.VegetableRich), state.PlanningSettings.WeeklyFoodRules.MinimumVegetableRichMeals, false)
-        };
+            targets =
+            [
+                new(FoodGroupKind.Fish, CountMealsForGroup(state, weekStart, FoodGroupKind.Fish), state.PlanningSettings.WeeklyFoodRules.MinimumFishMeals, false),
+                new(FoodGroupKind.Legumes, CountMealsForGroup(state, weekStart, FoodGroupKind.Legumes), state.PlanningSettings.WeeklyFoodRules.MinimumLegumeMeals, false),
+                new(FoodGroupKind.RedMeat, CountMealsForGroup(state, weekStart, FoodGroupKind.RedMeat), state.PlanningSettings.WeeklyFoodRules.MaximumRedMeatMeals, true),
+                new(FoodGroupKind.VegetableRich, CountMealsForGroup(state, weekStart, FoodGroupKind.VegetableRich), state.PlanningSettings.WeeklyFoodRules.MinimumVegetableRichMeals, false)
+            ];
+        }
 
         return new WeeklyNutritionGoalStatus(
             week,

@@ -1160,8 +1160,11 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         HouseholdIngredientPreference preference) => new()
     {
         IngredientKnowledgeId = preference.IngredientKnowledgeId,
+        IsFavourite = preference.IsFavourite,
         IsFrequentlyUsed = preference.IsFrequentlyUsed,
         IsUsuallyAvailable = preference.IsUsuallyAvailable,
+        IsAlwaysInPantry = preference.IsAlwaysInPantry,
+        IsNormallyFrozen = preference.IsNormallyFrozen,
         UseFrequency = preference.UseFrequency,
         PreferredAlias = preference.PreferredAlias,
         HouseholdNotes = preference.HouseholdNotes
@@ -1184,12 +1187,28 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         var clone = new HouseholdPlanningSettings
         {
+            General = new HouseholdGeneralSettings
+            {
+                HouseholdName = settings?.General?.HouseholdName ?? "Nasdanus",
+                DefaultLanguage = settings?.General?.DefaultLanguage ?? HouseholdLanguage.Catalan,
+                MeasurementSystem = settings?.General?.MeasurementSystem ?? MeasurementSystemKind.Metric,
+                DefaultServings = settings?.General?.DefaultServings ?? 4,
+                WeekStartsOn = settings?.General?.WeekStartsOn ?? DayOfWeek.Monday
+            },
+            Members = settings?.Members?.Select(CloneHouseholdMemberProfile).ToList()
+                ?? HouseholdMemberDefaults.Create(),
             NutritionGoals = new HouseholdNutritionGoals
             {
+                GoalScope = settings?.NutritionGoals?.GoalScope ?? NutritionGoalScope.WeeklyAverage,
+                MacroMode = settings?.NutritionGoals?.MacroMode ?? NutritionMacroMode.AbsoluteGrams,
                 TargetCaloriesPerPerson = settings?.NutritionGoals?.TargetCaloriesPerPerson ?? 2000,
                 MinimumProteinGramsPerPerson = settings?.NutritionGoals?.MinimumProteinGramsPerPerson ?? 85,
                 TargetCarbohydrateGramsPerPerson = settings?.NutritionGoals?.TargetCarbohydrateGramsPerPerson ?? 240,
-                TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 70
+                TargetFatGramsPerPerson = settings?.NutritionGoals?.TargetFatGramsPerPerson ?? 70,
+                TargetFibreGramsPerPerson = settings?.NutritionGoals?.TargetFibreGramsPerPerson ?? 25,
+                ProteinPercent = settings?.NutritionGoals?.ProteinPercent ?? 30,
+                CarbohydratePercent = settings?.NutritionGoals?.CarbohydratePercent ?? 40,
+                FatPercent = settings?.NutritionGoals?.FatPercent ?? 30
             },
             WeeklyFoodRules = new WeeklyFoodRules
             {
@@ -1197,6 +1216,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 MinimumLegumeMeals = settings?.WeeklyFoodRules?.MinimumLegumeMeals ?? 1,
                 MaximumRedMeatMeals = settings?.WeeklyFoodRules?.MaximumRedMeatMeals ?? 1,
                 MinimumVegetableRichMeals = settings?.WeeklyFoodRules?.MinimumVegetableRichMeals ?? 7,
+                Targets = settings?.WeeklyFoodRules?.Targets
+                    ?.Select(CloneWeeklyFoodTarget)
+                    .ToList() ?? [],
                 DayRules = settings?.WeeklyFoodRules?.DayRules
                     ?.Select(rule => new DayFoodRule
                     {
@@ -1204,6 +1226,44 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                         FoodGroup = rule.FoodGroup
                     })
                     .ToList() ?? []
+            },
+            CookingPreferences = new HouseholdCookingPreferences
+            {
+                MaximumWeekdayCookingMinutes = settings?.CookingPreferences?.MaximumWeekdayCookingMinutes ?? 45,
+                MaximumWeekendCookingMinutes = settings?.CookingPreferences?.MaximumWeekendCookingMinutes ?? 90,
+                UseFreezerMeals = settings?.CookingPreferences?.UseFreezerMeals ?? true,
+                PreferSeasonalIngredients = settings?.CookingPreferences?.PreferSeasonalIngredients ?? true,
+                PreferLocalIngredients = settings?.CookingPreferences?.PreferLocalIngredients ?? true,
+                AvoidRepeatingRecipesWithinDays = settings?.CookingPreferences?.AvoidRepeatingRecipesWithinDays ?? 10,
+                PreferFavouriteRecipes = settings?.CookingPreferences?.PreferFavouriteRecipes ?? true,
+                PreferSuccessfullyCookedRecipes = settings?.CookingPreferences?.PreferSuccessfullyCookedRecipes ?? true,
+                AllowLeftovers = settings?.CookingPreferences?.AllowLeftovers ?? true,
+                MinimumVarietyMealsPerWeek = settings?.CookingPreferences?.MinimumVarietyMealsPerWeek ?? 7
+            },
+            KitchenPantry = new HouseholdKitchenPantrySettings
+            {
+                AlwaysAvailableIngredients = settings?.KitchenPantry?.AlwaysAvailableIngredients ?? string.Empty,
+                FreezerInventoryNotes = settings?.KitchenPantry?.FreezerInventoryNotes ?? string.Empty,
+                PantryStaplesNotes = settings?.KitchenPantry?.PantryStaplesNotes ?? string.Empty,
+                PreferredBrands = settings?.KitchenPantry?.PreferredBrands ?? string.Empty,
+                Appliances = new KitchenApplianceSettings
+                {
+                    AirFryer = settings?.KitchenPantry?.Appliances?.AirFryer ?? false,
+                    PressureCooker = settings?.KitchenPantry?.Appliances?.PressureCooker ?? false,
+                    Oven = settings?.KitchenPantry?.Appliances?.Oven ?? true,
+                    Bbq = settings?.KitchenPantry?.Appliances?.Bbq ?? false,
+                    Thermomix = settings?.KitchenPantry?.Appliances?.Thermomix ?? false,
+                    SteamCooker = settings?.KitchenPantry?.Appliances?.SteamCooker ?? false
+                }
+            },
+            Shopping = new HouseholdShoppingSettings
+            {
+                MergeDuplicatedIngredients = settings?.Shopping?.MergeDuplicatedIngredients ?? true,
+                SortBySupermarketOrder = settings?.Shopping?.SortBySupermarketOrder ?? true,
+                IgnorePantryItems = settings?.Shopping?.IgnorePantryItems ?? true,
+                IgnoreAlwaysAvailableIngredients = settings?.Shopping?.IgnoreAlwaysAvailableIngredients ?? true,
+                AutomaticQuantityAggregation = settings?.Shopping?.AutomaticQuantityAggregation ?? true,
+                PreferredUnits = settings?.Shopping?.PreferredUnits ?? PreferredUnitMode.RecipeUnits
             }
         };
 
@@ -1211,18 +1271,82 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         return clone;
     }
 
+    private static WeeklyFoodTarget CloneWeeklyFoodTarget(WeeklyFoodTarget target) => new()
+    {
+        FoodGroup = target.FoodGroup,
+        RuleType = target.RuleType,
+        MealsPerWeek = target.MealsPerWeek
+    };
+
+    private static HouseholdMemberProfile CloneHouseholdMemberProfile(HouseholdMemberProfile member) => new()
+    {
+        Id = member.Id,
+        Name = member.Name,
+        DateOfBirth = member.DateOfBirth,
+        HeightCentimeters = member.HeightCentimeters,
+        WeightKilograms = member.WeightKilograms,
+        Sex = member.Sex,
+        CurrentLifeStage = member.CurrentLifeStage,
+        ActivityLevel = member.ActivityLevel,
+        WeeklyExercise = member.WeeklyExercise,
+        Occupation = member.Occupation,
+        HealthNotes = member.HealthNotes,
+        FavouriteFoods = member.FavouriteFoods,
+        FoodsToAvoid = member.FoodsToAvoid,
+        FoodsToEncourage = member.FoodsToEncourage,
+        SpiceTolerance = member.SpiceTolerance,
+        CookingPreferences = member.CookingPreferences,
+        NutritionGoals = member.NutritionGoals.ToList(),
+        CustomNutritionGoals = member.CustomNutritionGoals
+    };
+
     private static void NormalizePlanningSettings(HouseholdPlanningSettings settings)
     {
+        settings.General ??= new HouseholdGeneralSettings();
         settings.NutritionGoals ??= new HouseholdNutritionGoals();
         settings.WeeklyFoodRules ??= new WeeklyFoodRules();
+        settings.CookingPreferences ??= new HouseholdCookingPreferences();
+        settings.KitchenPantry ??= new HouseholdKitchenPantrySettings();
+        settings.KitchenPantry.Appliances ??= new KitchenApplianceSettings();
+        settings.Shopping ??= new HouseholdShoppingSettings();
+
+        settings.General.HouseholdName = string.IsNullOrWhiteSpace(settings.General.HouseholdName)
+            ? "Nasdanus"
+            : settings.General.HouseholdName.Trim();
+        settings.General.DefaultLanguage = HouseholdLanguage.All.Contains(settings.General.DefaultLanguage)
+            ? settings.General.DefaultLanguage
+            : HouseholdLanguage.Catalan;
+        settings.General.MeasurementSystem = MeasurementSystemKind.All.Contains(settings.General.MeasurementSystem)
+            ? settings.General.MeasurementSystem
+            : MeasurementSystemKind.Metric;
+        settings.General.DefaultServings = Math.Clamp(settings.General.DefaultServings, 1, 20);
+
+        settings.Members ??= HouseholdMemberDefaults.Create();
+        settings.Members = settings.Members
+            .Select(NormalizeHouseholdMemberProfile)
+            .ToList();
+
+        settings.NutritionGoals.GoalScope = NutritionGoalScope.All.Contains(settings.NutritionGoals.GoalScope)
+            ? settings.NutritionGoals.GoalScope
+            : NutritionGoalScope.WeeklyAverage;
+        settings.NutritionGoals.MacroMode = NutritionMacroMode.All.Contains(settings.NutritionGoals.MacroMode)
+            ? settings.NutritionGoals.MacroMode
+            : NutritionMacroMode.AbsoluteGrams;
         settings.NutritionGoals.TargetCaloriesPerPerson = Math.Max(0, settings.NutritionGoals.TargetCaloriesPerPerson);
         settings.NutritionGoals.MinimumProteinGramsPerPerson = Math.Max(0, settings.NutritionGoals.MinimumProteinGramsPerPerson);
         settings.NutritionGoals.TargetCarbohydrateGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetCarbohydrateGramsPerPerson);
         settings.NutritionGoals.TargetFatGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetFatGramsPerPerson);
+        settings.NutritionGoals.TargetFibreGramsPerPerson = Math.Max(0, settings.NutritionGoals.TargetFibreGramsPerPerson);
+        settings.NutritionGoals.ProteinPercent = Math.Clamp(settings.NutritionGoals.ProteinPercent, 0, 100);
+        settings.NutritionGoals.CarbohydratePercent = Math.Clamp(settings.NutritionGoals.CarbohydratePercent, 0, 100);
+        settings.NutritionGoals.FatPercent = Math.Clamp(settings.NutritionGoals.FatPercent, 0, 100);
+
         settings.WeeklyFoodRules.MinimumFishMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumFishMeals);
         settings.WeeklyFoodRules.MinimumLegumeMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumLegumeMeals);
         settings.WeeklyFoodRules.MaximumRedMeatMeals = Math.Max(0, settings.WeeklyFoodRules.MaximumRedMeatMeals);
         settings.WeeklyFoodRules.MinimumVegetableRichMeals = Math.Max(0, settings.WeeklyFoodRules.MinimumVegetableRichMeals);
+        settings.WeeklyFoodRules.Targets = NormalizeWeeklyFoodTargets(settings.WeeklyFoodRules);
+        SyncLegacyWeeklyTargets(settings.WeeklyFoodRules);
 
         var dayRules = settings.WeeklyFoodRules.DayRules ?? [];
         settings.WeeklyFoodRules.DayRules = Enum.GetValues<DayOfWeek>()
@@ -1237,7 +1361,133 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 };
             })
             .ToList();
+
+        settings.CookingPreferences.MaximumWeekdayCookingMinutes = Math.Clamp(settings.CookingPreferences.MaximumWeekdayCookingMinutes, 0, 240);
+        settings.CookingPreferences.MaximumWeekendCookingMinutes = Math.Clamp(settings.CookingPreferences.MaximumWeekendCookingMinutes, 0, 360);
+        settings.CookingPreferences.AvoidRepeatingRecipesWithinDays = Math.Clamp(settings.CookingPreferences.AvoidRepeatingRecipesWithinDays, 0, 90);
+        settings.CookingPreferences.MinimumVarietyMealsPerWeek = Math.Clamp(settings.CookingPreferences.MinimumVarietyMealsPerWeek, 0, 14);
+
+        settings.KitchenPantry.AlwaysAvailableIngredients = settings.KitchenPantry.AlwaysAvailableIngredients.Trim();
+        settings.KitchenPantry.FreezerInventoryNotes = settings.KitchenPantry.FreezerInventoryNotes.Trim();
+        settings.KitchenPantry.PantryStaplesNotes = settings.KitchenPantry.PantryStaplesNotes.Trim();
+        settings.KitchenPantry.PreferredBrands = settings.KitchenPantry.PreferredBrands.Trim();
+
+        settings.Shopping.PreferredUnits = PreferredUnitMode.All.Contains(settings.Shopping.PreferredUnits)
+            ? settings.Shopping.PreferredUnits
+            : PreferredUnitMode.RecipeUnits;
     }
+
+    private static HouseholdMemberProfile NormalizeHouseholdMemberProfile(HouseholdMemberProfile member)
+    {
+        var normalized = CloneHouseholdMemberProfile(member);
+        normalized.Id = string.IsNullOrWhiteSpace(normalized.Id)
+            ? Guid.NewGuid().ToString("N")
+            : normalized.Id.Trim();
+        normalized.Name = normalized.Name.Trim();
+        normalized.HeightCentimeters = Math.Clamp(normalized.HeightCentimeters, 0, 260);
+        normalized.WeightKilograms = Math.Clamp(normalized.WeightKilograms, 0, 400);
+        normalized.Sex = MemberSex.All.Contains(normalized.Sex) ? normalized.Sex : MemberSex.Unspecified;
+        normalized.CurrentLifeStage = normalized.CurrentLifeStage.Trim();
+        normalized.ActivityLevel = MemberActivityLevel.All.Contains(normalized.ActivityLevel)
+            ? normalized.ActivityLevel
+            : MemberActivityLevel.Moderate;
+        normalized.WeeklyExercise = normalized.WeeklyExercise.Trim();
+        normalized.Occupation = normalized.Occupation.Trim();
+        normalized.HealthNotes = normalized.HealthNotes.Trim();
+        normalized.FavouriteFoods = normalized.FavouriteFoods.Trim();
+        normalized.FoodsToAvoid = normalized.FoodsToAvoid.Trim();
+        normalized.FoodsToEncourage = normalized.FoodsToEncourage.Trim();
+        normalized.SpiceTolerance = SpiceToleranceLevel.All.Contains(normalized.SpiceTolerance)
+            ? normalized.SpiceTolerance
+            : SpiceToleranceLevel.Medium;
+        normalized.CookingPreferences = normalized.CookingPreferences.Trim();
+        normalized.NutritionGoals = normalized.NutritionGoals
+            .Where(goal => MemberNutritionGoal.All.Contains(goal))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        normalized.CustomNutritionGoals = normalized.CustomNutritionGoals.Trim();
+        return normalized;
+    }
+
+    private static List<WeeklyFoodTarget> NormalizeWeeklyFoodTargets(WeeklyFoodRules rules)
+    {
+        var configured = (rules.Targets ?? [])
+            .Select(target => new WeeklyFoodTarget
+            {
+                FoodGroup = NormalizeFoodGroup(target.FoodGroup),
+                RuleType = WeeklyFoodRuleType.All.Contains(target.RuleType)
+                    ? target.RuleType
+                    : WeeklyFoodRuleType.Minimum,
+                MealsPerWeek = Math.Clamp(target.MealsPerWeek, 0, 14)
+            })
+            .Where(target => !string.IsNullOrWhiteSpace(target.FoodGroup))
+            .GroupBy(target => target.FoodGroup, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.Last(), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var target in DefaultWeeklyFoodTargets(rules))
+        {
+            configured.TryAdd(target.FoodGroup, target);
+        }
+
+        return configured.Values
+            .OrderBy(target => WeeklyFoodTargetSortOrder(target.FoodGroup))
+            .ToList();
+    }
+
+    private static IEnumerable<WeeklyFoodTarget> DefaultWeeklyFoodTargets(WeeklyFoodRules rules)
+    {
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.BlueFish, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.WhiteFish, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 1 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Legumes, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = Math.Max(2, rules.MinimumLegumeMeals) };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Eggs, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.RedMeat, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = Math.Max(1, rules.MaximumRedMeatMeals) };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.WhiteMeat, RuleType = WeeklyFoodRuleType.Target, MealsPerWeek = 3 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Vegetarian, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Pasta, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Rice, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.FastFood, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 1 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.Desserts, RuleType = WeeklyFoodRuleType.Maximum, MealsPerWeek = 2 };
+        yield return new WeeklyFoodTarget { FoodGroup = FoodGroupKind.VegetableRich, RuleType = WeeklyFoodRuleType.Minimum, MealsPerWeek = Math.Max(7, rules.MinimumVegetableRichMeals) };
+    }
+
+    private static void SyncLegacyWeeklyTargets(WeeklyFoodRules rules)
+    {
+        rules.MinimumFishMeals = rules.Targets
+            .Where(target => target.FoodGroup is FoodGroupKind.BlueFish or FoodGroupKind.WhiteFish or FoodGroupKind.Fish)
+            .Where(target => target.RuleType != WeeklyFoodRuleType.Maximum)
+            .Sum(target => target.MealsPerWeek);
+        rules.MinimumLegumeMeals = rules.Targets
+            .FirstOrDefault(target => target.FoodGroup == FoodGroupKind.Legumes)?.MealsPerWeek
+            ?? rules.MinimumLegumeMeals;
+        rules.MaximumRedMeatMeals = rules.Targets
+            .FirstOrDefault(target => target.FoodGroup == FoodGroupKind.RedMeat)?.MealsPerWeek
+            ?? rules.MaximumRedMeatMeals;
+        rules.MinimumVegetableRichMeals = rules.Targets
+            .FirstOrDefault(target => target.FoodGroup == FoodGroupKind.VegetableRich)?.MealsPerWeek
+            ?? rules.MinimumVegetableRichMeals;
+    }
+
+    private static int WeeklyFoodTargetSortOrder(string foodGroup)
+    {
+        var index = Array.IndexOf(WeeklyFoodTargetDisplayOrder, foodGroup);
+        return index < 0 ? WeeklyFoodTargetDisplayOrder.Length : index;
+    }
+
+    private static readonly string[] WeeklyFoodTargetDisplayOrder =
+    [
+        FoodGroupKind.BlueFish,
+        FoodGroupKind.WhiteFish,
+        FoodGroupKind.Legumes,
+        FoodGroupKind.Eggs,
+        FoodGroupKind.RedMeat,
+        FoodGroupKind.WhiteMeat,
+        FoodGroupKind.Vegetarian,
+        FoodGroupKind.Pasta,
+        FoodGroupKind.Rice,
+        FoodGroupKind.FastFood,
+        FoodGroupKind.Desserts,
+        FoodGroupKind.VegetableRich
+    ];
 
     private static int PlannerDaySortOrder(DayOfWeek day) =>
         day == DayOfWeek.Sunday ? 6 : (int)day - 1;

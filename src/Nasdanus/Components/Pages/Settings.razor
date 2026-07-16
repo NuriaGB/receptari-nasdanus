@@ -1,167 +1,570 @@
 @page "/settings"
+@using System.Globalization
+@inject PlanningSettingsService PlanningSettings
 @inject HouseholdIngredientPreferenceService Preferences
+@inject BrowserAppStore Store
 @inject ISnackbar Snackbar
 
 <PageTitle>Nasdanus - Configuracio</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="page-shell settings-shell">
+<MudContainer MaxWidth="MaxWidth.False" Class="page-shell settings-shell">
     <MudStack Spacing="3">
         <div class="page-heading page-heading-actions">
             <div>
                 <MudText Typo="Typo.overline">Configuracio</MudText>
-                <MudText Typo="Typo.h3">Ingredients de casa</MudText>
+                <MudText Typo="Typo.h3">La manera de menjar de casa</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    Marca els ingredients que feu servir sovint o que normalment teniu disponibles.
+                    Objectius, preferencies i criteris que guien el planner i les recomanacions.
                 </MudText>
             </div>
-            <MudButton OnClick="SaveAllAsync"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       StartIcon="@Icons.Material.Filled.Save"
-                       Disabled="@(_isLoading || _isSaving)">
-                Desar tots
-            </MudButton>
+            <MudStack Row Spacing="1" Class="settings-actions">
+                <MudButton OnClick="SaveSettingsAsync"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           Disabled="@(_isLoading || _isSavingSettings)">
+                    Desar configuracio
+                </MudButton>
+                <MudButton OnClick="SaveAllIngredientsAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Inventory2"
+                           Disabled="@(_isLoading || _isSavingIngredients)">
+                    Desar ingredients
+                </MudButton>
+            </MudStack>
         </div>
 
-        @if (_isLoading)
+        @if (_isLoading || _settings is null)
         {
             <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
         }
         else
         {
-            <MudPaper Class="filter-bar" Elevation="0">
-                <MudGrid Spacing="2">
-                    <MudItem xs="12" md="5">
-                        <MudTextField T="string"
-                                      @bind-Value="_search"
-                                      Immediate="true"
-                                      Placeholder="Cerca ingredient"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="3">
-                        <MudSelect T="string"
-                                   @bind-Value="_category"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Dense="true"
-                                   AdornmentIcon="@Icons.Material.Filled.Category"
-                                   Adornment="Adornment.Start">
-                            <MudSelectItem T="string" Value="@string.Empty">Totes</MudSelectItem>
-                            @foreach (var category in _categories)
-                            {
-                                <MudSelectItem T="string" Value="@category">@DisplayCategory(category)</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="settings-counts">
-                            <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
-                                @VisibleRows.Count / @_rows.Count visibles
-                            </MudChip>
-                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
-                                @ConfiguredCount marcats
-                            </MudChip>
-                        </MudStack>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <div class="settings-category-filter" role="group" aria-label="Filtres rapids per categoria">
-                            @foreach (var filter in QuickCategoryFilters)
-                            {
-                                <MudButton OnClick="@(() => SetCategory(filter.Category))"
-                                           Variant="@CategoryButtonVariant(filter.Category)"
-                                           Color="Color.Primary"
-                                           Size="Size.Small"
-                                           StartIcon="@Icons.Material.Filled.Category">
-                                    @filter.Label
-                                </MudButton>
-                            }
-                        </div>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-
-            @if (VisibleRows.Count == 0)
-            {
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No hi ha ingredients amb aquest filtre.</MudAlert>
-            }
-            else
-            {
-                <div class="ingredient-preference-list">
-                    @foreach (var row in VisibleRows)
-                    {
-                        <MudPaper Class="ingredient-preference-row" Elevation="0">
-                            <div class="ingredient-preference-main">
-                                <MudText Typo="Typo.subtitle1">@row.Ingredient.Name</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                    @DisplayTranslations(row.Ingredient)
-                                </MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                    @row.Ingredient.Category
-                                    @if (!string.IsNullOrWhiteSpace(row.Ingredient.Subcategory))
+            <MudTabs Rounded="true" Elevation="0" Class="settings-tabs">
+                <MudTabPanel Text="General">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("General", "Valors per defecte de la llar.")
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" Label="Nom de la llar" @bind-Value="_settings.General.HouseholdName" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="2">
+                                <MudSelect T="string" Label="Idioma" @bind-Value="_settings.General.DefaultLanguage" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var language in HouseholdLanguage.All)
                                     {
-                                        <span> / @row.Ingredient.Subcategory</span>
-                                    }
-                                    @if (!string.IsNullOrWhiteSpace(row.Ingredient.NutritionSourceId))
-                                    {
-                                        <span> / @row.Ingredient.NutritionSource @row.Ingredient.NutritionSourceId</span>
-                                    }
-                                </MudText>
-                            </div>
-
-                            <div class="ingredient-preference-controls">
-                                <MudCheckBox T="bool"
-                                             @bind-Value="row.Preference.IsUsuallyAvailable"
-                                             Color="Color.Primary"
-                                             Label="Disponible" />
-                                <MudCheckBox T="bool"
-                                             @bind-Value="row.Preference.IsFrequentlyUsed"
-                                             Color="Color.Primary"
-                                             Label="Habitual" />
-                                <MudSelect T="string"
-                                           @bind-Value="row.Preference.UseFrequency"
-                                           Variant="Variant.Outlined"
-                                           Margin="Margin.Dense"
-                                           Dense="true"
-                                           Label="Frequencia">
-                                    @foreach (var frequency in IngredientUseFrequency.All)
-                                    {
-                                        <MudSelectItem T="string" Value="@frequency">@IngredientUseFrequency.ToDisplayName(frequency)</MudSelectItem>
+                                        <MudSelectItem T="string" Value="@language">@HouseholdLanguage.ToDisplayName(language)</MudSelectItem>
                                     }
                                 </MudSelect>
-                                <MudTextField T="string"
-                                              @bind-Value="row.Preference.PreferredAlias"
-                                              Variant="Variant.Outlined"
-                                              Margin="Margin.Dense"
-                                              Label="Alias de casa" />
-                                <MudTextField T="string"
-                                              @bind-Value="row.Preference.HouseholdNotes"
-                                              Variant="Variant.Outlined"
-                                              Margin="Margin.Dense"
-                                              Label="Notes" />
-                                <MudIconButton OnClick="@(() => SaveRowAsync(row))"
-                                               Icon="@Icons.Material.Filled.Save"
-                                               Color="Color.Primary"
-                                               aria-label="Desar preferencia" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="2">
+                                <MudSelect T="string" Label="Mesura" @bind-Value="_settings.General.MeasurementSystem" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var system in MeasurementSystemKind.All)
+                                    {
+                                        <MudSelectItem T="string" Value="@system">@MeasurementSystemKind.ToDisplayName(system)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="2">
+                                <MudNumericField T="int" Label="Racions" @bind-Value="_settings.General.DefaultServings" Min="1" Max="20" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="2">
+                                <MudSelect T="DayOfWeek" Label="Inici setmana" @bind-Value="_settings.General.WeekStartsOn" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var day in OrderedDays)
+                                    {
+                                        <MudSelectItem T="DayOfWeek" Value="@day">@DisplayDay(day)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Household Members">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Household Members", "Perfils informatius per personalitzar suggeriments. No son dades mediques ni prescriuen dietes.")
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                            Aquests perfils ajudaran el motor de nutricio i suggeriments a entendre la composicio de la llar, activitat, gustos i consideracions generals.
+                        </MudAlert>
+                        <MudButton OnClick="AddMember"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.PersonAdd">
+                            Afegir membre
+                        </MudButton>
+
+                        <div class="member-profile-list">
+                            @foreach (var member in _settings.Members)
+                            {
+                                <MudPaper Class="member-profile-card" Elevation="0">
+                                    <div class="member-profile-header">
+                                        <div>
+                                            <MudText Typo="Typo.h6">@MemberTitle(member)</MudText>
+                                            <MudText Typo="Typo.body2" Color="Color.Secondary">@AgeText(member)</MudText>
+                                        </div>
+                                        <MudIconButton OnClick="@(() => RemoveMember(member))"
+                                                       Icon="@Icons.Material.Filled.Delete"
+                                                       Color="Color.Secondary"
+                                                       aria-label="Eliminar membre" />
+                                    </div>
+
+                                    <MudGrid Spacing="2">
+                                        <MudItem xs="12" md="3">
+                                            <MudTextField T="string" Label="Nom" @bind-Value="member.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6" md="3">
+                                            <MudDatePicker Label="Data naixement"
+                                                           Date="@member.DateOfBirth"
+                                                           DateChanged="@((DateTime? value) => member.DateOfBirth = value)"
+                                                           DateFormat="dd/MM/yyyy"
+                                                           Variant="Variant.Outlined"
+                                                           Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="6" sm="3" md="2">
+                                            <MudNumericField T="decimal" Label="Alcada cm" @bind-Value="member.HeightCentimeters" Min="0" Max="260" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="6" sm="3" md="2">
+                                            <MudNumericField T="decimal" Label="Pes kg" @bind-Value="member.WeightKilograms" Min="0" Max="400" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6" md="2">
+                                            <MudSelect T="string" Label="Sexe" @bind-Value="member.Sex" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                                @foreach (var sex in MemberSex.All)
+                                                {
+                                                    <MudSelectItem T="string" Value="@sex">@MemberSex.ToDisplayName(sex)</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudTextField T="string" Label="Etapa vital" @bind-Value="member.CurrentLifeStage" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6" md="3">
+                                            <MudSelect T="string" Label="Activitat" @bind-Value="member.ActivityLevel" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                                @foreach (var level in MemberActivityLevel.All)
+                                                {
+                                                    <MudSelectItem T="string" Value="@level">@MemberActivityLevel.ToDisplayName(level)</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6" md="5">
+                                            <MudTextField T="string" Label="Exercici setmanal" @bind-Value="member.WeeklyExercise" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudTextField T="string" Label="Ocupacio opcional" @bind-Value="member.Occupation" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="8">
+                                            <MudTextField T="string" Label="Notes de salut informatives" @bind-Value="member.HealthNotes" Lines="3" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudTextField T="string" Label="Menjars preferits" @bind-Value="member.FavouriteFoods" Lines="3" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudTextField T="string" Label="Evitar" @bind-Value="member.FoodsToAvoid" Lines="3" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudTextField T="string" Label="Fomentar" @bind-Value="member.FoodsToEncourage" Lines="3" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" md="3">
+                                            <MudSelect T="string" Label="Picant" @bind-Value="member.SpiceTolerance" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                                @foreach (var tolerance in SpiceToleranceLevel.All)
+                                                {
+                                                    <MudSelectItem T="string" Value="@tolerance">@SpiceToleranceLevel.ToDisplayName(tolerance)</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="12" md="9">
+                                            <MudTextField T="string" Label="Preferencies de cuina" @bind-Value="member.CookingPreferences" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </MudItem>
+                                    </MudGrid>
+
+                                    <MudText Typo="Typo.subtitle2">Objectius nutricionals</MudText>
+                                    <div class="settings-check-grid">
+                                        @foreach (var goal in MemberNutritionGoal.All)
+                                        {
+                                            <MudCheckBox T="bool"
+                                                         Label="@MemberNutritionGoal.ToDisplayName(goal)"
+                                                         Value="@IsGoalSelected(member, goal)"
+                                                         ValueChanged="@((bool selected) => SetMemberGoal(member, goal, selected))"
+                                                         Color="Color.Primary" />
+                                        }
+                                    </div>
+                                    <MudTextField T="string" Label="Objectius personalitzats" @bind-Value="member.CustomNutritionGoals" Lines="2" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudPaper>
+                            }
+                        </div>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Nutrition Goals">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Nutrition Goals", "Objectius aproximats per menjar millor durant la setmana.")
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4">
+                                <MudSelect T="string" Label="Lectura" @bind-Value="_settings.NutritionGoals.GoalScope" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var scope in NutritionGoalScope.All)
+                                    {
+                                        <MudSelectItem T="string" Value="@scope">@NutritionGoalScope.ToDisplayName(scope)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudSelect T="string" Label="Macros" @bind-Value="_settings.NutritionGoals.MacroMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var mode in NutritionMacroMode.All)
+                                    {
+                                        <MudSelectItem T="string" Value="@mode">@NutritionMacroMode.ToDisplayName(mode)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudNumericField T="decimal" Label="Calories opcionals" @bind-Value="_settings.NutritionGoals.TargetCaloriesPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                        </MudGrid>
+
+                        @if (_settings.NutritionGoals.MacroMode == NutritionMacroMode.PercentageDistribution)
+                        {
+                            <div class="settings-grid settings-grid-four">
+                                <MudNumericField T="decimal" Label="Proteina %" @bind-Value="_settings.NutritionGoals.ProteinPercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Hidrats %" @bind-Value="_settings.NutritionGoals.CarbohydratePercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Greix %" @bind-Value="_settings.NutritionGoals.FatPercent" Min="0" Max="100" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudPaper Class="settings-metric" Elevation="0">
+                                    <MudText Typo="Typo.overline">Total</MudText>
+                                    <MudText Typo="Typo.h6">@MacroPercentTotal.ToString("0", CultureInfo.InvariantCulture)%</MudText>
+                                </MudPaper>
                             </div>
+                        }
+                        else
+                        {
+                            <div class="settings-grid settings-grid-four">
+                                <MudNumericField T="decimal" Label="Proteina g" @bind-Value="_settings.NutritionGoals.MinimumProteinGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Hidrats g" @bind-Value="_settings.NutritionGoals.TargetCarbohydrateGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Greix g" @bind-Value="_settings.NutritionGoals.TargetFatGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudNumericField T="decimal" Label="Fibra g opcional" @bind-Value="_settings.NutritionGoals.TargetFibreGramsPerPerson" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </div>
+                        }
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Weekly Food Rules">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Weekly Food Rules", "Preferencies setmanals. No bloquegen la planificacio manual.")
+
+                        <MudText Typo="Typo.h6">Objectius setmanals</MudText>
+                        <div class="settings-target-list">
+                            @foreach (var target in _settings.WeeklyFoodRules.Targets)
+                            {
+                                <div class="settings-target-row">
+                                    <MudSelect T="string" Label="Grup" @bind-Value="target.FoodGroup" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                        @foreach (var group in WeeklyTargetGroups)
+                                        {
+                                            <MudSelectItem T="string" Value="@group">@FoodGroupKind.ToDisplayName(group)</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    <MudSelect T="string" Label="Regla" @bind-Value="target.RuleType" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                        @foreach (var ruleType in WeeklyFoodRuleType.All)
+                                        {
+                                            <MudSelectItem T="string" Value="@ruleType">@WeeklyFoodRuleType.ToDisplayName(ruleType)</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    <MudNumericField T="int" Label="Apats/setmana" @bind-Value="target.MealsPerWeek" Min="0" Max="14" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    <MudIconButton OnClick="@(() => RemoveWeeklyTarget(target))"
+                                                   Icon="@Icons.Material.Filled.Delete"
+                                                   Color="Color.Secondary"
+                                                   aria-label="Eliminar regla" />
+                                </div>
+                            }
+                        </div>
+                        <MudButton OnClick="AddWeeklyTarget" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">
+                            Afegir regla
+                        </MudButton>
+
+                        <MudDivider Class="settings-divider" />
+
+                        <MudText Typo="Typo.h6">Dies amb grup preferit</MudText>
+                        <div class="settings-day-rule-grid">
+                            @foreach (var rule in _settings.WeeklyFoodRules.DayRules)
+                            {
+                                <MudSelect T="string" Label="@DisplayDay(rule.DayOfWeek)" @bind-Value="rule.FoodGroup" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    <MudSelectItem T="string" Value="@FoodGroupKind.None">Sense regla</MudSelectItem>
+                                    @foreach (var group in FoodGroupKind.PlanningGroups)
+                                    {
+                                        <MudSelectItem T="string" Value="@group">@FoodGroupKind.ToDisplayName(group)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                        </div>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Household Preferences">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Household Preferences", "Com preferiu cuinar i repetir plats.")
+                        <div class="settings-grid settings-grid-four">
+                            <MudNumericField T="int" Label="Temps feiners min" @bind-Value="_settings.CookingPreferences.MaximumWeekdayCookingMinutes" Min="0" Max="240" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudNumericField T="int" Label="Temps cap setmana min" @bind-Value="_settings.CookingPreferences.MaximumWeekendCookingMinutes" Min="0" Max="360" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudNumericField T="int" Label="No repetir en dies" @bind-Value="_settings.CookingPreferences.AvoidRepeatingRecipesWithinDays" Min="0" Max="90" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudNumericField T="int" Label="Varietat minima" @bind-Value="_settings.CookingPreferences.MinimumVarietyMealsPerWeek" Min="0" Max="14" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </div>
+                        <div class="settings-check-grid">
+                            <MudCheckBox T="bool" Label="Usar congelador" @bind-Value="_settings.CookingPreferences.UseFreezerMeals" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Ingredients de temporada" @bind-Value="_settings.CookingPreferences.PreferSeasonalIngredients" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Ingredients locals" @bind-Value="_settings.CookingPreferences.PreferLocalIngredients" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Prioritzar favorites" @bind-Value="_settings.CookingPreferences.PreferFavouriteRecipes" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Prioritzar receptes provades" @bind-Value="_settings.CookingPreferences.PreferSuccessfullyCookedRecipes" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Permetre sobres" @bind-Value="_settings.CookingPreferences.AllowLeftovers" Color="Color.Primary" />
+                        </div>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Ingredient Knowledge">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Ingredient Knowledge", "Base local d'ingredients, nutricio, aliases i preferencies.")
+                        <MudPaper Class="filter-bar" Elevation="0">
+                            <MudGrid Spacing="2">
+                                <MudItem xs="12" md="5">
+                                    <MudTextField T="string"
+                                                  @bind-Value="_search"
+                                                  Immediate="true"
+                                                  Placeholder="Cerca ingredient"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"
+                                                  Adornment="Adornment.Start"
+                                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="3">
+                                    <MudSelect T="string"
+                                               @bind-Value="_category"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense"
+                                               Dense="true"
+                                               AdornmentIcon="@Icons.Material.Filled.Category"
+                                               Adornment="Adornment.Start">
+                                        <MudSelectItem T="string" Value="@string.Empty">Totes</MudSelectItem>
+                                        @foreach (var category in _categories)
+                                        {
+                                            <MudSelectItem T="string" Value="@category">@DisplayCategory(category)</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="settings-counts">
+                                        <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                                            @VisibleRows.Count / @_rows.Count visibles
+                                        </MudChip>
+                                        <MudChip T="string" Color="@MissingNutritionColor" Variant="Variant.Outlined">
+                                            @MissingNutritionCount sense nutricio
+                                        </MudChip>
+                                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
+                                            @ConfiguredCount marcats
+                                        </MudChip>
+                                    </MudStack>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <div class="settings-category-filter" role="group" aria-label="Filtres rapids per categoria">
+                                        @foreach (var filter in QuickCategoryFilters)
+                                        {
+                                            <MudButton OnClick="@(() => SetCategory(filter.Category))"
+                                                       Variant="@CategoryButtonVariant(filter.Category)"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       StartIcon="@Icons.Material.Filled.Category">
+                                                @filter.Label
+                                            </MudButton>
+                                        }
+                                        <MudCheckBox T="bool" Label="Nomes sense nutricio" @bind-Value="_missingNutritionOnly" Color="Color.Primary" />
+                                    </div>
+                                </MudItem>
+                            </MudGrid>
                         </MudPaper>
-                    }
-                </div>
-            }
+
+                        @if (VisibleRows.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No hi ha ingredients amb aquest filtre.</MudAlert>
+                        }
+                        else
+                        {
+                            <div class="ingredient-preference-list">
+                                @foreach (var row in VisibleRows)
+                                {
+                                    <MudPaper Class="ingredient-preference-row" Elevation="0">
+                                        <div class="ingredient-preference-main">
+                                            <MudText Typo="Typo.subtitle1">@row.Ingredient.Name</MudText>
+                                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                                @DisplayTranslations(row.Ingredient)
+                                            </MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @DisplayCategory(row.Ingredient.Category)
+                                                @if (!string.IsNullOrWhiteSpace(row.Ingredient.Subcategory))
+                                                {
+                                                    <span> / @row.Ingredient.Subcategory</span>
+                                                }
+                                                @if (!string.IsNullOrWhiteSpace(row.Ingredient.NutritionSourceId))
+                                                {
+                                                    <span> / @row.Ingredient.NutritionSource @row.Ingredient.NutritionSourceId</span>
+                                                }
+                                            </MudText>
+                                            @if (row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                    @NutritionText(row.Ingredient.NutritionPer100Grams)
+                                                </MudText>
+                                            }
+                                            else
+                                            {
+                                                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">Sense nutricio</MudAlert>
+                                            }
+                                        </div>
+
+                                        <div class="ingredient-preference-controls">
+                                            <MudCheckBox T="bool" @bind-Value="row.Preference.IsFavourite" Color="Color.Primary" Label="Favorit" />
+                                            <MudCheckBox T="bool" @bind-Value="row.Preference.IsFrequentlyUsed" Color="Color.Primary" Label="Habitual" />
+                                            <MudCheckBox T="bool" @bind-Value="row.Preference.IsUsuallyAvailable" Color="Color.Primary" Label="Disponible" />
+                                            <MudCheckBox T="bool" @bind-Value="row.Preference.IsAlwaysInPantry" Color="Color.Primary" Label="Sempre rebost" />
+                                            <MudCheckBox T="bool" @bind-Value="row.Preference.IsNormallyFrozen" Color="Color.Primary" Label="Congelat" />
+                                            <MudSelect T="string"
+                                                       @bind-Value="row.Preference.UseFrequency"
+                                                       Variant="Variant.Outlined"
+                                                       Margin="Margin.Dense"
+                                                       Dense="true"
+                                                       Label="Frequencia">
+                                                @foreach (var frequency in IngredientUseFrequency.All)
+                                                {
+                                                    <MudSelectItem T="string" Value="@frequency">@IngredientUseFrequency.ToDisplayName(frequency)</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                            <MudTextField T="string" @bind-Value="row.Preference.PreferredAlias" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Alias de casa" />
+                                            <MudTextField T="string" @bind-Value="row.Preference.HouseholdNotes" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Notes" />
+                                            <MudIconButton OnClick="@(() => SaveRowAsync(row))"
+                                                           Icon="@Icons.Material.Filled.Save"
+                                                           Color="Color.Primary"
+                                                           aria-label="Desar preferencia" />
+                                        </div>
+                                    </MudPaper>
+                                }
+                            </div>
+                        }
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Kitchen & Pantry">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Kitchen & Pantry", "Defaults de cuina, rebost i electrodomestics.")
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" Label="Ingredients sempre disponibles" @bind-Value="_settings.KitchenPantry.AlwaysAvailableIngredients" Lines="4" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" Label="Inventari congelador" @bind-Value="_settings.KitchenPantry.FreezerInventoryNotes" Lines="4" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" Label="Basics de rebost" @bind-Value="_settings.KitchenPantry.PantryStaplesNotes" Lines="4" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" Label="Marques preferides" @bind-Value="_settings.KitchenPantry.PreferredBrands" Lines="4" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudText Typo="Typo.h6">Electrodomestics</MudText>
+                        <div class="settings-check-grid">
+                            <MudCheckBox T="bool" Label="Air fryer" @bind-Value="_settings.KitchenPantry.Appliances.AirFryer" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Olla a pressio" @bind-Value="_settings.KitchenPantry.Appliances.PressureCooker" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Forn" @bind-Value="_settings.KitchenPantry.Appliances.Oven" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="BBQ" @bind-Value="_settings.KitchenPantry.Appliances.Bbq" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Thermomix" @bind-Value="_settings.KitchenPantry.Appliances.Thermomix" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Vaporera" @bind-Value="_settings.KitchenPantry.Appliances.SteamCooker" Color="Color.Primary" />
+                        </div>
+
+                        <MudButton Href="pantry" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Inventory2">
+                            Obrir rebost
+                        </MudButton>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Shopping">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Shopping", "Com generar i ordenar la compra.")
+                        <div class="settings-check-grid">
+                            <MudCheckBox T="bool" Label="Fusionar duplicats" @bind-Value="_settings.Shopping.MergeDuplicatedIngredients" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Ordre de supermercat" @bind-Value="_settings.Shopping.SortBySupermarketOrder" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Ignorar rebost" @bind-Value="_settings.Shopping.IgnorePantryItems" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Ignorar sempre disponibles" @bind-Value="_settings.Shopping.IgnoreAlwaysAvailableIngredients" Color="Color.Primary" />
+                            <MudCheckBox T="bool" Label="Agregar quantitats" @bind-Value="_settings.Shopping.AutomaticQuantityAggregation" Color="Color.Primary" />
+                        </div>
+                        <MudSelect T="string" Label="Unitats preferides" @bind-Value="_settings.Shopping.PreferredUnits" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="settings-short-field">
+                            @foreach (var mode in PreferredUnitMode.All)
+                            {
+                                <MudSelectItem T="string" Value="@mode">@PreferredUnitMode.ToDisplayName(mode)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="Data">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("Data", "Backup, restore i exportacio.")
+                        @if (_summary is not null)
+                        {
+                            <div class="data-summary-grid">
+                                @SummaryMetric("Receptes", _summary.Recipes)
+                                @SummaryMetric("Ingredients", _summary.Ingredients)
+                                @SummaryMetric("Prefs ingredients", _summary.HouseholdIngredientPreferences)
+                                @SummaryMetric("Compra", _summary.ShoppingItems)
+                                @SummaryMetric("Rebost", _summary.PantryItems)
+                            </div>
+                        }
+                        <div class="settings-link-grid">
+                            <MudButton Href="data" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Storage">Backup / Restore</MudButton>
+                            <MudButton Href="data" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FileDownload">Exportar JSON</MudButton>
+                            <MudButton Href="data" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile">Importar JSON</MudButton>
+                        </div>
+                    </MudPaper>
+                </MudTabPanel>
+
+                <MudTabPanel Text="About">
+                    <MudPaper Class="settings-section" Elevation="0">
+                        @SectionHeading("About", "Versions i fonts locals.")
+                        <div class="settings-grid settings-grid-four">
+                            @AboutMetric("Version", AppInfo.Version)
+                            @AboutMetric("Knowledge DB", $"{_rows.Count} ingredients")
+                            @AboutMetric("Importer", "Nasdanus.KnowledgeImporter")
+                            @AboutMetric("Nutrition provider", "USDA SR Legacy")
+                        </div>
+                    </MudPaper>
+                </MudTabPanel>
+            </MudTabs>
         }
     </MudStack>
 </MudContainer>
 
 @code {
+    private static readonly CultureInfo Catalan = CultureInfo.GetCultureInfo("ca-ES");
+
+    private HouseholdPlanningSettings? _settings;
+    private DataBackupSummary? _summary;
     private List<HouseholdIngredientPreferenceRow> _rows = [];
     private List<string> _categories = [];
     private string _search = string.Empty;
     private string _category = string.Empty;
+    private bool _missingNutritionOnly;
     private bool _isLoading = true;
-    private bool _isSaving;
+    private bool _isSavingSettings;
+    private bool _isSavingIngredients;
+
+    private static readonly string[] WeeklyTargetGroups =
+    [
+        FoodGroupKind.BlueFish,
+        FoodGroupKind.WhiteFish,
+        FoodGroupKind.Legumes,
+        FoodGroupKind.Eggs,
+        FoodGroupKind.RedMeat,
+        FoodGroupKind.WhiteMeat,
+        FoodGroupKind.Vegetarian,
+        FoodGroupKind.Pasta,
+        FoodGroupKind.Rice,
+        FoodGroupKind.FastFood,
+        FoodGroupKind.Desserts,
+        FoodGroupKind.VegetableRich
+    ];
 
     private static readonly CategoryFilter[] QuickCategoryFilters =
     [
@@ -177,11 +580,22 @@
         new("spices", "Especies")
     ];
 
+    private static IReadOnlyList<DayOfWeek> OrderedDays => Enum.GetValues<DayOfWeek>()
+        .OrderBy(day => day == DayOfWeek.Sunday ? 6 : (int)day - 1)
+        .ToList();
+
+    private decimal MacroPercentTotal => _settings is null
+        ? 0
+        : _settings.NutritionGoals.ProteinPercent
+            + _settings.NutritionGoals.CarbohydratePercent
+            + _settings.NutritionGoals.FatPercent;
+
     private int ConfiguredCount => _rows.Count(row => HasConfiguredPreference(row.Preference));
+    private int MissingNutritionCount => _rows.Count(row => row.Ingredient.NutritionPer100Grams?.HasAnyValue != true);
+    private Color MissingNutritionColor => MissingNutritionCount == 0 ? Color.Success : Color.Warning;
 
     private List<HouseholdIngredientPreferenceRow> VisibleRows => _rows
         .Where(MatchesFilters)
-        .Take(140)
         .ToList();
 
     protected override async Task OnInitializedAsync()
@@ -192,7 +606,9 @@
 
     private async Task LoadAsync()
     {
+        _settings = await PlanningSettings.GetSettingsAsync();
         _rows = await Preferences.GetRowsAsync();
+        _summary = await Store.GetSummaryAsync();
         _categories = _rows
             .Select(row => row.Ingredient.Category)
             .Where(category => !string.IsNullOrWhiteSpace(category))
@@ -201,8 +617,103 @@
             .ToList();
     }
 
+    private async Task SaveSettingsAsync()
+    {
+        if (_settings is null)
+        {
+            return;
+        }
+
+        _isSavingSettings = true;
+        try
+        {
+            await PlanningSettings.SaveSettingsAsync(_settings);
+            _settings = await PlanningSettings.GetSettingsAsync();
+            _summary = await Store.GetSummaryAsync();
+            Snackbar.Add("Configuracio desada.", Severity.Success);
+        }
+        finally
+        {
+            _isSavingSettings = false;
+        }
+    }
+
+    private async Task SaveRowAsync(HouseholdIngredientPreferenceRow row)
+    {
+        await Preferences.SaveAsync(row.Preference);
+        await LoadAsync();
+        Snackbar.Add("Preferencia desada.", Severity.Success);
+    }
+
+    private async Task SaveAllIngredientsAsync()
+    {
+        _isSavingIngredients = true;
+        try
+        {
+            await Preferences.SaveManyAsync(_rows.Select(row => row.Preference));
+            await LoadAsync();
+            Snackbar.Add("Ingredients desats.", Severity.Success);
+        }
+        finally
+        {
+            _isSavingIngredients = false;
+        }
+    }
+
+    private void AddWeeklyTarget()
+    {
+        _settings?.WeeklyFoodRules.Targets.Add(new WeeklyFoodTarget
+        {
+            FoodGroup = FoodGroupKind.VegetableRich,
+            RuleType = WeeklyFoodRuleType.Minimum,
+            MealsPerWeek = 1
+        });
+    }
+
+    private void RemoveWeeklyTarget(WeeklyFoodTarget target)
+    {
+        _settings?.WeeklyFoodRules.Targets.Remove(target);
+    }
+
+    private void AddMember()
+    {
+        _settings?.Members.Add(new HouseholdMemberProfile
+        {
+            Name = "Nou membre",
+            ActivityLevel = MemberActivityLevel.Moderate,
+            Sex = MemberSex.Unspecified,
+            SpiceTolerance = SpiceToleranceLevel.Medium,
+            NutritionGoals = [MemberNutritionGoal.ImproveOverallDiet]
+        });
+    }
+
+    private void RemoveMember(HouseholdMemberProfile member)
+    {
+        _settings?.Members.Remove(member);
+    }
+
+    private static bool IsGoalSelected(HouseholdMemberProfile member, string goal) =>
+        member.NutritionGoals.Contains(goal);
+
+    private static void SetMemberGoal(HouseholdMemberProfile member, string goal, bool selected)
+    {
+        if (selected && !member.NutritionGoals.Contains(goal))
+        {
+            member.NutritionGoals.Add(goal);
+        }
+        else if (!selected)
+        {
+            member.NutritionGoals.RemoveAll(existing => existing == goal);
+        }
+    }
+
     private bool MatchesFilters(HouseholdIngredientPreferenceRow row)
     {
+        if (_missingNutritionOnly && row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
+        {
+            return false;
+        }
+
         if (!string.IsNullOrWhiteSpace(_category)
             && !string.Equals(row.Ingredient.Category, _category, StringComparison.OrdinalIgnoreCase))
         {
@@ -221,28 +732,6 @@
             || row.Ingredient.Aliases.Any(alias => alias.Contains(search, StringComparison.OrdinalIgnoreCase));
     }
 
-    private async Task SaveRowAsync(HouseholdIngredientPreferenceRow row)
-    {
-        await Preferences.SaveAsync(row.Preference);
-        await LoadAsync();
-        Snackbar.Add("Preferencia desada.", Severity.Success);
-    }
-
-    private async Task SaveAllAsync()
-    {
-        _isSaving = true;
-        try
-        {
-            await Preferences.SaveManyAsync(_rows.Select(row => row.Preference));
-            await LoadAsync();
-            Snackbar.Add("Preferencies desades.", Severity.Success);
-        }
-        finally
-        {
-            _isSaving = false;
-        }
-    }
-
     private void SetCategory(string category)
     {
         _category = category;
@@ -252,6 +741,16 @@
         string.Equals(_category, category, StringComparison.OrdinalIgnoreCase)
             ? Variant.Filled
             : Variant.Outlined;
+
+    private static bool HasConfiguredPreference(HouseholdIngredientPreference preference) =>
+        preference.IsFavourite
+        || preference.IsFrequentlyUsed
+        || preference.IsUsuallyAvailable
+        || preference.IsAlwaysInPantry
+        || preference.IsNormallyFrozen
+        || preference.UseFrequency != IngredientUseFrequency.Occasional
+        || !string.IsNullOrWhiteSpace(preference.PreferredAlias)
+        || !string.IsNullOrWhiteSpace(preference.HouseholdNotes);
 
     private static string DisplayCategory(string category) => category switch
     {
@@ -264,15 +763,41 @@
         "grains" => "Cereals",
         "pantry" => "Rebost",
         "spices" => "Especies",
+        IngredientCategory.Fruit => "Fruita",
+        IngredientCategory.Vegetables => "Verdures",
+        IngredientCategory.Meat => "Carn",
+        IngredientCategory.Fish => "Peix",
+        IngredientCategory.DairyEggs => "Lactis i ous",
+        IngredientCategory.Legumes => "Llegums",
+        IngredientCategory.Grains => "Cereals",
+        IngredientCategory.Pantry => "Rebost",
+        IngredientCategory.Spices => "Especies",
         _ => category
     };
 
-    private static bool HasConfiguredPreference(HouseholdIngredientPreference preference) =>
-        preference.IsFrequentlyUsed
-        || preference.IsUsuallyAvailable
-        || preference.UseFrequency != IngredientUseFrequency.Occasional
-        || !string.IsNullOrWhiteSpace(preference.PreferredAlias)
-        || !string.IsNullOrWhiteSpace(preference.HouseholdNotes);
+    private static string DisplayDay(DayOfWeek day) =>
+        Catalan.DateTimeFormat.GetDayName(day);
+
+    private static string MemberTitle(HouseholdMemberProfile member) =>
+        string.IsNullOrWhiteSpace(member.Name) ? "Membre sense nom" : member.Name;
+
+    private static string AgeText(HouseholdMemberProfile member)
+    {
+        if (member.DateOfBirth is null)
+        {
+            return "Edat pendent";
+        }
+
+        var today = DateTime.Today;
+        var birthDate = member.DateOfBirth.Value.Date;
+        var age = today.Year - birthDate.Year;
+        if (birthDate.Date > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return $"{Math.Max(0, age)} anys";
+    }
 
     private static string DisplayTranslations(Ingredient ingredient)
     {
@@ -283,6 +808,27 @@
 
         return names.Count == 0 ? "Sense traduccions" : string.Join(" / ", names);
     }
+
+    private static string NutritionText(IngredientNutrition nutrition) =>
+        $"{nutrition.CaloriesKcal?.ToString("0", CultureInfo.InvariantCulture) ?? "-"} kcal · "
+        + $"{nutrition.ProteinGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g prot · "
+        + $"{nutrition.CarbohydrateGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g hidrats · "
+        + $"{nutrition.FatGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g greix";
+
+    private static RenderFragment SectionHeading(string title, string text) => @<div class="settings-section-heading">
+        <MudText Typo="Typo.h5">@title</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">@text</MudText>
+    </div>;
+
+    private static RenderFragment SummaryMetric(string label, int value) => @<MudPaper Class="data-metric" Elevation="0">
+        <MudText Typo="Typo.overline">@label</MudText>
+        <MudText Typo="Typo.h6">@value</MudText>
+    </MudPaper>;
+
+    private static RenderFragment AboutMetric(string label, string value) => @<MudPaper Class="settings-metric" Elevation="0">
+        <MudText Typo="Typo.overline">@label</MudText>
+        <MudText Typo="Typo.h6">@value</MudText>
+    </MudPaper>;
 
     private sealed record CategoryFilter(string Category, string Label);
 }

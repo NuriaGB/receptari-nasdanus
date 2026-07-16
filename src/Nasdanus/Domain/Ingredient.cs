@@ -57,8 +57,11 @@ public sealed class Product
 public sealed class HouseholdIngredientPreference
 {
     public string IngredientKnowledgeId { get; set; } = string.Empty;
+    public bool IsFavourite { get; set; }
     public bool IsFrequentlyUsed { get; set; }
     public bool IsUsuallyAvailable { get; set; }
+    public bool IsAlwaysInPantry { get; set; }
+    public bool IsNormallyFrozen { get; set; }
     public string UseFrequency { get; set; } = IngredientUseFrequency.Occasional;
     public string PreferredAlias { get; set; } = string.Empty;
     public string HouseholdNotes { get; set; } = string.Empty;
