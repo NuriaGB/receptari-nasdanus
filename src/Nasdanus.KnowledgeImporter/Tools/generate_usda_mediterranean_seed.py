@@ -189,6 +189,8 @@ FORCED_FDC_IDS = [
     "167747",  # Lemon juice, raw
     "168462",  # Spinach, raw
     "169705",  # Oats
+    "169094",  # Olives, ripe, canned
+    "169096",  # Olives, pickled, canned or bottled, green
     "167818",  # Pork loin, raw
     "172521",  # Rabbit, raw
     "170859",  # Heavy whipping cream
@@ -233,9 +235,13 @@ FORCED_FDC_IDS = [
     "171509",  # Chicken breast, raw
     "172378",  # Chicken leg quarter, raw
     "172876",  # Turkey breast, raw
+    "172941",  # Turkey breast, sliced, prepackaged
     "172408",  # Duck, meat and skin, raw
     "168312",  # Pork tenderloin, raw
     "168263",  # Pork loin chop, raw
+    "168295",  # Cured ham, boneless, unheated
+    "173859",  # Chorizo, raw
+    "174603",  # Salami, Italian, pork
     "169542",  # Beef tenderloin, raw
     "168693",  # Beef shoulder, raw
     "169928",  # Peach, raw
@@ -377,6 +383,8 @@ LOCALIZED_BY_FDC_ID = {
     "167747": ("Suc de llimona", "Suc de llimona", "Zumo de limón"),
     "168462": ("Espinacs crus", "Espinacs crus", "Espinacas crudas"),
     "169705": ("Civada", "Civada", "Avena"),
+    "169094": ("Olives negres en conserva", "Olives negres en conserva", "Aceitunas negras en conserva"),
+    "169096": ("Olives verdes en conserva", "Olives verdes en conserva", "Aceitunas verdes en conserva"),
     "167818": ("Llom de porc", "Llom de porc", "Lomo de cerdo"),
     "172521": ("Conill", "Conill", "Conejo"),
     "170859": ("Nata per muntar", "Nata per muntar", "Nata para montar"),
@@ -421,9 +429,13 @@ LOCALIZED_BY_FDC_ID = {
     "171509": ("Pit de pollastre cru", "Pit de pollastre cru", "Pechuga de pollo cruda"),
     "172378": ("Quart de darrere de pollastre cru", "Quart de darrere de pollastre cru", "Muslo de pollo crudo"),
     "172876": ("Pit de gall dindi cru", "Pit de gall dindi cru", "Pechuga de pavo cruda"),
+    "172941": ("Pit de gall dindi embotit", "Pit de gall dindi embotit", "Pechuga de pavo loncheada"),
     "172408": ("Ànec cru amb pell", "Ànec cru amb pell", "Pato crudo con piel"),
     "168312": ("Filet de porc cru", "Filet de porc cru", "Solomillo de cerdo crudo"),
     "168263": ("Cinta de porc crua", "Cinta de porc crua", "Lomo de cerdo crudo"),
+    "168295": ("Pernil curat", "Pernil curat", "Jamón curado"),
+    "173859": ("Xoriço cru", "Xoriço cru", "Chorizo crudo"),
+    "174603": ("Salami italià", "Salami italià", "Salami italiano"),
     "169542": ("Filet de vedella cru", "Filet de vedella cru", "Solomillo de ternera crudo"),
     "168693": ("Espatlla de vedella crua", "Espatlla de vedella crua", "Espalda de ternera cruda"),
     "169928": ("Préssec groc cru", "Préssec groc cru", "Melocoton amarillo crudo"),
@@ -561,6 +573,8 @@ EXTRA_ALIASES_BY_FDC_ID = {
     "167747": ["suc de llimona", "zumo de limon", "zumo de limón", "lemon juice"],
     "168462": ["espinacs", "espinacas", "spinach"],
     "169705": ["civada", "avena", "flocs de civada", "copos de avena"],
+    "169094": ["olives negres", "aceitunas negras", "black olives"],
+    "169096": ["olives verdes", "aceitunas verdes", "green olives", "olives verdes farcides", "olives verdes farcides d'anxova", "aceitunas rellenas de anchoa"],
     "167818": ["llom porc", "lomo cerdo"],
     "170859": ["nata muntar", "nata liquida", "heavy cream"],
     "171412": ["aceite de coco"],
@@ -600,9 +614,13 @@ EXTRA_ALIASES_BY_FDC_ID = {
     "171509": ["pit de pollastre"],
     "172378": ["quarts de darrera de pollastre"],
     "172876": ["pit de gall dindi"],
+    "172941": ["pit de pavo", "pit de gall dindi embotit", "pechuga de pavo", "pavo loncheado"],
     "172408": ["magret d'ànec"],
     "168312": ["filet de porc", "solomillo de cerdo"],
     "168263": ["cinta de porc"],
+    "168295": ["pernil salat", "jamon serrano", "jamón serrano", "espatlla iberica", "espatlla ibèrica"],
+    "173859": ["xoriço", "chorizo"],
+    "174603": ["salami"],
     "169542": ["filet de vedella"],
     "168693": ["espatlla de vedella"],
     "169928": ["préssec de vinya", "préssec d'aigua"],
@@ -673,6 +691,35 @@ EXTRA_ALIASES_BY_FDC_ID = {
     "173756": ["cigrons de Salamanca", "garbanzos"],
     "175202": ["mongetes del ganxet", "mongetes"],
     "170419": ["pèsols del Maresme", "pèsols"],
+}
+
+BLOCKED_ALIASES_BY_FDC_ID = {
+    "173859": [
+        "botifarra",
+        "botifarra blanca",
+        "botifarra negra",
+        "butifarra",
+        "costella de porc",
+        "costilla",
+        "fuet",
+        "llonganissa",
+        "longaniza",
+        "salami",
+        "salchicha",
+    ],
+    "174603": [
+        "botifarra",
+        "botifarra blanca",
+        "botifarra negra",
+        "butifarra",
+        "chorizo",
+        "costella de porc",
+        "costilla",
+        "fuet",
+        "llonganissa",
+        "longaniza",
+        "xoriço",
+    ],
 }
 
 LOCALIZED = {
@@ -869,6 +916,9 @@ def should_exclude_food(description, category):
             "buttermilk",
         ]
         return any(token in n for token in blocked)
+
+    if category == "Pork Products" and "fresh leg ham" in n:
+        return True
 
     return False
 
@@ -1244,6 +1294,12 @@ def main():
         }
         for alias in list(aliases):
             aliases.update(household_aliases.get(norm(alias), set()))
+        blocked_aliases = {
+            norm(alias)
+            for alias in BLOCKED_ALIASES_BY_FDC_ID.get(row["fdc_id"], [])
+        }
+        if blocked_aliases:
+            aliases = {alias for alias in aliases if norm(alias) not in blocked_aliases}
         aliases = sorted(aliases)
         item = {
             "providerId": f"fdc:{row['fdc_id']}",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-16T11:17:56.1154482+00:00",
+  "generatedAt": "2026-07-16T13:11:26.9572988+00:00",
   "items": [
     {
       "ingredientId": "oli-d-oliva",
@@ -11,8 +11,20 @@
       "alias": "aceite oliva"
     },
     {
-      "ingredientId": "oli-d-oliva",
+      "ingredientId": "olives-negres-en-conserva",
       "alias": "Aceituna"
+    },
+    {
+      "ingredientId": "olives-negres-en-conserva",
+      "alias": "aceitunas negras"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "aceitunas rellenas de anchoa"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "aceitunas verdes"
     },
     {
       "ingredientId": "gelatina",
@@ -323,10 +335,6 @@
       "alias": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\u0022 fat, select, raw"
     },
     {
-      "ingredientId": "vedella-cru-variant-23",
-      "alias": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\u0022 fat, all grades, raw"
-    },
-    {
       "ingredientId": "vedella-cru-variant-17",
       "alias": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\u0022 fat, choice, raw"
     },
@@ -391,6 +399,10 @@
       "alias": "bistec"
     },
     {
+      "ingredientId": "olives-negres-en-conserva",
+      "alias": "black olives"
+    },
+    {
       "ingredientId": "mores-crues",
       "alias": "Blackberries, raw"
     },
@@ -409,18 +421,6 @@
     {
       "ingredientId": "anxova-cru",
       "alias": "boquerones"
-    },
-    {
-      "ingredientId": "botifarra-cru",
-      "alias": "Botifarra"
-    },
-    {
-      "ingredientId": "botifarra-cru",
-      "alias": "botifarra blanca"
-    },
-    {
-      "ingredientId": "botifarra-cru",
-      "alias": "botifarra negra"
     },
     {
       "ingredientId": "espatlla-de-vedella-crua",
@@ -481,10 +481,6 @@
     {
       "ingredientId": "blat-sarrai",
       "alias": "Buckwheat"
-    },
-    {
-      "ingredientId": "botifarra-cru",
-      "alias": "butifarra"
     },
     {
       "ingredientId": "mantega-amb-sal",
@@ -651,7 +647,7 @@
       "alias": "carbassons"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "salami-italia",
       "alias": "carne de cerdo"
     },
     {
@@ -715,7 +711,7 @@
       "alias": "ceps"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "salami-italia",
       "alias": "Cerdo"
     },
     {
@@ -883,7 +879,7 @@
       "alias": "Chocolate, dark, 70-85% cacao solids"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "xorico-cru",
       "alias": "Chorizo"
     },
     {
@@ -1035,7 +1031,7 @@
       "alias": "Cornstarch"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "cinta-de-porc-crua",
       "alias": "costella de porc"
     },
     {
@@ -1043,7 +1039,7 @@
       "alias": "costella de xai"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "cinta-de-porc-crua",
       "alias": "costilla"
     },
     {
@@ -1227,6 +1223,10 @@
       "alias": "espatlla de vedella"
     },
     {
+      "ingredientId": "pernil-curat",
+      "alias": "espatlla iberica"
+    },
+    {
       "ingredientId": "espelta-integral",
       "alias": "espelta"
     },
@@ -1291,7 +1291,7 @@
       "alias": "fideus"
     },
     {
-      "ingredientId": "pit-de-gall-dindi-cru",
+      "ingredientId": "pit-de-gall-dindi-embotit",
       "alias": "filet de gall dindi"
     },
     {
@@ -1559,10 +1559,6 @@
       "alias": "fruits vermells"
     },
     {
-      "ingredientId": "botifarra-cru",
-      "alias": "fuet"
-    },
-    {
       "ingredientId": "llorer",
       "alias": "fulla de llorer"
     },
@@ -1571,7 +1567,7 @@
       "alias": "fumet"
     },
     {
-      "ingredientId": "pit-de-gall-dindi-cru",
+      "ingredientId": "pit-de-gall-dindi-embotit",
       "alias": "Gall dindi"
     },
     {
@@ -1755,6 +1751,10 @@
       "alias": "Grapes, red or green (European type, such as Thompson seedless), raw"
     },
     {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "green olives"
+    },
+    {
       "ingredientId": "pebre-vermell-picant",
       "alias": "guindilla cayena"
     },
@@ -1815,11 +1815,11 @@
       "alias": "jalapenos rodanxes"
     },
     {
-      "ingredientId": "porc-cru-variant-15",
+      "ingredientId": "pernil-curat",
       "alias": "Jam\u00F3n"
     },
     {
-      "ingredientId": "porc-cru-variant-15",
+      "ingredientId": "pernil-curat",
       "alias": "jamon serrano"
     },
     {
@@ -2127,10 +2127,6 @@
       "alias": "llom porc"
     },
     {
-      "ingredientId": "botifarra-cru",
-      "alias": "llonganissa"
-    },
-    {
       "ingredientId": "llobarro-cru",
       "alias": "llop de mar"
     },
@@ -2141,10 +2137,6 @@
     {
       "ingredientId": "llom-de-porc",
       "alias": "lomo cerdo"
-    },
-    {
-      "ingredientId": "botifarra-cru",
-      "alias": "longaniza"
     },
     {
       "ingredientId": "llobarro-cru",
@@ -2495,8 +2487,32 @@
       "alias": "oli oliva suau 0.4"
     },
     {
-      "ingredientId": "oli-d-oliva",
+      "ingredientId": "olives-negres-en-conserva",
       "alias": "Oliva"
+    },
+    {
+      "ingredientId": "olives-negres-en-conserva",
+      "alias": "olives negres"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "olives verdes"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "olives verdes farcides"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "olives verdes farcides d\u0027anxova"
+    },
+    {
+      "ingredientId": "olives-verdes-en-conserva",
+      "alias": "Olives, pickled, canned or bottled, green"
+    },
+    {
+      "ingredientId": "olives-negres-en-conserva",
+      "alias": "Olives, ripe, canned (small-extra large)"
     },
     {
       "ingredientId": "ceba-crua",
@@ -2687,10 +2703,6 @@
       "alias": "Pasta, gluten-free, corn and rice flour, cooked"
     },
     {
-      "ingredientId": "pasta-cuit-variant-5",
-      "alias": "Pasta, gluten-free, corn flour and quinoa flour, cooked, ANCIENT HARVEST"
-    },
-    {
       "ingredientId": "pasta-cuit-variant-3",
       "alias": "Pasta, gluten-free, rice flour and rice bran extract, cooked, DE BOLES"
     },
@@ -2739,8 +2751,12 @@
       "alias": "Pato"
     },
     {
-      "ingredientId": "pit-de-gall-dindi-cru",
+      "ingredientId": "pit-de-gall-dindi-embotit",
       "alias": "Pavo"
+    },
+    {
+      "ingredientId": "pit-de-gall-dindi-embotit",
+      "alias": "pavo loncheado"
     },
     {
       "ingredientId": "pressec-groc-cru",
@@ -2815,6 +2831,10 @@
       "alias": "pechuga"
     },
     {
+      "ingredientId": "pit-de-gall-dindi-embotit",
+      "alias": "pechuga de pavo"
+    },
+    {
       "ingredientId": "peix-espasa-cru",
       "alias": "Peix espasa"
     },
@@ -2843,10 +2863,6 @@
       "alias": "Peppers, jalapeno, raw"
     },
     {
-      "ingredientId": "pebrot-cru-variant-2",
-      "alias": "Peppers, serrano, raw"
-    },
-    {
       "ingredientId": "pebrot-verd-cru",
       "alias": "Peppers, sweet, green, raw"
     },
@@ -2867,11 +2883,11 @@
       "alias": "peres"
     },
     {
-      "ingredientId": "porc-cru-variant-15",
+      "ingredientId": "pernil-curat",
       "alias": "Pernil"
     },
     {
-      "ingredientId": "porc-cru-variant-15",
+      "ingredientId": "pernil-curat",
       "alias": "pernil salat"
     },
     {
@@ -2947,8 +2963,12 @@
       "alias": "pit d\u0027anec"
     },
     {
-      "ingredientId": "pit-de-gall-dindi-cru",
+      "ingredientId": "pit-de-gall-dindi-embotit",
       "alias": "pit de gall dindi"
+    },
+    {
+      "ingredientId": "pit-de-gall-dindi-embotit",
+      "alias": "pit de pavo"
     },
     {
       "ingredientId": "pit-de-pollastre-cru",
@@ -2983,12 +3003,16 @@
       "alias": "Pop"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "salami-italia",
       "alias": "Porc"
     },
     {
       "ingredientId": "porc-cru-variant-7",
       "alias": "Pork loin, fresh, backribs, bone-in, raw, lean only"
+    },
+    {
+      "ingredientId": "pernil-curat",
+      "alias": "Pork, cured, ham, boneless, extra lean and regular, unheated"
     },
     {
       "ingredientId": "porc-cru-variant-2",
@@ -3117,10 +3141,6 @@
     {
       "ingredientId": "patata-cru-variant-3",
       "alias": "Potatoes, red, flesh and skin, raw"
-    },
-    {
-      "ingredientId": "patata-cru-variant-4",
-      "alias": "Potatoes, white, flesh and skin, raw"
     },
     {
       "ingredientId": "albercoc-en-conserva",
@@ -3271,12 +3291,12 @@
       "alias": "Salad dressing, mayonnaise, regular"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "salami-italia",
       "alias": "salami"
     },
     {
-      "ingredientId": "botifarra-cru",
-      "alias": "Salchicha"
+      "ingredientId": "salami-italia",
+      "alias": "Salami, Italian, pork"
     },
     {
       "ingredientId": "salmo-cru",
@@ -3355,7 +3375,7 @@
       "alias": "Sauce, worcestershire"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "xorico-cru",
       "alias": "Sausage, pork, chorizo, link or ground, raw"
     },
     {
@@ -3373,10 +3393,6 @@
     {
       "ingredientId": "mantega-cru",
       "alias": "Seeds, sesame butter, tahini, from raw and stone ground kernels"
-    },
-    {
-      "ingredientId": "mantega-variant-11",
-      "alias": "Seeds, sesame butter, tahini, from roasted and toasted kernels (most common type)"
     },
     {
       "ingredientId": "sesam",
@@ -3963,6 +3979,10 @@
       "alias": "Truita de riu"
     },
     {
+      "ingredientId": "pit-de-gall-dindi-embotit",
+      "alias": "Turkey breast, sliced, prepackaged"
+    },
+    {
       "ingredientId": "pit-de-gall-dindi-cru",
       "alias": "Turkey, breast, from whole bird, meat only, with added solution, raw"
     },
@@ -4099,7 +4119,7 @@
       "alias": "xocolata Valor 82%"
     },
     {
-      "ingredientId": "botifarra-cru",
+      "ingredientId": "xorico-cru",
       "alias": "Xori\u00E7o"
     },
     {

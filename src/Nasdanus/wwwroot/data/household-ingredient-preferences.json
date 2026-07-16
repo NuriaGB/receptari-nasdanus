@@ -28,6 +28,8 @@
 
     { "matchNames": [ "Anxoves en conserva amb oli", "anxoves" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "anxoves amb oli d'oliva" },
     { "matchNames": [ "Tonyina en conserva amb oli", "tonyina" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "tonyina Consorcio amb oli d'oliva" },
+    { "matchNames": [ "Olives negres en conserva", "olives negres" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "olives negres" },
+    { "matchNames": [ "Olives verdes en conserva", "olives verdes farcides d'anxova" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "olives verdes Del Abuelo picantes / farcides d'anxova", "householdNotes": "Marca i variants de casa; USDA SR Legacy no te registre especific d'olives farcides d'anxova, aixi que la nutricio queda vinculada a oliva verda generica." },
     { "matchNames": [ "Bacallà salat", "bacallà" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "bacallà salat dessalat a casa" },
     { "matchNames": [ "Salmó fumat" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "salmó fumat" },
     { "matchNames": [ "Salmó cru", "salmó" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "salmó fresc congelat" },
@@ -40,9 +42,13 @@
     { "matchNames": [ "Pit de pollastre cru", "pit de pollastre" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "pit de pollastre" },
     { "matchNames": [ "Quart de darrere de pollastre cru", "quarts de darrera" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "quarts de darrera de pollastre" },
     { "matchNames": [ "Pit de gall dindi cru", "pit de gall dindi" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "pit de gall dindi" },
+    { "matchNames": [ "Pit de gall dindi embotit", "pit de pavo" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "pit de pavo embotit" },
     { "matchNames": [ "Ànec cru amb pell", "magret d'ànec" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Rare", "preferredAlias": "magret d'ànec" },
     { "matchNames": [ "Filet de porc cru", "filet de porc" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "filet de porc" },
     { "matchNames": [ "Cinta de porc crua", "cinta de porc" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "cinta de porc" },
+    { "matchNames": [ "Pernil curat", "pernil salat" ], "isFrequentlyUsed": true, "isUsuallyAvailable": true, "useFrequency": "Frequent", "preferredAlias": "pernil salat / espatlla ibèrica", "householdNotes": "USDA SR Legacy aporta pernil curat genèric, no una espatlla ibèrica específica." },
+    { "matchNames": [ "Xoriço cru", "xoriço" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "xoriço", "householdNotes": "No és una equivalència exacta amb xoriço de León curat; la font local és xoriço de porc cru." },
+    { "matchNames": [ "Salami italià", "salami" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "salami" },
     { "matchNames": [ "Filet de vedella cru", "filet de vedella" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Rare", "preferredAlias": "filet de vedella" },
     { "matchNames": [ "Espatlla de vedella crua", "espatlla de vedella" ], "isFrequentlyUsed": true, "isUsuallyAvailable": false, "useFrequency": "Occasional", "preferredAlias": "espatlla de vedella" },
 
@@ -162,6 +168,7 @@
     "eritritol: no hi ha registre SR Legacy clar.",
     "pasta harissa: no hi ha registre SR Legacy clar.",
     "pebre verd en gra: no hi ha registre SR Legacy clar.",
+    "fuet i llonganissa: no hi ha registre SR Legacy clar; no es vinculen a xoriço ni salami per evitar falses equivalències.",
     "xereç, Cointreau, conyac i cava: no hi ha equivalents SR Legacy prou específics en el dataset local."
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-16T11:17:48.842665+00:00",
+  "generatedAt": "2026-07-16T13:11:17.965391+00:00",
   "source": "USDA FoodData Central SR Legacy",
   "sourceRelease": "2018-04",
   "sourceUrl": "https://fdc.nal.usda.gov/download-datasets",
@@ -2915,6 +2915,69 @@
       }
     },
     {
+      "providerId": "fdc:169094",
+      "fdcId": "169094",
+      "ndbNumber": "9193",
+      "name": "Olives negres en conserva",
+      "catalanName": "Olives negres en conserva",
+      "spanishName": "Aceitunas negras en conserva",
+      "aliases": [
+        "Aceituna",
+        "Oliva",
+        "Olives, ripe, canned (small-extra large)",
+        "aceitunas negras",
+        "black olives",
+        "olives negres"
+      ],
+      "category": "fruit",
+      "subcategory": "fruit",
+      "defaultUnit": "g",
+      "canFreeze": false,
+      "pantryCategory": "vegetables",
+      "nutritionState": "canned",
+      "nutrition": {
+        "calories": 116.0,
+        "protein": 0.84,
+        "carbohydrates": 6.04,
+        "fat": 10.9,
+        "fibre": 1.6,
+        "sugar": 0.0,
+        "salt": 1.837
+      }
+    },
+    {
+      "providerId": "fdc:169096",
+      "fdcId": "169096",
+      "ndbNumber": "9195",
+      "name": "Olives verdes en conserva",
+      "catalanName": "Olives verdes en conserva",
+      "spanishName": "Aceitunas verdes en conserva",
+      "aliases": [
+        "Olives, pickled, canned or bottled, green",
+        "aceitunas rellenas de anchoa",
+        "aceitunas verdes",
+        "green olives",
+        "olives verdes",
+        "olives verdes farcides",
+        "olives verdes farcides d'anxova"
+      ],
+      "category": "fruit",
+      "subcategory": "fruit",
+      "defaultUnit": "g",
+      "canFreeze": false,
+      "pantryCategory": "vegetables",
+      "nutritionState": "canned",
+      "nutrition": {
+        "calories": 145.0,
+        "protein": 1.03,
+        "carbohydrates": 3.84,
+        "fat": 15.32,
+        "fibre": 3.3,
+        "sugar": 0.54,
+        "salt": 3.89
+      }
+    },
+    {
       "providerId": "fdc:169124",
       "fdcId": "169124",
       "ndbNumber": "9266",
@@ -4894,32 +4957,6 @@
       }
     },
     {
-      "providerId": "fdc:172027",
-      "fdcId": "172027",
-      "ndbNumber": "20655",
-      "name": "Pasta cuit variant 5",
-      "catalanName": "Pasta cuit variant 5",
-      "spanishName": "Pasta cocido variante 5",
-      "aliases": [
-        "Pasta, gluten-free, corn flour and quinoa flour, cooked, ANCIENT HARVEST"
-      ],
-      "category": "grains",
-      "subcategory": "rice, cereals and pasta",
-      "defaultUnit": "g",
-      "canFreeze": false,
-      "pantryCategory": "pantry",
-      "nutritionState": "cooked",
-      "nutrition": {
-        "calories": 152.0,
-        "protein": 3.23,
-        "carbohydrates": 31.11,
-        "fat": 2.07,
-        "fibre": 3.3,
-        "sugar": 0.3,
-        "salt": 0.01
-      }
-    },
-    {
       "providerId": "fdc:168928",
       "fdcId": "168928",
       "ndbNumber": "20421",
@@ -6187,32 +6224,6 @@
       }
     },
     {
-      "providerId": "fdc:171812",
-      "fdcId": "171812",
-      "ndbNumber": "23601",
-      "name": "Vedella cru variant 23",
-      "catalanName": "Vedella cru variant 23",
-      "spanishName": "Ternera crudo variante 23",
-      "aliases": [
-        "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, all grades, raw"
-      ],
-      "category": "meat",
-      "subcategory": "beef",
-      "defaultUnit": "g",
-      "canFreeze": true,
-      "pantryCategory": "meat",
-      "nutritionState": "raw",
-      "nutrition": {
-        "calories": 153.0,
-        "protein": 22.12,
-        "carbohydrates": 0.0,
-        "fat": 6.52,
-        "fibre": 0.0,
-        "sugar": 0.0,
-        "salt": 0.14
-      }
-    },
-    {
       "providerId": "fdc:171796",
       "fdcId": "171796",
       "ndbNumber": "23567",
@@ -6369,30 +6380,79 @@
       }
     },
     {
+      "providerId": "fdc:172941",
+      "fdcId": "172941",
+      "ndbNumber": "7081",
+      "name": "Pit de gall dindi embotit",
+      "catalanName": "Pit de gall dindi embotit",
+      "spanishName": "Pechuga de pavo loncheada",
+      "aliases": [
+        "Gall dindi",
+        "Pavo",
+        "Turkey breast, sliced, prepackaged",
+        "filet de gall dindi",
+        "pavo loncheado",
+        "pechuga de pavo",
+        "pit de gall dindi",
+        "pit de pavo"
+      ],
+      "category": "meat",
+      "subcategory": "cured meats and sausages",
+      "defaultUnit": "g",
+      "canFreeze": true,
+      "pantryCategory": "meat",
+      "nutritionState": "unspecified",
+      "nutrition": {
+        "calories": 106.0,
+        "protein": 14.81,
+        "carbohydrates": 2.2,
+        "fat": 3.77,
+        "fibre": 0.0,
+        "sugar": 0.91,
+        "salt": 2.245
+      }
+    },
+    {
+      "providerId": "fdc:174603",
+      "fdcId": "174603",
+      "ndbNumber": "7926",
+      "name": "Salami italià",
+      "catalanName": "Salami italià",
+      "spanishName": "Salami italiano",
+      "aliases": [
+        "Cerdo",
+        "Porc",
+        "Salami, Italian, pork",
+        "carne de cerdo",
+        "salami"
+      ],
+      "category": "meat",
+      "subcategory": "cured meats and sausages",
+      "defaultUnit": "g",
+      "canFreeze": true,
+      "pantryCategory": "meat",
+      "nutritionState": "unspecified",
+      "nutrition": {
+        "calories": 425.0,
+        "protein": 21.7,
+        "carbohydrates": 1.2,
+        "fat": 37.0,
+        "fibre": 0.0,
+        "sugar": 1.2,
+        "salt": 4.725
+      }
+    },
+    {
       "providerId": "fdc:173859",
       "fdcId": "173859",
       "ndbNumber": "7019",
-      "name": "Botifarra cru",
-      "catalanName": "Botifarra cru",
-      "spanishName": "Salchicha crudo",
+      "name": "Xoriço cru",
+      "catalanName": "Xoriço cru",
+      "spanishName": "Chorizo crudo",
       "aliases": [
-        "Botifarra",
-        "Cerdo",
         "Chorizo",
-        "Porc",
-        "Salchicha",
         "Sausage, pork, chorizo, link or ground, raw",
-        "Xoriço",
-        "botifarra blanca",
-        "botifarra negra",
-        "butifarra",
-        "carne de cerdo",
-        "costella de porc",
-        "costilla",
-        "fuet",
-        "llonganissa",
-        "longaniza",
-        "salami"
+        "Xoriço"
       ],
       "category": "meat",
       "subcategory": "cured meats and sausages",
@@ -7120,7 +7180,9 @@
       "spanishName": "Lomo de cerdo crudo",
       "aliases": [
         "Pork, fresh, loin, center loin (chops), boneless, separable lean only, raw",
-        "cinta de porc"
+        "cinta de porc",
+        "costella de porc",
+        "costilla"
       ],
       "category": "meat",
       "subcategory": "pork",
@@ -7194,6 +7256,37 @@
         "fibre": 0.0,
         "sugar": 0.0,
         "salt": 0.125
+      }
+    },
+    {
+      "providerId": "fdc:168295",
+      "fdcId": "168295",
+      "ndbNumber": "10182",
+      "name": "Pernil curat",
+      "catalanName": "Pernil curat",
+      "spanishName": "Jamón curado",
+      "aliases": [
+        "Jamón",
+        "Pernil",
+        "Pork, cured, ham, boneless, extra lean and regular, unheated",
+        "espatlla iberica",
+        "jamon serrano",
+        "pernil salat"
+      ],
+      "category": "meat",
+      "subcategory": "pork",
+      "defaultUnit": "g",
+      "canFreeze": true,
+      "pantryCategory": "meat",
+      "nutritionState": "unspecified",
+      "nutrition": {
+        "calories": 162.0,
+        "protein": 18.26,
+        "carbohydrates": 2.28,
+        "fat": 8.39,
+        "fibre": 0.0,
+        "sugar": 0.0,
+        "salt": 3.195
       }
     },
     {
@@ -7359,11 +7452,7 @@
       "catalanName": "Porc cru variant 15",
       "spanishName": "Cerdo crudo variante 15",
       "aliases": [
-        "Jamón",
-        "Pernil",
-        "Pork, fresh, leg (ham), shank half, separable lean only, raw",
-        "jamon serrano",
-        "pernil salat"
+        "Pork, fresh, leg (ham), shank half, separable lean only, raw"
       ],
       "category": "meat",
       "subcategory": "pork",
@@ -7882,11 +7971,7 @@
       "catalanName": "Pit de gall dindi cru",
       "spanishName": "Pechuga de pavo cruda",
       "aliases": [
-        "Gall dindi",
-        "Pavo",
-        "Turkey, breast, from whole bird, meat only, with added solution, raw",
-        "filet de gall dindi",
-        "pit de gall dindi"
+        "Turkey, breast, from whole bird, meat only, with added solution, raw"
       ],
       "category": "meat",
       "subcategory": "poultry",
@@ -9063,32 +9148,6 @@
       }
     },
     {
-      "providerId": "fdc:170189",
-      "fdcId": "170189",
-      "ndbNumber": "12166",
-      "name": "Mantega variant 11",
-      "catalanName": "Mantega variant 11",
-      "spanishName": "Mantequilla variante 11",
-      "aliases": [
-        "Seeds, sesame butter, tahini, from roasted and toasted kernels (most common type)"
-      ],
-      "category": "pantry",
-      "subcategory": "nuts and seeds",
-      "defaultUnit": "g",
-      "canFreeze": false,
-      "pantryCategory": "pantry",
-      "nutritionState": "cooked",
-      "nutrition": {
-        "calories": 595.0,
-        "protein": 17.0,
-        "carbohydrates": 21.19,
-        "fat": 53.76,
-        "fibre": 9.3,
-        "sugar": 0.49,
-        "salt": 0.287
-      }
-    },
-    {
       "providerId": "fdc:170187",
       "fdcId": "170187",
       "ndbNumber": "12155",
@@ -9340,9 +9399,7 @@
       "spanishName": "Aceite de oliva",
       "aliases": [
         "AOVE",
-        "Aceituna",
         "Oil, olive, salad or cooking",
-        "Oliva",
         "aceite",
         "aceite oliva",
         "oli",
@@ -12669,32 +12726,6 @@
       }
     },
     {
-      "providerId": "fdc:170028",
-      "fdcId": "170028",
-      "ndbNumber": "11354",
-      "name": "Patata cru variant 4",
-      "catalanName": "Patata cru variant 4",
-      "spanishName": "Patata crudo variante 4",
-      "aliases": [
-        "Potatoes, white, flesh and skin, raw"
-      ],
-      "category": "vegetables",
-      "subcategory": "vegetables, mushrooms and fresh herbs",
-      "defaultUnit": "g",
-      "canFreeze": false,
-      "pantryCategory": "vegetables",
-      "nutritionState": "raw",
-      "nutrition": {
-        "calories": 69.0,
-        "protein": 1.68,
-        "carbohydrates": 15.71,
-        "fat": 0.1,
-        "fibre": 2.4,
-        "sugar": 1.15,
-        "salt": 0.04
-      }
-    },
-    {
       "providerId": "fdc:169394",
       "fdcId": "169394",
       "ndbNumber": "11976",
@@ -12718,32 +12749,6 @@
         "fibre": 3.4,
         "sugar": 1.95,
         "salt": 0.033
-      }
-    },
-    {
-      "providerId": "fdc:169395",
-      "fdcId": "169395",
-      "ndbNumber": "11977",
-      "name": "Pebrot cru variant 2",
-      "catalanName": "Pebrot cru variant 2",
-      "spanishName": "Pimiento crudo variante 2",
-      "aliases": [
-        "Peppers, serrano, raw"
-      ],
-      "category": "vegetables",
-      "subcategory": "vegetables, mushrooms and fresh herbs",
-      "defaultUnit": "g",
-      "canFreeze": false,
-      "pantryCategory": "vegetables",
-      "nutritionState": "raw",
-      "nutrition": {
-        "calories": 32.0,
-        "protein": 1.74,
-        "carbohydrates": 6.7,
-        "fat": 0.44,
-        "fibre": 3.7,
-        "sugar": 3.83,
-        "salt": 0.025
       }
     },
     {
