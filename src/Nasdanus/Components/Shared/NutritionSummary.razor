@@ -41,6 +41,10 @@
         {
             <MudText Typo="Typo.caption" Class="nutrition-warning">
                 @MissingDataText
+                @if (!string.IsNullOrWhiteSpace(MissingDataHref))
+                {
+                    <MudLink Href="@MissingDataHref" Class="nutrition-warning-link">@MissingDataLinkText</MudLink>
+                }
             </MudText>
         }
     </MudStack>
@@ -70,6 +74,12 @@
 
     [Parameter]
     public string Class { get; set; } = string.Empty;
+
+    [Parameter]
+    public string MissingDataHref { get; set; } = string.Empty;
+
+    [Parameter]
+    public string MissingDataLinkText { get; set; } = "Veure detalls";
 
     private string CoverageText =>
         $"{Totals.ResolvedIngredientPercent.ToString("0", CultureInfo.InvariantCulture)}% of recipe ingredients resolved";

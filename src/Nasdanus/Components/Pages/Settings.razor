@@ -458,12 +458,20 @@
                                         <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
                                             @VisibleRows.Count / @_rows.Count visibles
                                         </MudChip>
-                                        <MudChip T="string" Color="@MissingNutritionColor" Variant="Variant.Outlined">
+                                        <MudButton Href="nutrition-gaps?view=missing"
+                                                   Color="@MissingNutritionColor"
+                                                   Variant="Variant.Outlined"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Edit">
                                             @MissingNutritionCount sense nutricio
-                                        </MudChip>
-                                        <MudChip T="string" Color="@UnresolvedIngredientColor" Variant="Variant.Outlined">
+                                        </MudButton>
+                                        <MudButton Href="nutrition-gaps?view=unresolved"
+                                                   Color="@UnresolvedIngredientColor"
+                                                   Variant="Variant.Outlined"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.LinkOff">
                                             @_summary?.UnresolvedIngredients unresolved recipe ingredients
-                                        </MudChip>
+                                        </MudButton>
                                         <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
                                             @ConfiguredCount marcats
                                         </MudChip>

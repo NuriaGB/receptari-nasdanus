@@ -209,6 +209,10 @@ h3:focus {
     color: #8a5a00;
 }
 
+.nutrition-warning-link {
+    margin-left: 0.4rem;
+}
+
 .daily-goal-card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -599,6 +603,115 @@ h3:focus {
     grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
     gap: 0.65rem;
     align-items: center;
+}
+
+.nutrition-gaps-shell {
+    max-width: 1180px;
+}
+
+.gap-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.gap-metric {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+    cursor: pointer;
+}
+
+.gap-metric.is-active {
+    border-color: var(--mud-palette-primary);
+    background: #edf7fa;
+}
+
+.gap-mode-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.gap-panel {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.gap-list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.gap-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.85rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.gap-row-main {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.gap-row-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.gap-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.gap-occurrences {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.gap-occurrence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    color: var(--nas-muted);
+    font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+    .gap-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .gap-mode-buttons {
+        justify-content: flex-start;
+    }
+
+    .gap-row {
+        grid-template-columns: 1fr;
+    }
+
+    .gap-row-actions {
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 960px) {
