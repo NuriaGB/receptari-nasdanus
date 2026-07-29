@@ -1,0 +1,293 @@
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="Nom"
+                                  @bind-Value="_name"
+                                  Required="true"
+                                  Immediate="true"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Nom catala"
+                                  @bind-Value="_catalanName"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Nom castella"
+                                  @bind-Value="_spanishName"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="Aliases"
+                                  HelperText="Un alias per linia. Exemple: AOVE; oli d'oliva verge extra."
+                                  @bind-Value="_aliasesText"
+                                  Lines="4"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               Label="Categoria"
+                               @bind-Value="_category"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Dense="true">
+                        @foreach (var category in IngredientCategory.All)
+                        {
+                            <MudSelectItem T="string" Value="@category">@DisplayIngredientCategory(category)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Subcategoria"
+                                  @bind-Value="_subcategory"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Unitat per defecte"
+                                  @bind-Value="_defaultUnit"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               Label="Categoria compra"
+                               @bind-Value="_pantryCategory"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Dense="true">
+                        @foreach (var category in ShoppingCategory.DisplayOrder)
+                        {
+                            <MudSelectItem T="string" Value="@category">@DisplayShoppingCategory(category)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudCheckBox T="bool" @bind-Value="_canFreeze" Color="Color.Primary" Label="Es pot congelar" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider />
+
+            <MudText Typo="Typo.subtitle2">Nutricio per 100 g</MudText>
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="kcal"
+                                     @bind-Value="_nutrition.CaloriesKcal"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Proteina g"
+                                     @bind-Value="_nutrition.ProteinGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Hidrats g"
+                                     @bind-Value="_nutrition.CarbohydrateGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Greix g"
+                                     @bind-Value="_nutrition.FatGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Fibra g"
+                                     @bind-Value="_nutrition.FibreGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Sucre g"
+                                     @bind-Value="_nutrition.SugarGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Sal g"
+                                     @bind-Value="_nutrition.SaltGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Font"
+                                  @bind-Value="_nutritionSource"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="Referencia"
+                                  @bind-Value="_nutritionSourceId"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
+        <MudButton OnClick="Save"
+                   Disabled="@(!CanSave)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar ingredient
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public Ingredient? Ingredient { get; set; }
+
+    private string _name = string.Empty;
+    private string _catalanName = string.Empty;
+    private string _spanishName = string.Empty;
+    private string _aliasesText = string.Empty;
+    private string _category = IngredientCategory.Other;
+    private string _subcategory = string.Empty;
+    private string _defaultUnit = "g";
+    private string _pantryCategory = ShoppingCategory.Other;
+    private bool _canFreeze;
+    private IngredientNutrition _nutrition = new();
+    private string _nutritionSource = "manual";
+    private string _nutritionSourceId = string.Empty;
+
+    private bool CanSave => !string.IsNullOrWhiteSpace(_name);
+
+    protected override void OnParametersSet()
+    {
+        if (Ingredient is null)
+        {
+            _name = string.Empty;
+            _catalanName = string.Empty;
+            _spanishName = string.Empty;
+            _aliasesText = string.Empty;
+            _category = IngredientCategory.Other;
+            _subcategory = string.Empty;
+            _defaultUnit = "g";
+            _pantryCategory = ShoppingCategory.Other;
+            _canFreeze = false;
+            _nutrition = new IngredientNutrition();
+            _nutritionSource = "manual";
+            _nutritionSourceId = string.Empty;
+            return;
+        }
+
+        _name = Ingredient.Name;
+        _catalanName = Ingredient.CatalanName;
+        _spanishName = Ingredient.SpanishName;
+        _aliasesText = string.Join(Environment.NewLine, Ingredient.Aliases);
+        _category = IngredientCategory.All.Contains(Ingredient.Category) ? Ingredient.Category : IngredientCategory.Other;
+        _subcategory = Ingredient.Subcategory;
+        _defaultUnit = string.IsNullOrWhiteSpace(Ingredient.DefaultUnit) ? "g" : Ingredient.DefaultUnit;
+        _pantryCategory = ShoppingCategory.DisplayOrder.Contains(Ingredient.PantryCategory) ? Ingredient.PantryCategory : ShoppingCategory.Other;
+        _canFreeze = Ingredient.CanFreeze;
+        _nutrition = Ingredient.NutritionPer100Grams is null
+            ? new IngredientNutrition()
+            : new IngredientNutrition
+            {
+                CaloriesKcal = Ingredient.NutritionPer100Grams.CaloriesKcal,
+                ProteinGrams = Ingredient.NutritionPer100Grams.ProteinGrams,
+                CarbohydrateGrams = Ingredient.NutritionPer100Grams.CarbohydrateGrams,
+                FatGrams = Ingredient.NutritionPer100Grams.FatGrams,
+                FibreGrams = Ingredient.NutritionPer100Grams.FibreGrams,
+                SugarGrams = Ingredient.NutritionPer100Grams.SugarGrams,
+                SaltGrams = Ingredient.NutritionPer100Grams.SaltGrams
+            };
+        var hasManualSource = string.Equals(Ingredient.NutritionSource, "manual", StringComparison.OrdinalIgnoreCase);
+        _nutritionSource = hasManualSource ? Ingredient.NutritionSource : "manual";
+        _nutritionSourceId = hasManualSource ? Ingredient.NutritionSourceId : Ingredient.Name;
+    }
+
+    private void Save()
+    {
+        var edit = new IngredientKnowledgeManualEdit(
+            _name.Trim(),
+            _catalanName.Trim(),
+            _spanishName.Trim(),
+            ParseAliases(_aliasesText),
+            _category,
+            _subcategory.Trim(),
+            string.IsNullOrWhiteSpace(_defaultUnit) ? "g" : _defaultUnit.Trim(),
+            _pantryCategory,
+            _canFreeze,
+            _nutrition.HasAnyValue ? _nutrition : null,
+            string.IsNullOrWhiteSpace(_nutritionSource) ? "manual" : _nutritionSource.Trim(),
+            string.IsNullOrWhiteSpace(_nutritionSourceId) ? _name.Trim() : _nutritionSourceId.Trim());
+
+        MudDialog.Close(DialogResult.Ok(edit));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private static List<string> ParseAliases(string aliasesText) =>
+        aliasesText
+            .Split(['\r', '\n', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(alias => !string.IsNullOrWhiteSpace(alias))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(alias => alias)
+            .ToList();
+
+    private static string DisplayIngredientCategory(string category) => category switch
+    {
+        IngredientCategory.Fruit => "Fruita",
+        IngredientCategory.Vegetables => "Verdures",
+        IngredientCategory.Meat => "Carn",
+        IngredientCategory.Fish => "Peix",
+        IngredientCategory.DairyEggs => "Lactis i ous",
+        IngredientCategory.Legumes => "Llegums",
+        IngredientCategory.Grains => "Cereals",
+        IngredientCategory.Pantry => "Rebost",
+        IngredientCategory.Spices => "Especies",
+        _ => "Altres"
+    };
+
+    private static string DisplayShoppingCategory(string category) => category switch
+    {
+        ShoppingCategory.Vegetables => "Verdures",
+        ShoppingCategory.Meat => "Carn",
+        ShoppingCategory.Fish => "Peix",
+        ShoppingCategory.DairyEggs => "Lactis i ous",
+        ShoppingCategory.Pantry => "Rebost",
+        ShoppingCategory.Spices => "Especies",
+        _ => "Altres"
+    };
+}

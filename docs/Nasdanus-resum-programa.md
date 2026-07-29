@@ -1,6 +1,8 @@
 # Nasdanus - Resum del programa
 
-Data del resum: 1 de juliol de 2026
+Data del resum: 29 de juliol de 2026
+
+Informe complementari d'estat actual: `docs/implementation_status.md`.
 
 ## 1. Visio general
 
@@ -28,6 +30,7 @@ L'aplicacio ja te una vertical slice funcional:
 - Dades, backup i restauracio
 - Product Backlog intern
 - Ingredient Knowledge i motor nutricional local
+- Pagina de buits nutricionals: pla actual, ingredients sense nutricio, unresolved i quantitats no utilitzables
 - Knowledge Importer per generar fitxers locals de coneixement
 - PWA / desplegament static a GitHub Pages
 
@@ -75,6 +78,7 @@ La navegacio principal inclou:
 - Avui
 - Receptes
 - Planner
+- Nutricio
 - Compra
 - Rebost
 - Dades
@@ -119,6 +123,26 @@ Tambe mostra nutricio aproximada:
 - Week average: mitjana diaria de la setmana planificada.
 
 Quan alguns ingredients encara no tenen dades nutricionals, es calcula el que es pot i es mostra un avis.
+
+## 5b. Nutricio i buits de dades
+
+La funcionalitat nutricional actual es basa en ingredients coneguts i quantitats convertibles a grams.
+
+Flux implementat:
+
+- Els ingredients de recepta s'han de vincular a ingredients coneguts.
+- Els ingredients coneguts poden tenir nutricio per 100 g.
+- Si falta nutricio, es pot informar manualment des de Settings o des de `/nutrition-gaps`.
+- Les dades manuals es guarden com a font `manual` i no es trepitgen quan es reaplica la base local.
+
+La pagina `/nutrition-gaps` separa quatre problemes diferents:
+
+- `Pla actual`: incidencies que afecten la setmana planificada.
+- `Sense nutricio`: ingredients coneguts sense valors nutricionals.
+- `Unresolved`: ingredients de recepta no vinculats a cap ingredient conegut.
+- `Quantitat`: ingredients amb nutricio, pero quantitat/unitat no convertible a grams.
+
+Aixo fa que els avisos del planner siguin accionables: es pot veure quin ingredient falla, en quina recepta i quina accio cal fer.
 
 ## 6. Receptari
 

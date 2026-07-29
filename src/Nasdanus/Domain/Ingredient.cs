@@ -46,6 +46,24 @@ public sealed record IngredientNutritionManualEdit(
     string Source,
     string SourceId);
 
+public sealed record IngredientKnowledgeManualEdit(
+    string Name,
+    string CatalanName,
+    string SpanishName,
+    IReadOnlyList<string> Aliases,
+    string Category,
+    string Subcategory,
+    string DefaultUnit,
+    string PantryCategory,
+    bool CanFreeze,
+    IngredientNutrition? Nutrition,
+    string NutritionSource,
+    string NutritionSourceId);
+
+public sealed record IngredientKnowledgeManualSaveResult(
+    Ingredient Ingredient,
+    bool Created);
+
 public sealed class Product
 {
     public int Id { get; set; }

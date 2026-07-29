@@ -423,6 +423,20 @@
                 <MudTabPanel Text="Ingredient Knowledge">
                     <MudPaper Class="settings-section" Elevation="0">
                         @SectionHeading("Ingredient Knowledge", "Base local d'ingredients, nutricio, aliases i preferencies.")
+                        <div class="settings-actions">
+                            <MudButton OnClick="OpenCreateIngredientDialogAsync"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Add">
+                                Afegir ingredient
+                            </MudButton>
+                            <MudButton Href="nutrition-gaps"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Warning"
+                                       StartIcon="@Icons.Material.Filled.Assignment">
+                                Buits nutricionals
+                            </MudButton>
+                        </div>
                         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
                             Canonical data stores names, aliases, categories, nutrition and source. Household data stores favourites, usual availability, pantry/freezer flags, preferred alias and notes.
                         </MudAlert>
@@ -546,12 +560,12 @@
                                                 {
                                                     <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">Sense nutricio</MudAlert>
                                                 }
-                                                <MudButton OnClick="@(() => OpenNutritionDialogAsync(row))"
+                                                <MudButton OnClick="@(() => OpenIngredientDialogAsync(row.Ingredient))"
                                                            Variant="Variant.Outlined"
                                                            Color="@(row.Ingredient.NutritionPer100Grams?.HasAnyValue == true ? Color.Primary : Color.Warning)"
                                                            Size="Size.Small"
                                                            StartIcon="@Icons.Material.Filled.Edit">
-                                                    Nutricio
+                                                    Editar
                                                 </MudButton>
                                             </div>
                                         </div>
@@ -934,6 +948,56 @@
         Snackbar.Add("Preferencia desada.", Severity.Success);
     }
 
+    private async Task OpenCreateIngredientDialogAsync()
+    {
+        var dialog = await DialogService.ShowAsync<IngredientKnowledgeDialog>(
+            "Afegir ingredient",
+            CreateIngredientDialogOptions());
+        var result = await dialog.Result;
+        if (result is null || result.Canceled || result.Data is not IngredientKnowledgeManualEdit edit)
+        {
+            return;
+        }
+
+        var saved = await IngredientKnowledge.CreateManualIngredientAsync(edit);
+        if (saved is null)
+        {
+            Snackbar.Add("Cal informar el nom de l'ingredient.", Severity.Warning);
+            return;
+        }
+
+        await LoadAsync();
+        Snackbar.Add(saved.Created ? "Ingredient creat." : "Ingredient existent actualitzat.", Severity.Success);
+    }
+
+    private async Task OpenIngredientDialogAsync(Ingredient ingredient)
+    {
+        var parameters = new DialogParameters<IngredientKnowledgeDialog>
+        {
+            { dialog => dialog.Ingredient, ingredient }
+        };
+
+        var dialog = await DialogService.ShowAsync<IngredientKnowledgeDialog>(
+            $"Editar: {ingredient.Name}",
+            parameters,
+            CreateIngredientDialogOptions());
+        var result = await dialog.Result;
+        if (result is null || result.Canceled || result.Data is not IngredientKnowledgeManualEdit edit)
+        {
+            return;
+        }
+
+        var saved = await IngredientKnowledge.SaveIngredientAsync(ingredient.KnowledgeId, edit);
+        if (!saved)
+        {
+            Snackbar.Add("No s'ha pogut desar l'ingredient.", Severity.Error);
+            return;
+        }
+
+        await LoadAsync();
+        Snackbar.Add("Ingredient desat.", Severity.Success);
+    }
+
     private async Task OpenNutritionDialogAsync(HouseholdIngredientPreferenceRow row)
     {
         var parameters = new DialogParameters<IngredientNutritionDialog>
@@ -964,6 +1028,13 @@
         await LoadAsync();
         Snackbar.Add("Nutricio desada.", Severity.Success);
     }
+
+    private static DialogOptions CreateIngredientDialogOptions() => new()
+    {
+        CloseButton = true,
+        MaxWidth = MaxWidth.Small,
+        FullWidth = true
+    };
 
     private async Task SaveAllIngredientsAsync()
     {
