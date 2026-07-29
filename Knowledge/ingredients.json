@@ -3563,6 +3563,34 @@
       "lastUpdated": "2026-07-16T13:11:17.965391+00:00"
     },
     {
+      "id": "mascarpone",
+      "name": "Mascarpone",
+      "catalanName": "Mascarpone",
+      "spanishName": "Mascarpone",
+      "aliases": [
+        "formatge mascarpone",
+        "queso mascarpone"
+      ],
+      "category": "dairy-eggs",
+      "subcategory": "dairy and eggs",
+      "defaultUnit": "g",
+      "canFreeze": false,
+      "pantryCategory": "dairy-eggs",
+      "nutrition": {
+        "calories": 429.0,
+        "protein": 4.6,
+        "carbohydrates": 4.0,
+        "fat": 44.5,
+        "fibre": 0.0,
+        "sugar": 3.5,
+        "salt": 0.1
+      },
+      "nutritionState": "unspecified",
+      "source": "manual",
+      "sourceId": "mascarpone-generic",
+      "lastUpdated": "2026-07-29T00:00:00+00:00"
+    },
+    {
       "id": "formatge-de-cabra-curat",
       "name": "Formatge de cabra curat",
       "catalanName": "Formatge de cabra curat",
@@ -6647,9 +6675,9 @@
     },
     {
       "id": "oli-d-oliva",
-      "name": "AOVE / oli d\u0027oliva verge extra",
-      "catalanName": "AOVE / oli d\u0027oliva verge extra",
-      "spanishName": "AOVE / aceite de oliva virgen extra",
+      "name": "Oli d\u0027oliva",
+      "catalanName": "Oli d\u0027oliva",
+      "spanishName": "Aceite de oliva",
       "aliases": [
         "aceite",
         "aceite de oliva virgen extra",

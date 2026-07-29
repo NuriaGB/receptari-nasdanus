@@ -1842,6 +1842,21 @@
       "lastUpdated": "2026-07-16T13:11:17.965391+00:00"
     },
     {
+      "ingredientId": "mascarpone",
+      "nutrition": {
+        "calories": 429.0,
+        "protein": 4.6,
+        "carbohydrates": 4.0,
+        "fat": 44.5,
+        "fibre": 0.0,
+        "sugar": 3.5,
+        "salt": 0.1
+      },
+      "source": "manual",
+      "sourceId": "mascarpone-generic",
+      "lastUpdated": "2026-07-29T00:00:00+00:00"
+    },
+    {
       "ingredientId": "formatge-de-cabra-curat",
       "nutrition": {
         "calories": 452.0,

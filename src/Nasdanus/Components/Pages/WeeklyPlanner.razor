@@ -166,7 +166,7 @@
                         <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
                         <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
                         <NutritionSummary Title="Total dia"
-                                          Subtitle="Dinar + sopar"
+                                          Subtitle="Per racio - dinar + sopar"
                                           Totals="@DayNutritionTotals(day)"
                                           Dense="true" />
                     </MudPaper>
@@ -365,8 +365,8 @@
     private static NutritionTotals DayNutritionTotals(DayPlan day)
     {
         var totals = new NutritionTotals();
-        totals.Add(NutritionService.CalculateMeal(day.Lunch).Totals);
-        totals.Add(NutritionService.CalculateMeal(day.Dinner).Totals);
+        totals.Add(NutritionService.PerPersonMeal(NutritionService.CalculateMeal(day.Lunch)));
+        totals.Add(NutritionService.PerPersonMeal(NutritionService.CalculateMeal(day.Dinner)));
         return totals;
     }
 

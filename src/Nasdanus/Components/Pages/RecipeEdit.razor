@@ -805,14 +805,8 @@
             .Concat(knownIngredient.Aliases)
             .Where(value => !string.IsNullOrWhiteSpace(value));
 
-    private static string KnownIngredientDisplayName(Ingredient knownIngredient)
-    {
-        var priorityAlias = knownIngredient.Aliases
-            .FirstOrDefault(alias => string.Equals(alias, "AOVE", StringComparison.OrdinalIgnoreCase));
-        return string.IsNullOrWhiteSpace(priorityAlias)
-            ? knownIngredient.Name
-            : $"{knownIngredient.Name} ({priorityAlias})";
-    }
+    private static string KnownIngredientDisplayName(Ingredient knownIngredient) =>
+        knownIngredient.Name;
 
     private static string KnownIngredientHint(Ingredient knownIngredient)
     {

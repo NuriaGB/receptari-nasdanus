@@ -157,6 +157,33 @@
       }
     },
     {
+      "providerId": "manual:mascarpone",
+      "fdcId": "",
+      "ndbNumber": "",
+      "name": "Mascarpone",
+      "catalanName": "Mascarpone",
+      "spanishName": "Mascarpone",
+      "aliases": [
+        "formatge mascarpone",
+        "queso mascarpone"
+      ],
+      "category": "dairy-eggs",
+      "subcategory": "dairy and eggs",
+      "defaultUnit": "g",
+      "canFreeze": false,
+      "pantryCategory": "dairy-eggs",
+      "nutritionState": "unspecified",
+      "nutrition": {
+        "calories": 429.0,
+        "protein": 4.6,
+        "carbohydrates": 4.0,
+        "fat": 44.5,
+        "fibre": 0.0,
+        "sugar": 3.5,
+        "salt": 0.1
+      }
+    },
+    {
       "providerId": "fdc:172197",
       "fdcId": "172197",
       "ndbNumber": "1156",
@@ -9396,9 +9423,9 @@
       "providerId": "fdc:171413",
       "fdcId": "171413",
       "ndbNumber": "4053",
-      "name": "AOVE / oli d'oliva verge extra",
-      "catalanName": "AOVE / oli d'oliva verge extra",
-      "spanishName": "AOVE / aceite de oliva virgen extra",
+      "name": "Oli d'oliva",
+      "catalanName": "Oli d'oliva",
+      "spanishName": "Aceite de oliva",
       "aliases": [
         "AOVE",
         "Oil, olive, salad or cooking",

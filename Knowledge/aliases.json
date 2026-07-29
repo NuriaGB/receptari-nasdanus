@@ -763,6 +763,14 @@
       "alias": "Cheese, cream"
     },
     {
+      "ingredientId": "mascarpone",
+      "alias": "formatge mascarpone"
+    },
+    {
+      "ingredientId": "mascarpone",
+      "alias": "queso mascarpone"
+    },
+    {
       "ingredientId": "formatge-feta-bloc",
       "alias": "Cheese, feta"
     },
