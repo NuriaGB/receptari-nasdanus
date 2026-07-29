@@ -605,6 +605,15 @@ h3:focus {
     align-items: center;
 }
 
+.quantity-conversion-row {
+    align-items: center;
+}
+
+.quantity-conversion-remove {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .nutrition-gaps-shell {
     max-width: 1180px;
 }

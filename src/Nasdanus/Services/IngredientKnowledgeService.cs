@@ -127,6 +127,12 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(alias => alias)
             .ToList();
+
+        var quantityConversions = mergeAliases
+            ? ingredient.QuantityConversions.Concat(edit.QuantityConversions)
+            : edit.QuantityConversions;
+        ingredient.QuantityConversions = NormalizeQuantityConversions(quantityConversions);
+
         if (preserveExistingName)
         {
             if (!string.Equals(edit.Category, IngredientCategory.Other, StringComparison.OrdinalIgnoreCase))
@@ -260,6 +266,21 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
     private static string NormalizeShoppingCategory(string category) =>
         ShoppingCategory.DisplayOrder.Contains(category) ? category : ShoppingCategory.Other;
 
+    private static List<IngredientQuantityConversion> NormalizeQuantityConversions(
+        IEnumerable<IngredientQuantityConversion> conversions) =>
+        conversions
+            .Where(conversion => !string.IsNullOrWhiteSpace(conversion.Measure) && conversion.Grams > 0)
+            .Select(conversion => new IngredientQuantityConversion
+            {
+                Measure = conversion.Measure.Trim(),
+                Grams = conversion.Grams,
+                Notes = conversion.Notes?.Trim() ?? string.Empty
+            })
+            .GroupBy(conversion => FoodText.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .OrderBy(conversion => conversion.Measure, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
     private static Ingredient Clone(Ingredient ingredient) => new()
     {
         Id = ingredient.Id,
@@ -274,6 +295,9 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
         PantryCategory = ingredient.PantryCategory,
         CanFreeze = ingredient.CanFreeze,
         Seasonality = ingredient.Seasonality,
+        QuantityConversions = ingredient.QuantityConversions
+            .Select(CloneQuantityConversion)
+            .ToList(),
         NutritionPer100Grams = ingredient.NutritionPer100Grams is null ? null : CloneNutrition(ingredient.NutritionPer100Grams),
         NutritionState = ingredient.NutritionState,
         NutritionSource = ingredient.NutritionSource,
@@ -290,5 +314,12 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
         FibreGrams = nutrition.FibreGrams,
         SugarGrams = nutrition.SugarGrams,
         SaltGrams = nutrition.SaltGrams
+    };
+
+    private static IngredientQuantityConversion CloneQuantityConversion(IngredientQuantityConversion conversion) => new()
+    {
+        Measure = conversion.Measure,
+        Grams = conversion.Grams,
+        Notes = conversion.Notes
     };
 }

@@ -558,6 +558,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ingredient.Subcategory = ingredient.Subcategory.Trim();
             ingredient.NutritionState = NormalizeNutritionState(ingredient.NutritionState);
             ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
+            ingredient.QuantityConversions = NormalizeQuantityConversions(ingredient.QuantityConversions);
             ingredient.NutritionSource = ingredient.NutritionSource.Trim();
             ingredient.NutritionSourceId = ingredient.NutritionSourceId.Trim();
             EnrichIngredientNutrition(ingredient);
@@ -842,6 +843,9 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         PantryCategory = ingredient.PantryCategory,
         CanFreeze = ingredient.CanFreeze,
         Seasonality = ingredient.Seasonality,
+        QuantityConversions = ingredient.QuantityConversions
+            .Select(CloneQuantityConversion)
+            .ToList(),
         NutritionPer100Grams = CloneNutrition(ingredient.NutritionPer100Grams),
         NutritionState = ingredient.NutritionState,
         NutritionSource = ingredient.NutritionSource,
@@ -861,6 +865,20 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             SugarGrams = nutrition.SugarGrams,
             SaltGrams = nutrition.SaltGrams
         };
+
+    private static IngredientQuantityConversion CloneQuantityConversion(IngredientQuantityConversion conversion) => new()
+    {
+        Measure = conversion.Measure,
+        Grams = conversion.Grams,
+        Notes = conversion.Notes
+    };
+
+    private static IngredientQuantityConversion ToQuantityConversion(IngredientKnowledgeQuantityConversion conversion) => new()
+    {
+        Measure = conversion.Measure,
+        Grams = conversion.Grams,
+        Notes = conversion.Notes
+    };
 
     private static Ingredient CreateIngredientSnapshot(Ingredient ingredient) => CloneIngredient(ingredient);
 
@@ -1125,6 +1143,12 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             : item.DefaultUnit.Trim();
         ingredient.PantryCategory = MapKnowledgeShoppingCategory(item.PantryCategory, item.Category);
         ingredient.CanFreeze = item.CanFreeze;
+        if (item.QuantityConversions.Count > 0)
+        {
+            ingredient.QuantityConversions = NormalizeQuantityConversions(
+                ingredient.QuantityConversions.Concat(item.QuantityConversions.Select(ToQuantityConversion)));
+        }
+
         var hasManualNutrition = HasManualNutrition(ingredient);
         if (!hasManualNutrition)
         {
@@ -1690,6 +1714,21 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ? category
             : ShoppingCategory.Other;
 
+    private static List<IngredientQuantityConversion> NormalizeQuantityConversions(
+        IEnumerable<IngredientQuantityConversion>? conversions) =>
+        (conversions ?? [])
+            .Where(conversion => !string.IsNullOrWhiteSpace(conversion.Measure) && conversion.Grams > 0)
+            .Select(conversion => new IngredientQuantityConversion
+            {
+                Measure = conversion.Measure.Trim(),
+                Grams = conversion.Grams,
+                Notes = conversion.Notes?.Trim() ?? string.Empty
+            })
+            .GroupBy(conversion => FoodText.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .OrderBy(conversion => conversion.Measure, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
     private static string MapKnowledgeIngredientCategory(string category) =>
         category switch
         {
@@ -2004,6 +2043,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         public string DefaultUnit { get; set; } = string.Empty;
         public bool CanFreeze { get; set; }
         public string PantryCategory { get; set; } = string.Empty;
+        public List<IngredientKnowledgeQuantityConversion> QuantityConversions { get; set; } = [];
         public string NutritionState { get; set; } = string.Empty;
         public IngredientKnowledgeNutrition? Nutrition { get; set; }
         public string Source { get; set; } = string.Empty;
@@ -2020,6 +2060,13 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         public decimal? Fibre { get; set; }
         public decimal? Sugar { get; set; }
         public decimal? Salt { get; set; }
+    }
+
+    private sealed class IngredientKnowledgeQuantityConversion
+    {
+        public string Measure { get; set; } = string.Empty;
+        public decimal Grams { get; set; }
+        public string Notes { get; set; } = string.Empty;
     }
 
     private sealed class HouseholdIngredientPreferenceSeedFile

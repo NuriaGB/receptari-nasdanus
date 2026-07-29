@@ -544,6 +544,12 @@
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">
                                                 Aliases: @AliasesText(row.Ingredient)
                                             </MudText>
+                                            @if (row.Ingredient.QuantityConversions.Count > 0)
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                    Conversions: @QuantityConversionsText(row.Ingredient)
+                                                </MudText>
+                                            }
                                             <div class="ingredient-nutrition-line">
                                                 @if (row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
                                                 {
@@ -1389,6 +1395,12 @@
         ingredient.Aliases.Count == 0
             ? "Sense aliases"
             : string.Join(", ", ingredient.Aliases);
+
+    private static string QuantityConversionsText(Ingredient ingredient) =>
+        string.Join(", ", ingredient.QuantityConversions
+            .Take(4)
+            .Select(conversion => $"{conversion.Measure} = {conversion.Grams.ToString("0.#", CultureInfo.InvariantCulture)} g"))
+        + (ingredient.QuantityConversions.Count > 4 ? "..." : string.Empty);
 
     private static string NutritionText(IngredientNutrition nutrition) =>
         $"{nutrition.CaloriesKcal?.ToString("0", CultureInfo.InvariantCulture) ?? "-"} kcal · "

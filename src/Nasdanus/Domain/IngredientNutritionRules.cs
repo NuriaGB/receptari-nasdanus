@@ -30,7 +30,13 @@ public static class IngredientNutritionRules
 
     private static bool IsSpice(Ingredient? ingredient) =>
         ingredient is not null
-        && string.Equals(ingredient.Category, IngredientCategory.Spices, StringComparison.OrdinalIgnoreCase);
+        && (IsSpiceCategory(ingredient.Category)
+            || IsSpiceCategory(ingredient.PantryCategory));
+
+    private static bool IsSpiceCategory(string category) =>
+        string.Equals(category, IngredientCategory.Spices, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(category, ShoppingCategory.Spices, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(category, "spices", StringComparison.OrdinalIgnoreCase);
 
     private static IEnumerable<string> IngredientNames(Ingredient ingredient) =>
         new[] { ingredient.Name, ingredient.CatalanName, ingredient.SpanishName }

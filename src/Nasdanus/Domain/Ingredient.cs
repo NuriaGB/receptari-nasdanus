@@ -14,6 +14,7 @@ public sealed class Ingredient
     public string PantryCategory { get; set; } = ShoppingCategory.Other;
     public bool CanFreeze { get; set; }
     public string Seasonality { get; set; } = string.Empty;
+    public List<IngredientQuantityConversion> QuantityConversions { get; set; } = [];
     public IngredientNutrition? NutritionPer100Grams { get; set; }
     public string NutritionState { get; set; } = NutritionRecordState.Unspecified;
     public string NutritionSource { get; set; } = string.Empty;
@@ -56,6 +57,7 @@ public sealed record IngredientKnowledgeManualEdit(
     string DefaultUnit,
     string PantryCategory,
     bool CanFreeze,
+    IReadOnlyList<IngredientQuantityConversion> QuantityConversions,
     IngredientNutrition? Nutrition,
     string NutritionSource,
     string NutritionSourceId);
@@ -63,6 +65,13 @@ public sealed record IngredientKnowledgeManualEdit(
 public sealed record IngredientKnowledgeManualSaveResult(
     Ingredient Ingredient,
     bool Created);
+
+public sealed class IngredientQuantityConversion
+{
+    public string Measure { get; set; } = string.Empty;
+    public decimal Grams { get; set; }
+    public string Notes { get; set; } = string.Empty;
+}
 
 public sealed class Product
 {
