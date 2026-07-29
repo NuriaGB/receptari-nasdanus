@@ -1,7 +1,10 @@
 @using Nasdanus.Domain
 @inject IDialogService DialogService
 
-<MudStack Spacing="1" Class="meal-slot-selector">
+<MudStack Spacing="1"
+          Class="@MealSlotClass"
+          @ondragover:preventDefault="true"
+          @ondrop="OnDropAsync">
     <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="meal-slot-title">
         <div class="meal-slot-heading">
             <MudIcon Icon="@MealIcon" Color="Color.Primary" Size="Size.Small" />
@@ -80,10 +83,19 @@
     [Parameter]
     public EventCallback<(int PlannedRecipeId, PlannedRecipeSelection Selection)> ReplaceRecipe { get; set; }
 
+    [Parameter]
+    public int? DraggedRecipeId { get; set; }
+
+    [Parameter]
+    public EventCallback<(DateOnly Date, MealKind MealKind)> RecipeDropped { get; set; }
+
     private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
         .OrderBy(plannedRecipe => plannedRecipe.Order)
         .ToList();
     private MealNutritionSummary MealNutrition => NutritionService.CalculateMeal(Slot);
+    private string MealSlotClass => DraggedRecipeId is null
+        ? "meal-slot-selector"
+        : "meal-slot-selector is-drop-target";
     private string MealIcon => Slot.MealKind == MealKind.Lunch
         ? Icons.Material.Filled.Restaurant
         : Icons.Material.Filled.DarkMode;
@@ -139,6 +151,14 @@
         if (result is not null && !result.Canceled && result.Data is PlannedRecipeSelection selection)
         {
             await ReplaceRecipe.InvokeAsync((plannedRecipe.Id, selection));
+        }
+    }
+
+    private async Task OnDropAsync(DragEventArgs args)
+    {
+        if (DraggedRecipeId is not null && RecipeDropped.HasDelegate)
+        {
+            await RecipeDropped.InvokeAsync((Slot.Date, Slot.MealKind));
         }
     }
 

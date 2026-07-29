@@ -37,8 +37,16 @@
         {
             <section class="recipe-ideas-section" aria-labelledby="recipe-ideas-title">
                 <div class="recipe-ideas-header">
-                    <MudText Typo="Typo.h5" id="recipe-ideas-title">Recipe Ideas</MudText>
-                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@RecipeIdeas.Count idees</MudChip>
+                    <div>
+                        <MudText Typo="Typo.h5" id="recipe-ideas-title">Idees de receptes</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@RecipeIdeas.Count disponibles</MudText>
+                    </div>
+                    @if (IsRecipeIdeaBrowseActive)
+                    {
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                            @VisibleRecipeIdeas.Count / @FilteredRecipeIdeas.Count visibles
+                        </MudChip>
+                    }
                 </div>
 
                 @if (RecipeIdeas.Count == 0)
@@ -47,19 +55,99 @@
                 }
                 else
                 {
-                    <div class="recipe-ideas-list">
-                        @foreach (var recipe in RecipeIdeas)
+                    <div class="recipe-ideas-tools">
+                        <MudTextField T="string"
+                                      @bind-Value="_recipeIdeaSearch"
+                                      Immediate="true"
+                                      Placeholder="Cerca recepta"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" />
+                        <MudSelect T="string"
+                                   @bind-Value="_recipeIdeaCategory"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true"
+                                   Adornment="Adornment.Start"
+                                   AdornmentIcon="@Icons.Material.Filled.Category">
+                            <MudSelectItem T="string" Value="@string.Empty">Totes les categories</MudSelectItem>
+                            @foreach (var category in RecipeIdeaCategories)
+                            {
+                                <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudButton OnClick="ToggleAllRecipeIdeas"
+                                   Variant="@(_showAllRecipeIdeas ? Variant.Filled : Variant.Outlined)"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.ViewList">
+                            Mostrar totes
+                        </MudButton>
+                        <MudIconButton OnClick="ClearRecipeIdeaFilters"
+                                       Disabled="@(!IsRecipeIdeaBrowseActive)"
+                                       Icon="@Icons.Material.Filled.FilterAltOff"
+                                       Color="Color.Secondary"
+                                       aria-label="Netejar filtres" />
+                    </div>
+
+                    <div class="recipe-idea-categories" role="group" aria-label="Categories suggerides">
+                        @foreach (var category in RecipeIdeaCategorySummaries.Take(12))
                         {
-                            <div class="recipe-idea-chip">
-                                <span class="recipe-idea-name" title="@recipe.Name">@recipe.Name</span>
-                                <MudIconButton OnClick="@(() => DismissRecipeIdeaAsync(recipe.Id))"
-                                               Icon="@Icons.Material.Filled.Close"
-                                               Color="Color.Secondary"
-                                               Size="Size.Small"
-                                               aria-label="Treure idea" />
-                            </div>
+                            <MudButton OnClick="@(() => SelectRecipeIdeaCategory(category.Name))"
+                                       Variant="@RecipeIdeaCategoryVariant(category.Name)"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Category">
+                                @category.Name (@category.Count)
+                            </MudButton>
                         }
                     </div>
+
+                    @if (IsRecipeIdeaBrowseActive)
+                    {
+                        @if (FilteredRecipeIdeas.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No hi ha receptes amb aquests filtres.</MudAlert>
+                        }
+                        else
+                        {
+                            <div class="recipe-ideas-list">
+                                @foreach (var recipe in VisibleRecipeIdeas)
+                                {
+                                    <div class="recipe-idea-chip"
+                                         draggable="true"
+                                         @ondragstart="@(() => BeginRecipeIdeaDrag(recipe.Id))"
+                                         @ondragend="EndRecipeIdeaDrag">
+                                        <div class="recipe-idea-main">
+                                            <span class="recipe-idea-name" title="@recipe.Name">@recipe.Name</span>
+                                            <span class="recipe-idea-meta">@RecipeIdeaCategoryText(recipe)</span>
+                                        </div>
+                                        <MudMenu Icon="@Icons.Material.Filled.MoreVert"
+                                                 Size="Size.Small"
+                                                 Dense="true"
+                                                 Color="Color.Primary"
+                                                 AriaLabel="Assignar idea">
+                                            @foreach (var day in _days)
+                                            {
+                                                <MudMenuItem OnClick="@(() => AssignRecipeIdeaAsync(recipe.Id, day.Date, MealKind.Lunch))">
+                                                    @FormatDay(day.Date) dinar
+                                                </MudMenuItem>
+                                                <MudMenuItem OnClick="@(() => AssignRecipeIdeaAsync(recipe.Id, day.Date, MealKind.Dinner))">
+                                                    @FormatDay(day.Date) sopar
+                                                </MudMenuItem>
+                                            }
+                                        </MudMenu>
+                                        <MudIconButton OnClick="@(() => DismissRecipeIdeaAsync(recipe.Id))"
+                                                       Icon="@Icons.Material.Filled.Close"
+                                                       Color="Color.Secondary"
+                                                       Size="Size.Small"
+                                                       aria-label="Treure idea" />
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
                 }
             </section>
 
@@ -75,8 +163,8 @@
                             }
                         </div>
 
-                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
-                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" />
+                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
+                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
                         <NutritionSummary Title="Total dia"
                                           Subtitle="Dinar + sopar"
                                           Totals="@DayNutritionTotals(day)"
@@ -97,7 +185,13 @@
     private List<Recipe> _recipes = [];
     private HashSet<int> _plannedRecipeIds = [];
     private HashSet<int> _dismissedRecipeIdeaIds = [];
+    private string _recipeIdeaSearch = string.Empty;
+    private string _recipeIdeaCategory = string.Empty;
+    private bool _showAllRecipeIdeas;
+    private int? _draggedRecipeIdeaId;
     private bool _isLoading = true;
+
+    private const string NoCategoryLabel = "Sense categoria";
 
     private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
     private string WeekRangeText => $"{_weekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_weekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
@@ -105,6 +199,27 @@
         .Where(recipe => !_plannedRecipeIds.Contains(recipe.Id))
         .Where(recipe => !_dismissedRecipeIdeaIds.Contains(recipe.Id))
         .OrderBy(recipe => recipe.Name)
+        .ToList();
+    private bool IsRecipeIdeaBrowseActive =>
+        _showAllRecipeIdeas
+        || !string.IsNullOrWhiteSpace(_recipeIdeaSearch)
+        || !string.IsNullOrWhiteSpace(_recipeIdeaCategory);
+    private IReadOnlyList<RecipeIdeaCategorySummary> RecipeIdeaCategorySummaries => RecipeIdeas
+        .SelectMany(recipe => RecipeIdeaCategoriesFor(recipe).Select(category => (Category: category, RecipeId: recipe.Id)))
+        .GroupBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
+        .Select(group => new RecipeIdeaCategorySummary(group.Key, group.Select(item => item.RecipeId).Distinct().Count()))
+        .OrderByDescending(category => category.Count)
+        .ThenBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
+        .ToList();
+    private IReadOnlyList<string> RecipeIdeaCategories => RecipeIdeaCategorySummaries
+        .Select(category => category.Name)
+        .ToList();
+    private IReadOnlyList<Recipe> FilteredRecipeIdeas => RecipeIdeas
+        .Where(MatchesRecipeIdeaFilters)
+        .OrderBy(recipe => recipe.Name)
+        .ToList();
+    private IReadOnlyList<Recipe> VisibleRecipeIdeas => FilteredRecipeIdeas
+        .Take(60)
         .ToList();
 
     protected override async Task OnInitializedAsync()
@@ -145,6 +260,29 @@
         await LoadWeekAsync();
     }
 
+    private async Task AssignRecipeIdeaAsync(int recipeId, DateOnly date, MealKind mealKind)
+    {
+        var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == recipeId);
+        if (recipe is null)
+        {
+            return;
+        }
+
+        var servings = recipe.Servings > 0 ? recipe.Servings : 3;
+        await Planner.AddRecipeAsync(date, mealKind, recipe.Id, servings);
+        _recipes = await Recipes.GetAllAsync();
+        await LoadWeekAsync();
+        _draggedRecipeIdeaId = null;
+    }
+
+    private async Task DropRecipeIdeaAsync((DateOnly Date, MealKind MealKind) target)
+    {
+        if (_draggedRecipeIdeaId is int recipeId)
+        {
+            await AssignRecipeIdeaAsync(recipeId, target.Date, target.MealKind);
+        }
+    }
+
     private async Task DismissRecipeIdeaAsync(int recipeId)
     {
         await Planner.DismissRecipeIdeaAsync(_weekStart, recipeId);
@@ -165,6 +303,65 @@
 
     private static string FormatDay(DateOnly date) => date.ToString("ddd d/M", Catalan);
 
+    private void SelectRecipeIdeaCategory(string category)
+    {
+        _recipeIdeaCategory = category;
+        _showAllRecipeIdeas = false;
+    }
+
+    private void ToggleAllRecipeIdeas()
+    {
+        _showAllRecipeIdeas = !_showAllRecipeIdeas;
+        if (_showAllRecipeIdeas)
+        {
+            _recipeIdeaSearch = string.Empty;
+            _recipeIdeaCategory = string.Empty;
+        }
+    }
+
+    private void ClearRecipeIdeaFilters()
+    {
+        _recipeIdeaSearch = string.Empty;
+        _recipeIdeaCategory = string.Empty;
+        _showAllRecipeIdeas = false;
+    }
+
+    private void BeginRecipeIdeaDrag(int recipeId)
+    {
+        _draggedRecipeIdeaId = recipeId;
+    }
+
+    private void EndRecipeIdeaDrag()
+    {
+        _draggedRecipeIdeaId = null;
+    }
+
+    private Variant RecipeIdeaCategoryVariant(string category) =>
+        string.Equals(_recipeIdeaCategory, category, StringComparison.OrdinalIgnoreCase)
+            ? Variant.Filled
+            : Variant.Outlined;
+
+    private bool MatchesRecipeIdeaFilters(Recipe recipe)
+    {
+        if (!string.IsNullOrWhiteSpace(_recipeIdeaCategory)
+            && !RecipeIdeaCategoriesFor(recipe).Contains(_recipeIdeaCategory, StringComparer.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_recipeIdeaSearch)
+            || RecipeLibraryAnalysis.MatchesSearch(recipe, _recipeIdeaSearch);
+    }
+
+    private static IReadOnlyList<string> RecipeIdeaCategoriesFor(Recipe recipe)
+    {
+        var categories = RecipeCategory.Parse(recipe.Category);
+        return categories.Count == 0 ? [NoCategoryLabel] : categories;
+    }
+
+    private static string RecipeIdeaCategoryText(Recipe recipe) =>
+        string.Join(", ", RecipeIdeaCategoriesFor(recipe));
+
     private static NutritionTotals DayNutritionTotals(DayPlan day)
     {
         var totals = new NutritionTotals();
@@ -172,4 +369,6 @@
         totals.Add(NutritionService.CalculateMeal(day.Dinner).Totals);
         return totals;
     }
+
+    private sealed record RecipeIdeaCategorySummary(string Name, int Count);
 }

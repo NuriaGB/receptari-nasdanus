@@ -454,7 +454,8 @@ public static class RecipeLibraryAnalysis
         recipe.Steps.Any(step => !string.IsNullOrWhiteSpace(step.Title) || !string.IsNullOrWhiteSpace(step.Instruction));
 
     private static bool HasEquipment(Recipe recipe) =>
-        HasRecipeSignal(recipe, "forn", "oven", "air fryer", "thermomix", "bbq", "vapor", "vaporera", "olla", "pressure", "paella", "cassola", "planxa", "grill");
+        recipe.Tags.Any(tag => RecipeTagConventions.IsEquipmentTag(tag.Name))
+        || HasRecipeSignal(recipe, "forn", "oven", "air fryer", "thermomix", "bbq", "vapor", "vaporera", "olla", "pressure", "paella", "cassola", "planxa", "grill", "motlle", "batedora", "turmix", "microones", "safata", "wok");
 
     private static bool HasImage(Recipe recipe) =>
         !string.IsNullOrWhiteSpace(recipe.ImageUrl)

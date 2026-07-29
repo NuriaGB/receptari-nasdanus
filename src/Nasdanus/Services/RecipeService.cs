@@ -23,9 +23,8 @@ public sealed class RecipeService(BrowserAppStore store)
     public async Task<List<string>> GetCategoriesAsync()
     {
         var state = await store.GetStateAsync();
-        return state.Recipes
-            .Select(recipe => recipe.Category)
-            .Where(category => !string.IsNullOrWhiteSpace(category))
+        return RecipeCategory.All
+            .Concat(state.Recipes.SelectMany(recipe => RecipeCategory.Parse(recipe.Category)))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(category => category)
             .ToList();
@@ -39,7 +38,7 @@ public sealed class RecipeService(BrowserAppStore store)
             Id = store.NextId(state),
             Name = request.Name.Trim(),
             Description = request.Description.Trim(),
-            Category = request.Category.Trim(),
+            Category = RecipeCategory.Format(RecipeCategory.Parse(request.Category)),
             PreparationTimeMinutes = request.PreparationTimeMinutes ?? 0,
             CookingTimeMinutes = request.CookingTimeMinutes ?? 0,
             Difficulty = 1,
@@ -210,7 +209,7 @@ public sealed class RecipeService(BrowserAppStore store)
 
         recipe.Name = request.Name.Trim();
         recipe.Description = request.Description.Trim();
-        recipe.Category = request.Category.Trim();
+        recipe.Category = RecipeCategory.Format(RecipeCategory.Parse(request.Category));
         recipe.Servings = Math.Max(0, request.Servings);
         recipe.PreparationTimeMinutes = Math.Max(0, request.PreparationTimeMinutes);
         recipe.CookingTimeMinutes = Math.Max(0, request.CookingTimeMinutes);

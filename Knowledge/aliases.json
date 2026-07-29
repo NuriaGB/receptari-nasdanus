@@ -2815,15 +2815,15 @@
       "alias": "pebre vermell fumat"
     },
     {
-      "ingredientId": "pebrot-variant-2",
+      "ingredientId": "pebrot-cru",
       "alias": "pebrot groc"
     },
     {
-      "ingredientId": "pebrot-variant-2",
+      "ingredientId": "pebrot-verd-cru",
       "alias": "pebrot verd"
     },
     {
-      "ingredientId": "pebrot-variant-2",
+      "ingredientId": "pebrot-vermell-cru",
       "alias": "pebrot vermell"
     },
     {
@@ -2849,6 +2849,18 @@
     {
       "ingredientId": "pebrot-cru",
       "alias": "Pepper, banana, raw"
+    },
+    {
+      "ingredientId": "pebrot-cru",
+      "alias": "pebrot"
+    },
+    {
+      "ingredientId": "pebrot-cru",
+      "alias": "pimiento"
+    },
+    {
+      "ingredientId": "pebrot-cru",
+      "alias": "pimiento amarillo"
     },
     {
       "ingredientId": "pebrot",
@@ -2935,11 +2947,11 @@
       "alias": "pimienta"
     },
     {
-      "ingredientId": "pebrot-variant-2",
+      "ingredientId": "pebrot-vermell-cru",
       "alias": "pimiento rojo"
     },
     {
-      "ingredientId": "pebrot-variant-2",
+      "ingredientId": "pebrot-verd-cru",
       "alias": "pimiento verde"
     },
     {

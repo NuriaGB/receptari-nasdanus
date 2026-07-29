@@ -167,7 +167,19 @@
 
                     <MudTextField T="string" Label="Nom" @bind-Value="_request.Name" Required="true" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     <MudTextField T="string" Label="Descripcio curta" @bind-Value="_request.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" />
-                    <MudTextField T="string" Label="Categoria" @bind-Value="_request.Category" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudSelect T="string"
+                               Label="Categories"
+                               MultiSelection="true"
+                               SelectedValues="_quickAddCategories"
+                               SelectedValuesChanged="OnQuickAddCategoriesChanged"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Dense="true">
+                        @foreach (var category in Categories)
+                        {
+                            <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                        }
+                    </MudSelect>
                     <MudTextField T="string" Label="Ingredients" Placeholder="Un ingredient per linia" @bind-Value="_request.IngredientsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
                     <MudTextField T="string" Label="Passos" Placeholder="Un pas per linia" @bind-Value="_request.StepsText" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
 
@@ -226,6 +238,7 @@
     private string _documentationStatus = string.Empty;
     private string _cookingStatus = string.Empty;
     private string _quickFilter = string.Empty;
+    private HashSet<string> _quickAddCategories = new(StringComparer.OrdinalIgnoreCase);
     private int _plannedServings = 3;
     private bool _servingsInitialized;
     private bool _viewAll;
@@ -273,8 +286,8 @@
             : $"{VisibleRecipes.Count} recommended recipe(s). Type to search every recipe.";
 
     private IReadOnlyList<string> Categories => Recipes
-        .Select(recipe => recipe.Category)
-        .Where(category => !string.IsNullOrWhiteSpace(category))
+        .SelectMany(recipe => RecipeCategory.Parse(recipe.Category))
+        .Concat(RecipeCategory.All)
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .OrderBy(category => category)
         .ToList();
@@ -315,7 +328,7 @@
     private bool MatchesCommonFilters(PickerRecipeItem item)
     {
         if (!string.IsNullOrWhiteSpace(_category)
-            && !string.Equals(item.Recipe.Category, _category, StringComparison.OrdinalIgnoreCase))
+            && !RecipeCategory.Contains(item.Recipe.Category, _category))
         {
             return false;
         }
@@ -389,7 +402,16 @@
         }
 
         var displayName = Enum.Parse<MealKind>(_mealType).ToDisplayName();
-        return string.Equals(recipe.Category, displayName, StringComparison.OrdinalIgnoreCase);
+        return RecipeCategory.Contains(recipe.Category, displayName);
+    }
+
+    private void OnQuickAddCategoriesChanged(IEnumerable<string> categories)
+    {
+        _quickAddCategories = categories
+            .Select(RecipeCategory.Normalize)
+            .Where(category => !string.IsNullOrWhiteSpace(category))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _request.Category = RecipeCategory.Format(_quickAddCategories);
     }
 
     private void ShowRecommendations()
@@ -434,6 +456,7 @@
             return;
         }
 
+        _request.Category = RecipeCategory.Format(_quickAddCategories);
         var recipe = await RecipeService.CreateQuickDraftAsync(_request);
         MudDialog.Close(DialogResult.Ok(new PlannedRecipeSelection(recipe.Id, PlannedServingsFor(recipe))));
     }

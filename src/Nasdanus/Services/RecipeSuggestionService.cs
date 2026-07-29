@@ -329,8 +329,8 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
             return false;
         }
 
-        return string.Equals(recipe.Category, mealKind.ToDisplayName(), StringComparison.OrdinalIgnoreCase)
-            || recipe.Category.Contains(mealKind.ToString(), StringComparison.OrdinalIgnoreCase);
+        return RecipeCategory.Contains(recipe.Category, mealKind.ToDisplayName())
+            || RecipeCategory.Contains(recipe.Category, mealKind.ToString());
     }
 
     private static int TotalMinutes(Recipe recipe) =>

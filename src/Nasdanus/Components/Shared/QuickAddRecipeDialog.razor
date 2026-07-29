@@ -22,11 +22,19 @@
                           Margin="Margin.Dense"
                           Lines="2" />
 
-            <MudTextField T="string"
-                          Label="Categoria"
-                          @bind-Value="_request.Category"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense" />
+            <MudSelect T="string"
+                       Label="Categories"
+                       MultiSelection="true"
+                       SelectedValues="_selectedCategories"
+                       SelectedValuesChanged="OnCategoriesChanged"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Dense="true">
+                @foreach (var category in _categoryOptions)
+                {
+                    <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                }
+            </MudSelect>
 
             <MudTextField T="string"
                           Label="Ingredients"
@@ -73,8 +81,24 @@
     public MudDialogInstance MudDialog { get; set; } = default!;
 
     private readonly QuickAddRecipeRequest _request = new();
+    private HashSet<string> _selectedCategories = new(StringComparer.OrdinalIgnoreCase);
+    private List<string> _categoryOptions = [];
 
     private bool IsSaveDisabled => string.IsNullOrWhiteSpace(_request.Name);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categoryOptions = await Recipes.GetCategoriesAsync();
+    }
+
+    private void OnCategoriesChanged(IEnumerable<string> categories)
+    {
+        _selectedCategories = categories
+            .Select(RecipeCategory.Normalize)
+            .Where(category => !string.IsNullOrWhiteSpace(category))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _request.Category = RecipeCategory.Format(_selectedCategories);
+    }
 
     private void Cancel()
     {

@@ -47,7 +47,21 @@
                         <MudTextField T="string" Label="Nom" @bind-Value="_edit.Name" Required="true" Immediate="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     </MudItem>
                     <MudItem xs="12" md="6">
-                        <MudTextField T="string" Label="Categoria" @bind-Value="_edit.Category" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        <MudSelect T="string"
+                                   Label="Categories"
+                                   MultiSelection="true"
+                                   SelectedValues="_edit.Categories"
+                                   SelectedValuesChanged="OnCategoriesChanged"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Dense="true"
+                                   Adornment="Adornment.Start"
+                                   AdornmentIcon="@Icons.Material.Filled.Category">
+                            @foreach (var category in _categoryOptions)
+                            {
+                                <MudSelectItem T="string" Value="@category">@category</MudSelectItem>
+                            }
+                        </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField T="string" Label="Descripcio" @bind-Value="_edit.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" />
@@ -73,19 +87,40 @@
                     <MudItem xs="6" sm="3">
                         <MudNumericField T="int" Label="Dificultat" @bind-Value="_edit.Difficulty" Min="0" Max="5" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudCheckBox T="bool"
+                                     Label="Family approved"
+                                     @bind-Value="_edit.FamilyApproved"
+                                     Color="Color.Success" />
+                    </MudItem>
                 </MudGrid>
             </MudPaper>
 
             <MudPaper id="tags" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
                 <MudText Typo="Typo.h5">Tags i equipament</MudText>
-                <MudTextField T="string"
-                              Label="Tags, equipament i paraules clau"
-                              @bind-Value="_edit.TagsText"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Lines="3"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Label" />
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string"
+                                      Label="Tags i paraules clau"
+                                      @bind-Value="_edit.TagsText"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Label" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string"
+                                      Label="Equipament"
+                                      Placeholder="forn, paella, motlle..."
+                                      @bind-Value="_edit.EquipmentText"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Kitchen" />
+                    </MudItem>
+                </MudGrid>
             </MudPaper>
 
             <MudPaper id="ingredients" Class="detail-section recipe-edit-section recipe-edit-anchor" Elevation="0">
@@ -127,28 +162,44 @@
                                     <MudSelectItem T="string" Value="@IngredientScalingMode.ToTaste">Al gust</MudSelectItem>
                                 </MudSelect>
                                 <div class="ingredient-link-field">
-                                    <MudSelect T="string"
-                                               Label="Ingredient conegut"
-                                               Value="@IngredientLinkValue(ingredient)"
-                                               ValueChanged="@((string value) => OnIngredientLinkChanged(ingredient, value))"
-                                               Variant="Variant.Outlined"
-                                               Margin="Margin.Dense"
-                                               Dense="true"
-                                               Disabled="@(_knownIngredients.Count == 0)">
-                                        <MudSelectItem T="string" Value="@string.Empty">Sense vincle</MudSelectItem>
-                                        @foreach (var knownIngredient in _knownIngredients)
-                                        {
-                                            <MudSelectItem T="string" Value="@knownIngredient.Id.ToString(CultureInfo.InvariantCulture)">
-                                                @knownIngredient.Name
-                                            </MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                    <MudChip T="string"
-                                             Color="@IngredientLinkColor(ingredient)"
-                                             Variant="Variant.Outlined"
-                                             Size="Size.Small">
-                                        @IngredientLinkText(ingredient)
-                                    </MudChip>
+                                    <MudTextField T="string"
+                                                  Label="Cerca ingredient conegut"
+                                                  Value="@ingredient.KnownIngredientSearch"
+                                                  ValueChanged="@((string value) => OnIngredientLinkSearchChanged(ingredient, value))"
+                                                  Immediate="true"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"
+                                                  Disabled="@(_knownIngredients.Count == 0)"
+                                                  Adornment="Adornment.Start"
+                                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                                    <div class="ingredient-link-status">
+                                        <MudChip T="string"
+                                                 Color="@IngredientLinkColor(ingredient)"
+                                                 Variant="Variant.Outlined"
+                                                 Size="Size.Small">
+                                            @IngredientLinkText(ingredient)
+                                        </MudChip>
+                                        <MudIconButton OnClick="@(() => ClearIngredientLink(ingredient))"
+                                                       Disabled="@(ingredient.IngredientId is null && string.IsNullOrWhiteSpace(ingredient.KnownIngredientSearch))"
+                                                       Icon="@Icons.Material.Filled.LinkOff"
+                                                       Color="Color.Secondary"
+                                                       Size="Size.Small"
+                                                       aria-label="Treure vincle" />
+                                    </div>
+                                    @if (ShouldShowKnownIngredientSuggestions(ingredient))
+                                    {
+                                        <div class="ingredient-link-suggestions">
+                                            @foreach (var knownIngredient in KnownIngredientMatches(ingredient))
+                                            {
+                                                <button type="button"
+                                                        class="ingredient-link-suggestion"
+                                                        @onclick="@(() => SelectKnownIngredient(ingredient, knownIngredient))">
+                                                    <span>@KnownIngredientDisplayName(knownIngredient)</span>
+                                                    <small>@KnownIngredientHint(knownIngredient)</small>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                                 <div class="edit-row-actions">
                                     <MudIconButton OnClick="@(() => MoveIngredient(ingredient, -1))"
@@ -331,6 +382,7 @@
     private RecipeEditViewModel _edit = new();
     private List<Ingredient> _knownIngredients = [];
     private Dictionary<int, Ingredient> _knownIngredientsById = [];
+    private List<string> _categoryOptions = [];
     private bool _isLoading = true;
     private bool _isSaving;
     private string _generalNotesText = string.Empty;
@@ -344,6 +396,7 @@
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
+        _categoryOptions = await Recipes.GetCategoriesAsync();
         _knownIngredients = await IngredientKnowledge.GetKnownIngredientsAsync();
         _knownIngredientsById = _knownIngredients.ToDictionary(ingredient => ingredient.Id);
         _recipe = await Recipes.GetByIdAsync(Id);
@@ -361,13 +414,15 @@
         {
             Name = recipe.Name,
             Description = recipe.Description,
-            Category = recipe.Category,
+            Categories = RecipeCategory.Parse(recipe.Category).ToHashSet(StringComparer.OrdinalIgnoreCase),
             ImageUrl = recipe.ImageUrl,
             TagsText = TagsText(recipe),
+            EquipmentText = EquipmentText(recipe),
             Servings = recipe.Servings,
             PreparationTimeMinutes = recipe.PreparationTimeMinutes,
             CookingTimeMinutes = recipe.CookingTimeMinutes,
-            Difficulty = recipe.Difficulty
+            Difficulty = recipe.Difficulty,
+            FamilyApproved = RecipeLibraryAnalysis.Analyze(recipe).CookingStatus is RecipeCookingStatus.FamilyApproved or RecipeCookingStatus.Favourite
         };
 
         var ingredientKeyMap = new Dictionary<int, string>();
@@ -384,7 +439,8 @@
                 Quantity = ingredient.Quantity,
                 Unit = ingredient.Unit,
                 ScalingMode = ingredient.ScalingMode,
-                IsManualLink = knownIngredientId is not null
+                IsManualLink = knownIngredientId is not null,
+                KnownIngredientSearch = KnownIngredientSearchText(knownIngredientId, ingredient.Name)
             });
         }
 
@@ -430,24 +486,48 @@
         if (!ingredient.IsManualLink)
         {
             ingredient.IngredientId = FindKnownIngredientId(value);
+            ingredient.KnownIngredientSearch = KnownIngredientSearchText(ingredient.IngredientId, value);
         }
     }
 
-    private void OnIngredientLinkChanged(IngredientRow ingredient, string value)
+    private void OnIngredientLinkSearchChanged(IngredientRow ingredient, string value)
     {
+        ingredient.KnownIngredientSearch = value;
+        ingredient.ShowKnownIngredientSuggestions = !string.IsNullOrWhiteSpace(value);
         ingredient.IsManualLink = true;
-        if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var ingredientId)
-            || !_knownIngredientsById.TryGetValue(ingredientId, out var knownIngredient))
+        if (string.IsNullOrWhiteSpace(value))
         {
             ingredient.IngredientId = null;
+            ingredient.ShowKnownIngredientSuggestions = false;
             return;
         }
 
+        var exactMatches = _knownIngredients
+            .Where(knownIngredient => IsExactKnownIngredientMatch(knownIngredient, value))
+            .Take(2)
+            .ToList();
+
+        ingredient.IngredientId = exactMatches.Count == 1 ? exactMatches[0].Id : null;
+    }
+
+    private void SelectKnownIngredient(IngredientRow ingredient, Ingredient knownIngredient)
+    {
+        ingredient.IsManualLink = true;
         ingredient.IngredientId = knownIngredient.Id;
+        ingredient.KnownIngredientSearch = KnownIngredientDisplayName(knownIngredient);
+        ingredient.ShowKnownIngredientSuggestions = false;
         if (string.IsNullOrWhiteSpace(ingredient.Name))
         {
             ingredient.Name = knownIngredient.Name;
         }
+    }
+
+    private void ClearIngredientLink(IngredientRow ingredient)
+    {
+        ingredient.IsManualLink = true;
+        ingredient.IngredientId = null;
+        ingredient.KnownIngredientSearch = string.Empty;
+        ingredient.ShowKnownIngredientSuggestions = false;
     }
 
     private void RemoveIngredient(IngredientRow ingredient)
@@ -516,6 +596,10 @@
         _isSaving = true;
         var request = BuildRequest();
         await Recipes.UpdateRecipeAsync(Id, request);
+        if (_edit.FamilyApproved)
+        {
+            await Recipes.MarkFamilyApprovedAsync(Id);
+        }
         Navigation.NavigateTo($"recipes/{Id}");
     }
 
@@ -523,13 +607,13 @@
     {
         Name = _edit.Name,
         Description = _edit.Description,
-        Category = _edit.Category,
+        Category = RecipeCategory.Format(_edit.Categories),
         Servings = _edit.Servings,
         PreparationTimeMinutes = _edit.PreparationTimeMinutes,
         CookingTimeMinutes = _edit.CookingTimeMinutes,
         Difficulty = _edit.Difficulty,
         ImageUrl = _edit.ImageUrl,
-        Tags = ParseTags(_edit.TagsText),
+        Tags = BuildTags(),
         Ingredients = _edit.Ingredients
             .Select((ingredient, index) => new RecipeIngredientEditRequest
             {
@@ -562,6 +646,21 @@
             .ToList(),
         Notes = BuildNotes()
     };
+
+    private List<string> BuildTags()
+    {
+        var tags = ParseTags(_edit.TagsText)
+            .Where(tag => !RecipeTagConventions.IsEquipmentTag(tag))
+            .ToList();
+
+        tags.AddRange(ParseTags(_edit.EquipmentText)
+            .Select(RecipeTagConventions.EquipmentTag)
+            .Where(tag => !string.IsNullOrWhiteSpace(tag)));
+
+        return tags
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
 
     private List<RecipeNoteEditRequest> BuildNotes()
     {
@@ -604,14 +703,9 @@
         return match?.Id;
     }
 
-    private string IngredientLinkValue(IngredientRow ingredient) =>
-        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
-            ? ingredientId.ToString(CultureInfo.InvariantCulture)
-            : string.Empty;
-
     private string IngredientLinkText(IngredientRow ingredient) =>
         ingredient.IngredientId is int ingredientId && _knownIngredientsById.TryGetValue(ingredientId, out var knownIngredient)
-            ? $"Vinculat: {knownIngredient.Name}"
+            ? $"Vinculat: {KnownIngredientDisplayName(knownIngredient)}"
             : "Sense vincle";
 
     private Color IngredientLinkColor(IngredientRow ingredient) =>
@@ -628,6 +722,110 @@
         ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId)
             ? ingredientId
             : null;
+
+    private void OnCategoriesChanged(IEnumerable<string> categories)
+    {
+        _edit.Categories = categories
+            .Select(RecipeCategory.Normalize)
+            .Where(category => !string.IsNullOrWhiteSpace(category))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private string KnownIngredientSearchText(int? knownIngredientId, string fallback) =>
+        knownIngredientId is int ingredientId && _knownIngredientsById.TryGetValue(ingredientId, out var knownIngredient)
+            ? KnownIngredientDisplayName(knownIngredient)
+            : fallback;
+
+    private bool ShouldShowKnownIngredientSuggestions(IngredientRow ingredient) =>
+        ingredient.ShowKnownIngredientSuggestions
+        && !string.IsNullOrWhiteSpace(ingredient.KnownIngredientSearch)
+        && KnownIngredientMatches(ingredient).Any();
+
+    private IReadOnlyList<Ingredient> KnownIngredientMatches(IngredientRow ingredient)
+    {
+        var search = ingredient.KnownIngredientSearch;
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            return [];
+        }
+
+        return _knownIngredients
+            .Where(knownIngredient => MatchesKnownIngredient(knownIngredient, search))
+            .OrderBy(knownIngredient => KnownIngredientScore(knownIngredient, search))
+            .ThenBy(knownIngredient => knownIngredient.Name, StringComparer.OrdinalIgnoreCase)
+            .Take(6)
+            .ToList();
+    }
+
+    private static bool MatchesKnownIngredient(Ingredient knownIngredient, string search)
+    {
+        var normalizedSearch = FoodText.Normalize(search);
+        if (string.IsNullOrWhiteSpace(normalizedSearch))
+        {
+            return false;
+        }
+
+        return KnownIngredientKeys(knownIngredient)
+            .Select(FoodText.Normalize)
+            .Any(key => key.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static int KnownIngredientScore(Ingredient knownIngredient, string search)
+    {
+        var normalizedSearch = FoodText.Normalize(search);
+        var keys = KnownIngredientKeys(knownIngredient)
+            .Select(FoodText.Normalize)
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .ToList();
+
+        if (keys.Any(key => key == normalizedSearch))
+        {
+            return 0;
+        }
+
+        if (keys.Any(key => key.StartsWith(normalizedSearch, StringComparison.OrdinalIgnoreCase)))
+        {
+            return 1;
+        }
+
+        return 2;
+    }
+
+    private static bool IsExactKnownIngredientMatch(Ingredient knownIngredient, string search)
+    {
+        var normalizedSearch = FoodText.Normalize(search);
+        return !string.IsNullOrWhiteSpace(normalizedSearch)
+            && KnownIngredientKeys(knownIngredient)
+                .Select(FoodText.Normalize)
+                .Any(key => key == normalizedSearch);
+    }
+
+    private static IEnumerable<string> KnownIngredientKeys(Ingredient knownIngredient) =>
+        new[] { knownIngredient.Name, knownIngredient.CatalanName, knownIngredient.SpanishName }
+            .Concat(knownIngredient.Aliases)
+            .Where(value => !string.IsNullOrWhiteSpace(value));
+
+    private static string KnownIngredientDisplayName(Ingredient knownIngredient)
+    {
+        var priorityAlias = knownIngredient.Aliases
+            .FirstOrDefault(alias => string.Equals(alias, "AOVE", StringComparison.OrdinalIgnoreCase));
+        return string.IsNullOrWhiteSpace(priorityAlias)
+            ? knownIngredient.Name
+            : $"{knownIngredient.Name} ({priorityAlias})";
+    }
+
+    private static string KnownIngredientHint(Ingredient knownIngredient)
+    {
+        var hints = new[] { knownIngredient.CatalanName, knownIngredient.SpanishName }
+            .Concat(knownIngredient.Aliases)
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Where(value => !string.Equals(value, knownIngredient.Name, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(3)
+            .ToList();
+
+        return hints.Count == 0 ? "Sense aliases" : string.Join(" · ", hints);
+    }
 
     private int StepNumber(StepRow step) => _edit.Steps.IndexOf(step) + 1;
 
@@ -657,6 +855,15 @@
     private static string TagsText(Recipe recipe) =>
         string.Join(", ", recipe.Tags
             .Select(tag => tag.Name)
+            .Where(tag => !RecipeTagConventions.IsEquipmentTag(tag))
+            .Where(tag => !string.IsNullOrWhiteSpace(tag))
+            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase));
+
+    private static string EquipmentText(Recipe recipe) =>
+        string.Join(", ", recipe.Tags
+            .Select(tag => tag.Name)
+            .Where(RecipeTagConventions.IsEquipmentTag)
+            .Select(RecipeTagConventions.RemoveEquipmentPrefix)
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
             .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase));
 
@@ -674,13 +881,15 @@
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Category { get; set; } = string.Empty;
+        public HashSet<string> Categories { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public string ImageUrl { get; set; } = string.Empty;
         public string TagsText { get; set; } = string.Empty;
+        public string EquipmentText { get; set; } = string.Empty;
         public int Servings { get; set; }
         public int PreparationTimeMinutes { get; set; }
         public int CookingTimeMinutes { get; set; }
         public int Difficulty { get; set; }
+        public bool FamilyApproved { get; set; }
         public List<IngredientRow> Ingredients { get; set; } = [];
         public List<StepRow> Steps { get; set; } = [];
     }
@@ -694,6 +903,8 @@
         public string Unit { get; set; } = string.Empty;
         public string ScalingMode { get; set; } = IngredientScalingMode.Linear;
         public bool IsManualLink { get; set; }
+        public string KnownIngredientSearch { get; set; } = string.Empty;
+        public bool ShowKnownIngredientSuggestions { get; set; }
     }
 
     private sealed class StepRow

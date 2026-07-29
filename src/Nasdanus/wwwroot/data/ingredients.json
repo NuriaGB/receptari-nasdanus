@@ -6647,11 +6647,12 @@
     },
     {
       "id": "oli-d-oliva",
-      "name": "Oli d\u0027oliva",
-      "catalanName": "Oli d\u0027oliva",
-      "spanishName": "Aceite de oliva",
+      "name": "AOVE / oli d\u0027oliva verge extra",
+      "catalanName": "AOVE / oli d\u0027oliva verge extra",
+      "spanishName": "AOVE / aceite de oliva virgen extra",
       "aliases": [
         "aceite",
+        "aceite de oliva virgen extra",
         "aceite oliva",
         "AOVE",
         "Oil, olive, salad or cooking",
@@ -6770,15 +6771,17 @@
     },
     {
       "id": "olives-verdes-en-conserva",
-      "name": "Olives verdes en conserva",
-      "catalanName": "Olives verdes en conserva",
-      "spanishName": "Aceitunas verdes en conserva",
+      "name": "Olives verdes farcides gust anxova",
+      "catalanName": "Olives verdes farcides gust anxova",
+      "spanishName": "Aceitunas verdes rellenas sabor anchoa",
       "aliases": [
         "aceitunas rellenas de anchoa",
+        "aceitunas rellenas sabor anchoa",
         "aceitunas verdes",
         "green olives",
         "olives verdes",
         "olives verdes farcides",
+        "olives verdes farcides gust anxova",
         "olives verdes farcides d\u0027anxova",
         "Olives, pickled, canned or bottled, green"
       ],
@@ -7725,10 +7728,12 @@
     },
     {
       "id": "pebrot",
-      "name": "Pebrot",
-      "catalanName": "Pebrot",
-      "spanishName": "Pimiento",
+      "name": "Menta fresca",
+      "catalanName": "Menta fresca",
+      "spanishName": "Menta fresca",
       "aliases": [
+        "hierbabuena",
+        "menta",
         "Peppermint, fresh"
       ],
       "category": "spices",
@@ -7751,11 +7756,15 @@
     },
     {
       "id": "pebrot-cru",
-      "name": "Pebrot cru",
-      "catalanName": "Pebrot cru",
-      "spanishName": "Pimiento crudo",
+      "name": "Pebrot groc cru",
+      "catalanName": "Pebrot groc cru",
+      "spanishName": "Pimiento amarillo crudo",
       "aliases": [
-        "Pepper, banana, raw"
+        "pebrot",
+        "pebrot groc",
+        "Pepper, banana, raw",
+        "pimiento",
+        "pimiento amarillo"
       ],
       "category": "vegetables",
       "subcategory": "vegetables, mushrooms and fresh herbs",
@@ -7778,15 +7787,10 @@
     },
     {
       "id": "pebrot-variant-2",
-      "name": "Pebrot variant 2",
-      "catalanName": "Pebrot variant 2",
-      "spanishName": "Pimiento variante 2",
+      "name": "Salsa de pebrot picant",
+      "catalanName": "Salsa de pebrot picant",
+      "spanishName": "Salsa de pimiento picante",
       "aliases": [
-        "pebrot groc",
-        "pebrot verd",
-        "pebrot vermell",
-        "pimiento rojo",
-        "pimiento verde",
         "Sauce, ready-to-serve, pepper or hot"
       ],
       "category": "pantry",
@@ -7810,9 +7814,9 @@
     },
     {
       "id": "pebrot-variant-3",
-      "name": "Pebrot variant 3",
-      "catalanName": "Pebrot variant 3",
-      "spanishName": "Pimiento variante 3",
+      "name": "Salsa Tabasco de pebrot",
+      "catalanName": "Salsa Tabasco de pebrot",
+      "spanishName": "Salsa Tabasco de pimiento",
       "aliases": [
         "Sauce, ready-to-serve, pepper, TABASCO"
       ],
@@ -7841,7 +7845,9 @@
       "catalanName": "Pebrot verd cru",
       "spanishName": "Pimiento verde crudo",
       "aliases": [
-        "Peppers, sweet, green, raw"
+        "pebrot verd",
+        "Peppers, sweet, green, raw",
+        "pimiento verde"
       ],
       "category": "vegetables",
       "subcategory": "vegetables, mushrooms and fresh herbs",
@@ -7868,7 +7874,9 @@
       "catalanName": "Pebrot vermell cru",
       "spanishName": "Pimiento rojo crudo",
       "aliases": [
-        "Peppers, sweet, red, raw"
+        "pebrot vermell",
+        "Peppers, sweet, red, raw",
+        "pimiento rojo"
       ],
       "category": "vegetables",
       "subcategory": "vegetables, mushrooms and fresh herbs",

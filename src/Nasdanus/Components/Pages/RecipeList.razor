@@ -256,7 +256,7 @@
         }
 
         if (!string.IsNullOrWhiteSpace(_category)
-            && !string.Equals(recipe.Category, _category, StringComparison.OrdinalIgnoreCase))
+            && !RecipeCategory.Contains(recipe.Category, _category))
         {
             return false;
         }
