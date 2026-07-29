@@ -2,6 +2,7 @@
 @using System.Globalization
 @inject PlannerService Planner
 @inject RecipeService Recipes
+@inject PlanningSettingsService PlanningSettings
 
 <PageTitle>Nasdanus - Planner</PageTitle>
 
@@ -154,6 +155,9 @@
             <div class="planner-grid" role="list">
                 @foreach (var day in _days)
                 {
+                    var dayTotals = DayNutritionTotals(day);
+                    var dayGoal = DailyGoal(dayTotals);
+
                     <MudPaper Class="planner-day-card" Elevation="0" role="listitem">
                         <div class="planner-day-header">
                             <MudText Typo="Typo.subtitle1">@FormatDay(day.Date)</MudText>
@@ -167,8 +171,20 @@
                         <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
                         <NutritionSummary Title="Total dia"
                                           Subtitle="Per racio - dinar + sopar"
-                                          Totals="@DayNutritionTotals(day)"
+                                          Totals="@dayTotals"
                                           Dense="true" />
+                        <MudPaper Class="@DailyGoalCardClass(dayGoal)" Elevation="0">
+                            <MudIcon Icon="@DailyGoalIcon(dayGoal)"
+                                     Color="@DailyGoalColor(dayGoal)"
+                                     Size="Size.Small" />
+                            <div class="daily-goal-copy">
+                                <MudText Typo="Typo.subtitle2">@DailyGoalTitle(dayGoal)</MudText>
+                                <div class="daily-goal-lines">
+                                    <span>Proteina @FormatGoalNumber(dayGoal.ProteinGrams) g (@FormatGoalNumber(dayGoal.ProteinPercent)% de @FormatGoalNumber(dayGoal.ProteinTargetGrams) g)</span>
+                                    <span>Kcal @FormatGoalNumber(dayGoal.CaloriesKcal) / @FormatGoalNumber(dayGoal.CalorieLimit)</span>
+                                </div>
+                            </div>
+                        </MudPaper>
                     </MudPaper>
                 }
             </div>
@@ -183,6 +199,7 @@
     private DateOnly _weekStart;
     private List<DayPlan> _days = [];
     private List<Recipe> _recipes = [];
+    private HouseholdPlanningSettings? _settings;
     private HashSet<int> _plannedRecipeIds = [];
     private HashSet<int> _dismissedRecipeIdeaIds = [];
     private string _recipeIdeaSearch = string.Empty;
@@ -195,6 +212,8 @@
 
     private int WeekNumber => ISOWeek.GetWeekOfYear(_weekStart.ToDateTime(TimeOnly.MinValue));
     private string WeekRangeText => $"{_weekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_weekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
+    private decimal ProteinTargetGrams => PositiveOrDefault(_settings?.NutritionGoals.MinimumProteinGramsPerPerson, 150m);
+    private decimal CalorieLimit => PositiveOrDefault(_settings?.NutritionGoals.TargetCaloriesPerPerson, 2000m);
     private IReadOnlyList<Recipe> RecipeIdeas => _recipes
         .Where(recipe => !_plannedRecipeIds.Contains(recipe.Id))
         .Where(recipe => !_dismissedRecipeIdeaIds.Contains(recipe.Id))
@@ -226,6 +245,7 @@
     {
         _today = DateOnly.FromDateTime(DateTime.Today);
         _weekStart = PlannerService.WeekStart(_today);
+        _settings = await PlanningSettings.GetSettingsAsync();
         _recipes = await Recipes.GetAllAsync();
         await LoadWeekAsync();
         _isLoading = false;
@@ -370,5 +390,55 @@
         return totals;
     }
 
+    private DailyNutritionGoal DailyGoal(NutritionTotals totals)
+    {
+        var proteinTarget = ProteinTargetGrams;
+        var calorieLimit = CalorieLimit;
+        var proteinPercent = proteinTarget > 0 ? totals.ProteinGrams * 100m / proteinTarget : 0m;
+        var proteinInRange = proteinPercent is >= 80m and <= 110m;
+        var caloriesInRange = totals.CaloriesKcal <= calorieLimit;
+
+        return new DailyNutritionGoal(
+            totals.CaloriesKcal,
+            totals.ProteinGrams,
+            proteinTarget,
+            proteinPercent,
+            calorieLimit,
+            proteinInRange,
+            caloriesInRange);
+    }
+
+    private static decimal PositiveOrDefault(decimal? value, decimal fallback) =>
+        value is > 0 ? value.Value : fallback;
+
+    private static string DailyGoalCardClass(DailyNutritionGoal goal) =>
+        goal.IsOnTrack ? "daily-goal-card is-ok" : "daily-goal-card is-warning";
+
+    private static string DailyGoalIcon(DailyNutritionGoal goal) =>
+        goal.IsOnTrack ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Info;
+
+    private static Color DailyGoalColor(DailyNutritionGoal goal) =>
+        goal.IsOnTrack ? Color.Success : Color.Warning;
+
+    private static string DailyGoalTitle(DailyNutritionGoal goal) =>
+        goal.IsOnTrack
+            ? "Objectiu del dia OK"
+            : "Revisa objectiu del dia";
+
+    private static string FormatGoalNumber(decimal value) =>
+        Math.Round(value, 0).ToString("0", CultureInfo.InvariantCulture);
+
     private sealed record RecipeIdeaCategorySummary(string Name, int Count);
+
+    private sealed record DailyNutritionGoal(
+        decimal CaloriesKcal,
+        decimal ProteinGrams,
+        decimal ProteinTargetGrams,
+        decimal ProteinPercent,
+        decimal CalorieLimit,
+        bool ProteinInRange,
+        bool CaloriesInRange)
+    {
+        public bool IsOnTrack => ProteinInRange && CaloriesInRange;
+    }
 }

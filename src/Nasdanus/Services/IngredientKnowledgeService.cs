@@ -14,6 +14,34 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
             .ToList();
     }
 
+    public async Task<bool> SaveNutritionAsync(string knowledgeId, IngredientNutritionManualEdit edit)
+    {
+        if (string.IsNullOrWhiteSpace(knowledgeId))
+        {
+            return false;
+        }
+
+        var state = await store.GetStateAsync();
+        var ingredient = state.Ingredients.FirstOrDefault(ingredient =>
+            string.Equals(ingredient.KnowledgeId, knowledgeId, StringComparison.OrdinalIgnoreCase));
+        if (ingredient is null)
+        {
+            return false;
+        }
+
+        ingredient.NutritionPer100Grams = CloneNutrition(edit.Nutrition);
+        ingredient.NutritionSource = string.IsNullOrWhiteSpace(edit.Source)
+            ? "manual"
+            : edit.Source.Trim();
+        ingredient.NutritionSourceId = string.IsNullOrWhiteSpace(edit.SourceId)
+            ? "manual"
+            : edit.SourceId.Trim();
+        ingredient.NutritionLastUpdated = DateTimeOffset.UtcNow;
+
+        await store.SaveAsync();
+        return true;
+    }
+
     private static bool IsKnownIngredient(Ingredient ingredient) =>
         !string.IsNullOrWhiteSpace(ingredient.KnowledgeId);
 
@@ -31,21 +59,21 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
         PantryCategory = ingredient.PantryCategory,
         CanFreeze = ingredient.CanFreeze,
         Seasonality = ingredient.Seasonality,
-        NutritionPer100Grams = ingredient.NutritionPer100Grams is null
-            ? null
-            : new IngredientNutrition
-            {
-                CaloriesKcal = ingredient.NutritionPer100Grams.CaloriesKcal,
-                ProteinGrams = ingredient.NutritionPer100Grams.ProteinGrams,
-                CarbohydrateGrams = ingredient.NutritionPer100Grams.CarbohydrateGrams,
-                FatGrams = ingredient.NutritionPer100Grams.FatGrams,
-                FibreGrams = ingredient.NutritionPer100Grams.FibreGrams,
-                    SugarGrams = ingredient.NutritionPer100Grams.SugarGrams,
-                    SaltGrams = ingredient.NutritionPer100Grams.SaltGrams
-                },
+        NutritionPer100Grams = ingredient.NutritionPer100Grams is null ? null : CloneNutrition(ingredient.NutritionPer100Grams),
         NutritionState = ingredient.NutritionState,
         NutritionSource = ingredient.NutritionSource,
         NutritionSourceId = ingredient.NutritionSourceId,
         NutritionLastUpdated = ingredient.NutritionLastUpdated
+    };
+
+    private static IngredientNutrition CloneNutrition(IngredientNutrition nutrition) => new()
+    {
+        CaloriesKcal = nutrition.CaloriesKcal,
+        ProteinGrams = nutrition.ProteinGrams,
+        CarbohydrateGrams = nutrition.CarbohydrateGrams,
+        FatGrams = nutrition.FatGrams,
+        FibreGrams = nutrition.FibreGrams,
+        SugarGrams = nutrition.SugarGrams,
+        SaltGrams = nutrition.SaltGrams
     };
 }

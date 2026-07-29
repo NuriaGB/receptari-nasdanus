@@ -2,6 +2,7 @@
 @using System.Globalization
 @inject PlanningSettingsService PlanningSettings
 @inject HouseholdIngredientPreferenceService Preferences
+@inject IngredientKnowledgeService IngredientKnowledge
 @inject BrowserAppStore Store
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -480,7 +481,13 @@
                                                 @filter.Label
                                             </MudButton>
                                         }
-                                        <MudCheckBox T="bool" Label="Nomes sense nutricio" @bind-Value="_missingNutritionOnly" Color="Color.Primary" />
+                                        <MudButton OnClick="ToggleMissingNutritionOnly"
+                                                   Variant="@(_missingNutritionOnly ? Variant.Filled : Variant.Outlined)"
+                                                   Color="Color.Warning"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Warning">
+                                            Sense nutricio (@MissingNutritionCount)
+                                        </MudButton>
                                     </div>
                                 </MudItem>
                             </MudGrid>
@@ -515,16 +522,30 @@
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">
                                                 Aliases: @AliasesText(row.Ingredient)
                                             </MudText>
-                                            @if (row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
-                                            {
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                                    @NutritionText(row.Ingredient.NutritionPer100Grams)
-                                                </MudText>
-                                            }
-                                            else
-                                            {
-                                                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">Sense nutricio</MudAlert>
-                                            }
+                                            <div class="ingredient-nutrition-line">
+                                                @if (row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
+                                                {
+                                                    <div class="ingredient-nutrition-copy">
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                            @NutritionText(row.Ingredient.NutritionPer100Grams)
+                                                        </MudText>
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                            @NutritionSourceText(row.Ingredient)
+                                                        </MudText>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">Sense nutricio</MudAlert>
+                                                }
+                                                <MudButton OnClick="@(() => OpenNutritionDialogAsync(row))"
+                                                           Variant="Variant.Outlined"
+                                                           Color="@(row.Ingredient.NutritionPer100Grams?.HasAnyValue == true ? Color.Primary : Color.Warning)"
+                                                           Size="Size.Small"
+                                                           StartIcon="@Icons.Material.Filled.Edit">
+                                                    Nutricio
+                                                </MudButton>
+                                            </div>
                                         </div>
 
                                         <div class="ingredient-preference-controls">
@@ -905,6 +926,37 @@
         Snackbar.Add("Preferencia desada.", Severity.Success);
     }
 
+    private async Task OpenNutritionDialogAsync(HouseholdIngredientPreferenceRow row)
+    {
+        var parameters = new DialogParameters<IngredientNutritionDialog>
+        {
+            { dialog => dialog.Ingredient, row.Ingredient }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<IngredientNutritionDialog>($"Nutricio: {row.Ingredient.Name}", parameters, options);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled || result.Data is not IngredientNutritionManualEdit edit)
+        {
+            return;
+        }
+
+        var saved = await IngredientKnowledge.SaveNutritionAsync(row.Ingredient.KnowledgeId, edit);
+        if (!saved)
+        {
+            Snackbar.Add("No s'ha pogut desar la nutricio.", Severity.Error);
+            return;
+        }
+
+        await LoadAsync();
+        Snackbar.Add("Nutricio desada.", Severity.Success);
+    }
+
     private async Task SaveAllIngredientsAsync()
     {
         _isSavingIngredients = true;
@@ -1105,6 +1157,11 @@
         _category = category;
     }
 
+    private void ToggleMissingNutritionOnly()
+    {
+        _missingNutritionOnly = !_missingNutritionOnly;
+    }
+
     private Variant CategoryButtonVariant(string category) =>
         string.Equals(_category, category, StringComparison.OrdinalIgnoreCase)
             ? Variant.Filled
@@ -1249,6 +1306,16 @@
         + $"{nutrition.ProteinGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g prot · "
         + $"{nutrition.CarbohydrateGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g hidrats · "
         + $"{nutrition.FatGrams?.ToString("0.#", CultureInfo.InvariantCulture) ?? "-"} g greix";
+
+    private static string NutritionSourceText(Ingredient ingredient)
+    {
+        var source = string.IsNullOrWhiteSpace(ingredient.NutritionSource)
+            ? "font no registrada"
+            : ingredient.NutritionSource;
+        return string.IsNullOrWhiteSpace(ingredient.NutritionSourceId)
+            ? $"Font: {source}"
+            : $"Font: {source} {ingredient.NutritionSourceId}";
+    }
 
     private static RenderFragment SectionHeading(string title, string text) => @<div class="settings-section-heading">
         <MudText Typo="Typo.h5">@title</MudText>

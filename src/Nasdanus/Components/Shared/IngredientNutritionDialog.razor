@@ -1,0 +1,141 @@
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                @Ingredient.Name - valors per 100 g
+            </MudText>
+
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="kcal"
+                                     @bind-Value="_nutrition.CaloriesKcal"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Proteina g"
+                                     @bind-Value="_nutrition.ProteinGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Hidrats g"
+                                     @bind-Value="_nutrition.CarbohydrateGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Greix g"
+                                     @bind-Value="_nutrition.FatGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Fibra g"
+                                     @bind-Value="_nutrition.FibreGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Sucre g"
+                                     @bind-Value="_nutrition.SugarGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="Sal g"
+                                     @bind-Value="_nutrition.SaltGrams"
+                                     Min="0"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Font"
+                                  @bind-Value="_source"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="Referencia"
+                                  @bind-Value="_sourceId"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
+        <MudButton OnClick="Save"
+                   Disabled="@(!CanSave)"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Guardar nutricio
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public Ingredient Ingredient { get; set; } = new();
+
+    private IngredientNutrition _nutrition = new();
+    private string _source = "manual";
+    private string _sourceId = string.Empty;
+
+    private bool CanSave => _nutrition.HasAnyValue;
+
+    protected override void OnParametersSet()
+    {
+        _nutrition = Ingredient.NutritionPer100Grams is null
+            ? new IngredientNutrition()
+            : new IngredientNutrition
+            {
+                CaloriesKcal = Ingredient.NutritionPer100Grams.CaloriesKcal,
+                ProteinGrams = Ingredient.NutritionPer100Grams.ProteinGrams,
+                CarbohydrateGrams = Ingredient.NutritionPer100Grams.CarbohydrateGrams,
+                FatGrams = Ingredient.NutritionPer100Grams.FatGrams,
+                FibreGrams = Ingredient.NutritionPer100Grams.FibreGrams,
+                SugarGrams = Ingredient.NutritionPer100Grams.SugarGrams,
+                SaltGrams = Ingredient.NutritionPer100Grams.SaltGrams
+            };
+
+        var hasManualSource = string.Equals(Ingredient.NutritionSource, "manual", StringComparison.OrdinalIgnoreCase);
+        _source = hasManualSource && !string.IsNullOrWhiteSpace(Ingredient.NutritionSource)
+            ? Ingredient.NutritionSource
+            : "manual";
+        _sourceId = hasManualSource ? Ingredient.NutritionSourceId : Ingredient.Name;
+    }
+
+    private void Save()
+    {
+        var edit = new IngredientNutritionManualEdit(
+            _nutrition,
+            string.IsNullOrWhiteSpace(_source) ? "manual" : _source.Trim(),
+            string.IsNullOrWhiteSpace(_sourceId) ? Ingredient.Name : _sourceId.Trim());
+        MudDialog.Close(DialogResult.Ok(edit));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

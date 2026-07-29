@@ -192,6 +192,11 @@ h3:focus {
     gap: 0.5rem;
 }
 
+.nutrition-summary-card.is-dense .nutrition-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem 0.75rem;
+}
+
 .nutrition-summary-metric {
     min-width: 0;
 }
@@ -202,6 +207,42 @@ h3:focus {
 
 .nutrition-warning {
     color: #8a5a00;
+}
+
+.daily-goal-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+    padding: 0.65rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.daily-goal-card.is-ok {
+    border-color: #8fbf9b;
+    background: #f3faf5;
+}
+
+.daily-goal-card.is-warning {
+    border-color: #e4c879;
+    background: #fffaf0;
+}
+
+.daily-goal-copy {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.daily-goal-lines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+    color: var(--nas-muted);
+    font-size: 0.82rem;
 }
 
 @media (max-width: 480px) {
@@ -538,6 +579,19 @@ h3:focus {
     display: grid;
     gap: 0.2rem;
     min-width: 0;
+}
+
+.ingredient-nutrition-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.ingredient-nutrition-copy {
+    display: grid;
+    gap: 0.05rem;
+    min-width: min(18rem, 100%);
 }
 
 .ingredient-preference-controls {

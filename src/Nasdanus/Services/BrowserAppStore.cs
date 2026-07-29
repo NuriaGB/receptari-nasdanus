@@ -1125,9 +1125,13 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             : item.DefaultUnit.Trim();
         ingredient.PantryCategory = MapKnowledgeShoppingCategory(item.PantryCategory, item.Category);
         ingredient.CanFreeze = item.CanFreeze;
-        ingredient.NutritionState = NormalizeNutritionState(item.NutritionState);
+        var hasManualNutrition = HasManualNutrition(ingredient);
+        if (!hasManualNutrition)
+        {
+            ingredient.NutritionState = NormalizeNutritionState(item.NutritionState);
+        }
 
-        if (item.Nutrition is not null)
+        if (item.Nutrition is not null && !hasManualNutrition)
         {
             ingredient.NutritionPer100Grams = new IngredientNutrition
             {
@@ -1146,6 +1150,10 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             ingredient.NutritionLastUpdated = item.LastUpdated;
         }
     }
+
+    private static bool HasManualNutrition(Ingredient ingredient) =>
+        string.Equals(ingredient.NutritionSource, "manual", StringComparison.OrdinalIgnoreCase)
+        && ingredient.NutritionPer100Grams?.HasAnyValue == true;
 
     private static Product CreateProductSnapshot(Product product) => new()
     {

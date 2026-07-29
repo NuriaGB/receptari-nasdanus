@@ -41,6 +41,11 @@ public sealed class IngredientNutrition
         || SaltGrams is not null;
 }
 
+public sealed record IngredientNutritionManualEdit(
+    IngredientNutrition Nutrition,
+    string Source,
+    string SourceId);
+
 public sealed class Product
 {
     public int Id { get; set; }
