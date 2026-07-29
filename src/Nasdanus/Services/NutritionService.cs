@@ -126,8 +126,13 @@ public sealed class NutritionService(BrowserAppStore store)
 
     private static void AddIngredientNutrition(NutritionTotals totals, RecipeIngredient ingredient, decimal scale)
     {
-        totals.TotalIngredientCount++;
         var linkedIngredient = ingredient.Ingredient;
+        if (IngredientNutritionRules.ShouldIgnoreForNutrition(linkedIngredient))
+        {
+            return;
+        }
+
+        totals.TotalIngredientCount++;
         if (linkedIngredient is null)
         {
             totals.UnknownNutritionCount++;
@@ -135,6 +140,20 @@ public sealed class NutritionService(BrowserAppStore store)
         }
 
         totals.LinkedIngredientCount++;
+        if (IngredientNutritionRules.IsSalt(linkedIngredient))
+        {
+            var saltGrams = QuantityInGrams(ingredient, scale);
+            if (saltGrams is null)
+            {
+                totals.UnknownQuantityCount++;
+                return;
+            }
+
+            totals.KnownIngredientCount++;
+            totals.SaltGrams += saltGrams.Value;
+            return;
+        }
+
         var nutrition = linkedIngredient.NutritionPer100Grams;
         if (nutrition is null || !nutrition.HasAnyValue)
         {

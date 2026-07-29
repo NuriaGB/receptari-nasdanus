@@ -556,6 +556,12 @@
                                                         </MudText>
                                                     </div>
                                                 }
+                                                else if (IngredientNutritionRules.ShouldIgnoreForNutrition(row.Ingredient))
+                                                {
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                        Ignorat en el calcul nutricional.
+                                                    </MudText>
+                                                }
                                                 else
                                                 {
                                                     <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">Sense nutricio</MudAlert>
@@ -878,7 +884,9 @@
     private decimal CalculatedCarbGrams => CalculatedMacroGrams(_settings?.NutritionGoals.CarbohydratePercent ?? 0, 4);
     private decimal CalculatedFatGrams => CalculatedMacroGrams(_settings?.NutritionGoals.FatPercent ?? 0, 9);
     private int ConfiguredCount => _rows.Count(row => HasConfiguredPreference(row.Preference));
-    private int MissingNutritionCount => _rows.Count(row => row.Ingredient.NutritionPer100Grams?.HasAnyValue != true);
+    private int MissingNutritionCount => _rows.Count(row =>
+        IngredientNutritionRules.RequiresNutritionData(row.Ingredient)
+        && row.Ingredient.NutritionPer100Grams?.HasAnyValue != true);
     private Color MissingNutritionColor => MissingNutritionCount == 0 ? Color.Success : Color.Warning;
     private Color UnresolvedIngredientColor => _summary?.UnresolvedIngredients > 0 ? Color.Warning : Color.Success;
     private string KnowledgeLastUpdatedText => _rows
@@ -1208,7 +1216,9 @@
 
     private bool MatchesFilters(HouseholdIngredientPreferenceRow row)
     {
-        if (_missingNutritionOnly && row.Ingredient.NutritionPer100Grams?.HasAnyValue == true)
+        if (_missingNutritionOnly
+            && (!IngredientNutritionRules.RequiresNutritionData(row.Ingredient)
+                || row.Ingredient.NutritionPer100Grams?.HasAnyValue == true))
         {
             return false;
         }

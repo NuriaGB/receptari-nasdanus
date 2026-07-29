@@ -97,6 +97,7 @@
     private bool _isLoading = true;
 
     private List<Ingredient> FilteredKnownMissingIngredients => _knownIngredients
+        .Where(ingredient => IngredientNutritionRules.RequiresNutritionData(ingredient))
         .Where(ingredient => ingredient.NutritionPer100Grams?.HasAnyValue != true)
         .Where(MatchesSearch)
         .OrderBy(ingredient => ingredient.Name)
@@ -435,6 +436,18 @@
         if (linkedIngredient is null || string.IsNullOrWhiteSpace(linkedIngredient.KnowledgeId))
         {
             return new IngredientIssue(IssueKind.Unresolved, displayName, ingredientText, null, recipe.Id, recipe.Name, date, mealKind);
+        }
+
+        if (IngredientNutritionRules.ShouldIgnoreForNutrition(linkedIngredient))
+        {
+            return null;
+        }
+
+        if (IngredientNutritionRules.IsSalt(linkedIngredient))
+        {
+            return QuantityInGrams(recipeIngredient, scale) is null
+                ? new IngredientIssue(IssueKind.Quantity, linkedIngredient.Name, ingredientText, linkedIngredient, recipe.Id, recipe.Name, date, mealKind)
+                : null;
         }
 
         if (linkedIngredient.NutritionPer100Grams?.HasAnyValue != true)

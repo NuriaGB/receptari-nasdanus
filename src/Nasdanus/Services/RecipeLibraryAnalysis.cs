@@ -10,6 +10,7 @@ public sealed record RecipeLibraryProfile(
     RecipeWorkflowAction NextAction,
     int TotalIngredientCount,
     int LinkedIngredientCount,
+    int NutritionRelevantIngredientCount,
     int NutritionLinkedIngredientCount,
     bool HasUnresolvedIngredients,
     bool HasMissingNutrition,
@@ -157,12 +158,15 @@ public static class RecipeLibraryAnalysis
         var totalIngredients = recipe.Ingredients.Count;
         var linkedIngredients = recipe.Ingredients.Count(ingredient =>
             !string.IsNullOrWhiteSpace(ingredient.Ingredient?.KnowledgeId));
+        var nutritionRelevantIngredients = recipe.Ingredients.Count(ingredient =>
+            !IngredientNutritionRules.ShouldIgnoreForNutrition(ingredient.Ingredient));
         var nutritionLinkedIngredients = recipe.Ingredients.Count(ingredient =>
-            ingredient.Ingredient?.NutritionPer100Grams?.HasAnyValue == true);
+            !IngredientNutritionRules.ShouldIgnoreForNutrition(ingredient.Ingredient)
+            && IngredientNutritionRules.HasUsableNutritionForCalculation(ingredient.Ingredient));
         var hasUnresolvedIngredients = totalIngredients == 0 || linkedIngredients < totalIngredients;
-        var hasMissingNutrition = totalIngredients == 0 || nutritionLinkedIngredients < totalIngredients;
-        var completionItems = CompletionItems(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients);
-        var nextAction = NextAction(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients);
+        var hasMissingNutrition = totalIngredients == 0 || nutritionLinkedIngredients < nutritionRelevantIngredients;
+        var completionItems = CompletionItems(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients, nutritionRelevantIngredients);
+        var nextAction = NextAction(recipe, totalIngredients, linkedIngredients, nutritionLinkedIngredients, nutritionRelevantIngredients);
         var completionPercent = (int)Math.Round(
             completionItems.Count(item => item.IsComplete) * 100m / completionItems.Count,
             MidpointRounding.AwayFromZero);
@@ -175,6 +179,7 @@ public static class RecipeLibraryAnalysis
             NextAction: nextAction,
             TotalIngredientCount: totalIngredients,
             LinkedIngredientCount: linkedIngredients,
+            NutritionRelevantIngredientCount: nutritionRelevantIngredients,
             NutritionLinkedIngredientCount: nutritionLinkedIngredients,
             HasUnresolvedIngredients: hasUnresolvedIngredients,
             HasMissingNutrition: hasMissingNutrition,
@@ -288,11 +293,12 @@ public static class RecipeLibraryAnalysis
         Recipe recipe,
         int totalIngredients,
         int linkedIngredients,
-        int nutritionLinkedIngredients) =>
+        int nutritionLinkedIngredients,
+        int nutritionRelevantIngredients) =>
     [
         new("Ingredients", totalIngredients > 0),
         new("Ingredient links", totalIngredients > 0 && linkedIngredients == totalIngredients),
-        new("Nutrition links", totalIngredients > 0 && nutritionLinkedIngredients == totalIngredients),
+        new("Nutrition links", totalIngredients > 0 && nutritionLinkedIngredients >= nutritionRelevantIngredients),
         new("Steps", HasCookingSteps(recipe)),
         new("Preparation time", recipe.PreparationTimeMinutes > 0),
         new("Cooking time", recipe.CookingTimeMinutes > 0),
@@ -310,7 +316,8 @@ public static class RecipeLibraryAnalysis
         Recipe recipe,
         int totalIngredients,
         int linkedIngredients,
-        int nutritionLinkedIngredients)
+        int nutritionLinkedIngredients,
+        int nutritionRelevantIngredients)
     {
         if (totalIngredients == 0)
         {
@@ -322,7 +329,7 @@ public static class RecipeLibraryAnalysis
             return Action(RecipeWorkflowActionKind.LinkIngredients);
         }
 
-        if (nutritionLinkedIngredients < totalIngredients)
+        if (nutritionLinkedIngredients < nutritionRelevantIngredients)
         {
             return Action(RecipeWorkflowActionKind.AddNutritionLinks);
         }

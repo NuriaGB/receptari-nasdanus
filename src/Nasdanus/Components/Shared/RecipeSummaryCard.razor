@@ -110,7 +110,11 @@
             : Color.Error;
     private string KnowledgeText => Profile.TotalIngredientCount == 0
         ? "No ingredients documented"
-        : $"{Profile.LinkedIngredientCount}/{Profile.TotalIngredientCount} ingredients linked - {Profile.NutritionLinkedIngredientCount}/{Profile.TotalIngredientCount} with nutrition";
+        : $"{Profile.LinkedIngredientCount}/{Profile.TotalIngredientCount} ingredients linked - {NutritionKnowledgeText}";
+
+    private string NutritionKnowledgeText => Profile.NutritionRelevantIngredientCount == 0
+        ? "no nutrition-relevant ingredients"
+        : $"{Profile.NutritionLinkedIngredientCount}/{Profile.NutritionRelevantIngredientCount} with nutrition";
     private string WorkHref => RecipeLibraryAnalysis.WorkHref(Recipe, Profile.NextAction);
     private Color NextActionColor => Profile.NextAction.IsComplete ? Color.Success : Color.Warning;
     private string WorkActionIcon => Profile.NextAction.TargetKind switch
