@@ -128,6 +128,16 @@ public sealed class HouseholdIngredientPreferenceService(BrowserAppStore store)
         Subcategory = ingredient.Subcategory,
         DefaultUnit = ingredient.DefaultUnit,
         PantryCategory = ingredient.PantryCategory,
+        CanFreeze = ingredient.CanFreeze,
+        Seasonality = ingredient.Seasonality,
+        QuantityConversions = ingredient.QuantityConversions
+            .Select(conversion => new IngredientQuantityConversion
+            {
+                Measure = conversion.Measure,
+                Grams = conversion.Grams,
+                Notes = conversion.Notes
+            })
+            .ToList(),
         NutritionPer100Grams = ingredient.NutritionPer100Grams is null
             ? null
             : new IngredientNutrition
