@@ -1146,7 +1146,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         if (item.QuantityConversions.Count > 0)
         {
             ingredient.QuantityConversions = NormalizeQuantityConversions(
-                ingredient.QuantityConversions.Concat(item.QuantityConversions.Select(ToQuantityConversion)));
+                item.QuantityConversions.Select(ToQuantityConversion).Concat(ingredient.QuantityConversions));
         }
 
         var hasManualNutrition = HasManualNutrition(ingredient);
