@@ -32,6 +32,13 @@
                 <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@CompletedCount/@OrderedSteps.Count completats</MudChip>
             </MudStack>
 
+            @if (HasRecipeImage)
+            {
+                <div class="recipe-image-header cook-image-header">
+                    <img src="@_recipe.ImageUrl" alt="@_recipe.Name" />
+                </div>
+            }
+
             <div class="cook-heading">
                 <MudText Typo="Typo.h5">@_recipe.Name</MudText>
                 <MudText Typo="Typo.subtitle1">Pas @(_currentIndex + 1) de @OrderedSteps.Count</MudText>
@@ -147,6 +154,7 @@
     private bool IsLastStep => _currentIndex == OrderedSteps.Count - 1;
     private bool IsCurrentStepCompleted => _completedStepIds.Contains(CurrentStep.Id);
     private bool IsPlannedContext => _plannedRecipe is not null;
+    private bool HasRecipeImage => !string.IsNullOrWhiteSpace(_recipe?.ImageUrl);
     private decimal ScaleFactor => _recipe is null ? 1 : IngredientScaling.ScaleFactor(_recipe.Servings, _displayServings);
     private string RecipeHref => _recipe is null
         ? "recipes"

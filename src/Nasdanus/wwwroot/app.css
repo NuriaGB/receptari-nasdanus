@@ -316,7 +316,20 @@ h3:focus {
 }
 
 .recipe-summary {
+    overflow: hidden;
+}
+
+.recipe-summary-content {
     padding: 1rem;
+}
+
+.recipe-summary-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-bottom: 1px solid var(--nas-border);
+    background: #edf1ec;
 }
 
 .recipe-dashboard {
@@ -768,6 +781,24 @@ h3:focus {
     max-width: 46rem;
 }
 
+.recipe-image-header {
+    overflow: hidden;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #edf1ec;
+}
+
+.recipe-image-header img {
+    display: block;
+    width: 100%;
+    height: clamp(11rem, 30vw, 22rem);
+    object-fit: cover;
+}
+
+.cook-image-header img {
+    height: clamp(10rem, 24vw, 18rem);
+}
+
 .recipe-actions {
     align-items: center;
 }
@@ -1141,14 +1172,28 @@ h3:focus {
 
 .planned-recipe-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
     min-height: 2.4rem;
-    gap: 0.35rem;
-    padding: 0.25rem 0.35rem;
+    gap: 0.5rem;
+    padding: 0.55rem;
     border: 1px solid var(--nas-border);
     border-radius: 8px;
     background: var(--nas-panel);
+}
+
+.planned-recipe-row[draggable="true"] {
+    cursor: grab;
+}
+
+.planned-recipe-row[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.planned-recipe-main {
+    display: grid;
+    min-width: 0;
+    gap: 0.35rem;
 }
 
 .planned-recipe-name {
@@ -1163,6 +1208,10 @@ h3:focus {
 .planned-recipe-servings {
     color: var(--nas-muted);
     white-space: nowrap;
+}
+
+.planned-recipe-servings-field {
+    max-width: 9rem;
 }
 
 .planned-recipe-actions {

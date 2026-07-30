@@ -25,6 +25,13 @@
                 Tornar
             </MudButton>
 
+            @if (HasImage)
+            {
+                <div class="recipe-image-header recipe-edit-image-header">
+                    <img src="@_edit.ImageUrl" alt="@_edit.Name" />
+                </div>
+            }
+
             <div class="page-heading page-heading-actions">
                 <div>
                     <MudText Typo="Typo.overline">Editar recepta</MudText>
@@ -70,6 +77,7 @@
                         <MudTextField T="string"
                                       Label="Imatge / URL"
                                       @bind-Value="_edit.ImageUrl"
+                                      Immediate="true"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Adornment="Adornment.Start"
@@ -388,6 +396,7 @@
     private string _generalNotesText = string.Empty;
     private string _cookingTipsText = string.Empty;
     private string _variationsText = string.Empty;
+    private bool HasImage => !string.IsNullOrWhiteSpace(_edit.ImageUrl);
 
     private IReadOnlyList<IngredientRow> IngredientOptions => _edit.Ingredients
         .Where(ingredient => !string.IsNullOrWhiteSpace(ingredient.Name))

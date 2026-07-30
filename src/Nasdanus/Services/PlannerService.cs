@@ -74,6 +74,51 @@ public sealed class PlannerService(BrowserAppStore store)
         await store.SaveAsync();
     }
 
+    public async Task UpdatePlannedServingsAsync(int plannedRecipeId, int plannedServings)
+    {
+        var state = await store.GetStateAsync();
+        var plannedRecipe = state.MealPlanSlots
+            .SelectMany(slot => slot.PlannedRecipes)
+            .FirstOrDefault(recipe => recipe.Id == plannedRecipeId);
+
+        if (plannedRecipe is null)
+        {
+            return;
+        }
+
+        plannedRecipe.PlannedServings = Math.Max(1, plannedServings);
+        await store.SaveAsync();
+    }
+
+    public async Task MoveRecipeAsync(int plannedRecipeId, DateOnly date, MealKind mealKind)
+    {
+        var state = await store.GetStateAsync();
+        EnsureWeekSlots(state, WeekStart(date));
+        var sourceSlot = state.MealPlanSlots
+            .FirstOrDefault(slot => slot.PlannedRecipes.Any(recipe => recipe.Id == plannedRecipeId));
+        var targetSlot = SlotFor(state, date, mealKind);
+
+        if (sourceSlot is null || sourceSlot.Id == targetSlot.Id)
+        {
+            return;
+        }
+
+        var plannedRecipe = sourceSlot.PlannedRecipes.First(recipe => recipe.Id == plannedRecipeId);
+        sourceSlot.PlannedRecipes.Remove(plannedRecipe);
+        NormalizeOrders(sourceSlot);
+
+        var nextOrder = targetSlot.PlannedRecipes.Count == 0
+            ? 1
+            : targetSlot.PlannedRecipes.Max(recipe => recipe.Order) + 1;
+        plannedRecipe.MealPlanSlotId = targetSlot.Id;
+        plannedRecipe.MealPlanSlot = targetSlot;
+        plannedRecipe.Recipe = store.FindRecipe(state, plannedRecipe.RecipeId);
+        plannedRecipe.Order = nextOrder;
+        targetSlot.PlannedRecipes.Add(plannedRecipe);
+
+        await store.SaveAsync();
+    }
+
     public async Task<MealPlanRecipe?> GetPlannedRecipeAsync(int plannedRecipeId)
     {
         var state = await store.GetStateAsync();
@@ -178,6 +223,15 @@ public sealed class PlannerService(BrowserAppStore store)
 
     private static MealPlanSlot SlotFor(LocalAppState state, DateOnly date, MealKind mealKind) =>
         state.MealPlanSlots.Single(slot => slot.Date == date && slot.MealKind == mealKind);
+
+    private static void NormalizeOrders(MealPlanSlot slot)
+    {
+        var order = 1;
+        foreach (var plannedRecipe in slot.PlannedRecipes.OrderBy(recipe => recipe.Order))
+        {
+            plannedRecipe.Order = order++;
+        }
+    }
 }
 
 public sealed record DayPlan(DateOnly Date, MealPlanSlot Lunch, MealPlanSlot Dinner);

@@ -1,7 +1,15 @@
 @using Nasdanus.Domain
 
 <MudPaper Class="recipe-summary" Elevation="0">
-    <MudStack Spacing="1">
+    @if (HasImage)
+    {
+        <img class="recipe-summary-image"
+             src="@Recipe.ImageUrl"
+             alt="@Recipe.Name"
+             loading="lazy" />
+    }
+
+    <MudStack Spacing="1" Class="recipe-summary-content">
         <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="2">
             <div>
                 <MudText Typo="Typo.h6">@Recipe.Name</MudText>
@@ -88,6 +96,7 @@
     public EventCallback<Recipe> OnConsolidate { get; set; }
 
     private RecipeLibraryProfile Profile => RecipeLibraryAnalysis.Analyze(Recipe);
+    private bool HasImage => !string.IsNullOrWhiteSpace(Recipe.ImageUrl);
     private string CategoryText => string.IsNullOrWhiteSpace(Recipe.Category) ? "Sense categoria" : Recipe.Category;
     private Color DocumentationColor => Profile.DocumentationStatus switch
     {

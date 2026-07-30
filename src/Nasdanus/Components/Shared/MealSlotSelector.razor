@@ -28,13 +28,25 @@
         <MudStack Spacing="1">
             @foreach (var plannedRecipe in PlannedRecipes)
             {
-                <div class="planned-recipe-row">
-                    <span class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
-                        @plannedRecipe.Recipe?.Name
-                    </span>
-                    <MudText Typo="Typo.caption" Class="planned-recipe-servings">
-                        @PlannedServingsText(plannedRecipe)
-                    </MudText>
+                <div class="planned-recipe-row"
+                     draggable="true"
+                     @ondragstart="@(() => BeginPlannedRecipeDragAsync(plannedRecipe.Id))"
+                     @ondragend="EndPlannedRecipeDragAsync">
+                    <div class="planned-recipe-main">
+                        <span class="planned-recipe-name" title="@plannedRecipe.Recipe?.Name">
+                            @plannedRecipe.Recipe?.Name
+                        </span>
+                        <MudNumericField T="int"
+                                         Label="Racions"
+                                         Value="@PlannedServingsValue(plannedRecipe)"
+                                         ValueChanged="@((int value) => UpdatePlannedServingsAsync(plannedRecipe.Id, value))"
+                                         Min="1"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Adornment="Adornment.Start"
+                                         AdornmentIcon="@Icons.Material.Filled.Groups"
+                                         Class="planned-recipe-servings-field" />
+                    </div>
                     <div class="planned-recipe-actions">
                         <MudIconButton Href="@($"recipes/{plannedRecipe.RecipeId}?plannedMealId={plannedRecipe.Id}")"
                                        Icon="@Icons.Material.Filled.OpenInNew"
@@ -85,26 +97,36 @@
     public EventCallback<(int PlannedRecipeId, PlannedRecipeSelection Selection)> ReplaceRecipe { get; set; }
 
     [Parameter]
+    public EventCallback<(int PlannedRecipeId, int PlannedServings)> UpdateServings { get; set; }
+
+    [Parameter]
     public int? DraggedRecipeId { get; set; }
 
     [Parameter]
+    public int? DraggedPlannedRecipeId { get; set; }
+
+    [Parameter]
     public EventCallback<(DateOnly Date, MealKind MealKind)> RecipeDropped { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PlannedRecipeDragStarted { get; set; }
+
+    [Parameter]
+    public EventCallback PlannedRecipeDragEnded { get; set; }
+
+    [Parameter]
+    public EventCallback<(int PlannedRecipeId, DateOnly Date, MealKind MealKind)> PlannedRecipeDropped { get; set; }
 
     private IReadOnlyList<MealPlanRecipe> PlannedRecipes => Slot.PlannedRecipes
         .OrderBy(plannedRecipe => plannedRecipe.Order)
         .ToList();
     private MealNutritionSummary MealNutrition => NutritionService.CalculateMeal(Slot);
-    private string MealSlotClass => DraggedRecipeId is null
+    private string MealSlotClass => DraggedRecipeId is null && DraggedPlannedRecipeId is null
         ? "meal-slot-selector"
         : "meal-slot-selector is-drop-target";
     private string MealIcon => Slot.MealKind == MealKind.Lunch
         ? Icons.Material.Filled.Restaurant
         : Icons.Material.Filled.DarkMode;
-    private static string PlannedServingsText(MealPlanRecipe plannedRecipe)
-    {
-        var servings = PlannedServingsValue(plannedRecipe);
-        return servings > 0 ? $"{servings} rac." : "Racions?";
-    }
 
     private async Task OpenPickerAsync()
     {
@@ -155,8 +177,38 @@
         }
     }
 
+    private async Task UpdatePlannedServingsAsync(int plannedRecipeId, int plannedServings)
+    {
+        if (UpdateServings.HasDelegate)
+        {
+            await UpdateServings.InvokeAsync((plannedRecipeId, plannedServings));
+        }
+    }
+
+    private async Task BeginPlannedRecipeDragAsync(int plannedRecipeId)
+    {
+        if (PlannedRecipeDragStarted.HasDelegate)
+        {
+            await PlannedRecipeDragStarted.InvokeAsync(plannedRecipeId);
+        }
+    }
+
+    private async Task EndPlannedRecipeDragAsync()
+    {
+        if (PlannedRecipeDragEnded.HasDelegate)
+        {
+            await PlannedRecipeDragEnded.InvokeAsync();
+        }
+    }
+
     private async Task OnDropAsync(DragEventArgs args)
     {
+        if (DraggedPlannedRecipeId is int plannedRecipeId && PlannedRecipeDropped.HasDelegate)
+        {
+            await PlannedRecipeDropped.InvokeAsync((plannedRecipeId, Slot.Date, Slot.MealKind));
+            return;
+        }
+
         if (DraggedRecipeId is not null && RecipeDropped.HasDelegate)
         {
             await RecipeDropped.InvokeAsync((Slot.Date, Slot.MealKind));

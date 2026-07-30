@@ -167,8 +167,30 @@
                             }
                         </div>
 
-                        <MealSlotSelector Slot="@day.Lunch" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
-                        <MealSlotSelector Slot="@day.Dinner" Recipes="_recipes" AddRecipe="AddRecipeAsync" RemoveRecipe="RemoveRecipeAsync" ReplaceRecipe="ReplaceRecipeAsync" DraggedRecipeId="_draggedRecipeIdeaId" RecipeDropped="DropRecipeIdeaAsync" />
+                        <MealSlotSelector Slot="@day.Lunch"
+                                          Recipes="_recipes"
+                                          AddRecipe="AddRecipeAsync"
+                                          RemoveRecipe="RemoveRecipeAsync"
+                                          ReplaceRecipe="ReplaceRecipeAsync"
+                                          UpdateServings="UpdatePlannedServingsAsync"
+                                          DraggedRecipeId="_draggedRecipeIdeaId"
+                                          DraggedPlannedRecipeId="_draggedPlannedRecipeId"
+                                          RecipeDropped="DropRecipeIdeaAsync"
+                                          PlannedRecipeDragStarted="BeginPlannedRecipeDrag"
+                                          PlannedRecipeDragEnded="EndPlannedRecipeDrag"
+                                          PlannedRecipeDropped="DropPlannedRecipeAsync" />
+                        <MealSlotSelector Slot="@day.Dinner"
+                                          Recipes="_recipes"
+                                          AddRecipe="AddRecipeAsync"
+                                          RemoveRecipe="RemoveRecipeAsync"
+                                          ReplaceRecipe="ReplaceRecipeAsync"
+                                          UpdateServings="UpdatePlannedServingsAsync"
+                                          DraggedRecipeId="_draggedRecipeIdeaId"
+                                          DraggedPlannedRecipeId="_draggedPlannedRecipeId"
+                                          RecipeDropped="DropRecipeIdeaAsync"
+                                          PlannedRecipeDragStarted="BeginPlannedRecipeDrag"
+                                          PlannedRecipeDragEnded="EndPlannedRecipeDrag"
+                                          PlannedRecipeDropped="DropPlannedRecipeAsync" />
                         <NutritionSummary Title="Total dia"
                                           Subtitle="Per racio - dinar + sopar"
                                           Totals="@dayTotals"
@@ -207,6 +229,7 @@
     private string _recipeIdeaCategory = string.Empty;
     private bool _showAllRecipeIdeas;
     private int? _draggedRecipeIdeaId;
+    private int? _draggedPlannedRecipeId;
     private bool _isLoading = true;
 
     private const string NoCategoryLabel = "Sense categoria";
@@ -281,6 +304,19 @@
         await LoadWeekAsync();
     }
 
+    private async Task UpdatePlannedServingsAsync((int PlannedRecipeId, int PlannedServings) change)
+    {
+        await Planner.UpdatePlannedServingsAsync(change.PlannedRecipeId, change.PlannedServings);
+        await LoadWeekAsync();
+    }
+
+    private async Task DropPlannedRecipeAsync((int PlannedRecipeId, DateOnly Date, MealKind MealKind) target)
+    {
+        await Planner.MoveRecipeAsync(target.PlannedRecipeId, target.Date, target.MealKind);
+        await LoadWeekAsync();
+        _draggedPlannedRecipeId = null;
+    }
+
     private async Task AssignRecipeIdeaAsync(int recipeId, DateOnly date, MealKind mealKind)
     {
         var recipe = _recipes.FirstOrDefault(recipe => recipe.Id == recipeId);
@@ -350,11 +386,23 @@
     private void BeginRecipeIdeaDrag(int recipeId)
     {
         _draggedRecipeIdeaId = recipeId;
+        _draggedPlannedRecipeId = null;
     }
 
     private void EndRecipeIdeaDrag()
     {
         _draggedRecipeIdeaId = null;
+    }
+
+    private void BeginPlannedRecipeDrag(int plannedRecipeId)
+    {
+        _draggedPlannedRecipeId = plannedRecipeId;
+        _draggedRecipeIdeaId = null;
+    }
+
+    private void EndPlannedRecipeDrag()
+    {
+        _draggedPlannedRecipeId = null;
     }
 
     private Variant RecipeIdeaCategoryVariant(string category) =>
