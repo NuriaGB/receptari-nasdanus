@@ -3,6 +3,7 @@
 @inject PlannerService Planner
 @inject RecipeService Recipes
 @inject PlanningSettingsService PlanningSettings
+@inject IJSRuntime JS
 
 <PageTitle>Nasdanus - Planner</PageTitle>
 
@@ -26,6 +27,12 @@
                            Color="Color.Primary"
                            EndIcon="@Icons.Material.Filled.ChevronRight">
                     Setmana següent
+                </MudButton>
+                <MudButton OnClick="PrintAsync"
+                           Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Print">
+                    Imprimir
                 </MudButton>
             </MudStack>
         </div>
@@ -211,12 +218,49 @@
                     </MudPaper>
                 }
             </div>
+
+            <section class="planner-print-sheet" aria-label="Planning setmanal imprimible">
+                <header class="planner-print-header">
+                    <div>
+                        <p class="planner-print-kicker">Nasdanus</p>
+                        <h1>Planning setmanal</h1>
+                    </div>
+                    <div class="planner-print-meta">
+                        <span>Setmana @WeekNumber</span>
+                        <strong>@WeekRangeText</strong>
+                    </div>
+                </header>
+
+                <div class="planner-print-grid">
+                    @foreach (var day in _days)
+                    {
+                        <article class="planner-print-card planner-print-day">
+                            <header class="planner-print-card-header">
+                                <span>@FormatPrintDayName(day.Date)</span>
+                                <small>@FormatPrintDate(day.Date)</small>
+                            </header>
+                            @PrintMealSection("Esmorzar", null)
+                            @PrintMealSection("Dinar", day.Lunch)
+                            @PrintMealSection("Sopar", day.Dinner)
+                            @PrintMealSection("Snacks", null)
+                        </article>
+                    }
+
+                    <article class="planner-print-card planner-print-notes">
+                        <header class="planner-print-card-header">
+                            <span>Notes</span>
+                        </header>
+                        <div class="planner-print-notes-body"></div>
+                    </article>
+                </div>
+            </section>
         }
     </MudStack>
 </MudContainer>
 
 @code {
-    private static readonly CultureInfo Catalan = CultureInfo.GetCultureInfo("ca-ES");
+    private static readonly string[] CatalanShortDayNames = ["dg.", "dl.", "dt.", "dc.", "dj.", "dv.", "ds."];
+    private static readonly string[] CatalanDayNames = ["Diumenge", "Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte"];
 
     private DateOnly _today;
     private DateOnly _weekStart;
@@ -358,7 +402,54 @@
         await LoadWeekAsync();
     }
 
-    private static string FormatDay(DateOnly date) => date.ToString("ddd d/M", Catalan);
+    private async Task PrintAsync()
+    {
+        await JS.InvokeVoidAsync("print");
+    }
+
+    private static string FormatDay(DateOnly date) =>
+        $"{CatalanShortDayNames[(int)date.DayOfWeek]} {date.ToString("d/M", CultureInfo.InvariantCulture)}";
+
+    private static string FormatPrintDayName(DateOnly date) =>
+        CatalanDayNames[(int)date.DayOfWeek];
+
+    private static string FormatPrintDate(DateOnly date) =>
+        date.ToString("d/M", CultureInfo.InvariantCulture);
+
+    private static IReadOnlyList<MealPlanRecipe> PrintPlannedRecipes(MealPlanSlot? slot) =>
+        slot?.PlannedRecipes
+            .OrderBy(plannedRecipe => plannedRecipe.Order)
+            .ToList()
+        ?? [];
+
+    private static string PrintPlannedRecipeText(MealPlanRecipe plannedRecipe)
+    {
+        var name = plannedRecipe.Recipe?.Name;
+        var servings = plannedRecipe.PlannedServings > 0
+            ? plannedRecipe.PlannedServings
+            : plannedRecipe.Recipe?.Servings > 0
+                ? plannedRecipe.Recipe.Servings
+                : 3;
+
+        return $"{(string.IsNullOrWhiteSpace(name) ? "Recepta sense nom" : name)} - {servings} racions";
+    }
+
+    private RenderFragment PrintMealSection(string label, MealPlanSlot? slot) => @<section class="planner-print-meal">
+        <h2>@label</h2>
+        @if (PrintPlannedRecipes(slot).Count == 0)
+        {
+            <div class="planner-print-empty-line"></div>
+        }
+        else
+        {
+            <ul>
+                @foreach (var plannedRecipe in PrintPlannedRecipes(slot))
+                {
+                    <li>@PrintPlannedRecipeText(plannedRecipe)</li>
+                }
+            </ul>
+        }
+    </section>;
 
     private void SelectRecipeIdeaCategory(string category)
     {

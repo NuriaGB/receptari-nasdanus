@@ -1225,6 +1225,185 @@ h3:focus {
     padding-top: 0.1rem;
 }
 
+.planner-print-sheet {
+    display: none;
+}
+
+.planner-print-header,
+.planner-print-grid,
+.planner-print-card,
+.planner-print-meal,
+.planner-print-notes-body {
+    box-sizing: border-box;
+}
+
+.planner-print-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 1rem;
+}
+
+.planner-print-kicker {
+    margin: 0 0 0.15rem;
+    color: var(--nas-muted);
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.planner-print-header h1 {
+    margin: 0;
+    color: #161616;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.planner-print-meta {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 12rem;
+    padding-bottom: 0.15rem;
+    color: #4f4f4f;
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.planner-print-meta strong {
+    display: block;
+    padding-top: 0.35rem;
+    border-top: 1px solid #aeb4b0;
+    color: #202020;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.planner-print-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem 1rem;
+}
+
+.planner-print-card {
+    display: grid;
+    grid-template-rows: auto repeat(4, minmax(0, 1fr));
+    min-width: 0;
+    min-height: 19.5rem;
+    border: 1px solid #4c4c4c;
+    background: #fff;
+    break-inside: avoid;
+    overflow: hidden;
+}
+
+.planner-print-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.15rem;
+    padding: 0.35rem 0.55rem;
+    border-bottom: 1px solid #4c4c4c;
+    background: #bde7f1;
+    color: #222;
+    font-size: 0.96rem;
+    font-weight: 650;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.planner-print-card-header small {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.planner-print-card:nth-child(2) .planner-print-card-header,
+.planner-print-card:nth-child(8) .planner-print-card-header {
+    background: #f8cfd8;
+}
+
+.planner-print-card:nth-child(3) .planner-print-card-header {
+    background: #ffe4ac;
+}
+
+.planner-print-card:nth-child(4) .planner-print-card-header,
+.planner-print-card:nth-child(6) .planner-print-card-header {
+    background: #dfd1e8;
+}
+
+.planner-print-card:nth-child(5) .planner-print-card-header {
+    background: #caefe4;
+}
+
+.planner-print-card:nth-child(7) .planner-print-card-header {
+    background: #bde7f1;
+}
+
+.planner-print-meal {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.2rem;
+    min-width: 0;
+    padding: 0.45rem 0.55rem;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.planner-print-meal:last-child {
+    border-bottom: 0;
+}
+
+.planner-print-meal h2 {
+    margin: 0;
+    color: #4b4b4b;
+    font-size: 0.68rem;
+    font-weight: 520;
+    letter-spacing: 0.18em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.planner-print-meal ul {
+    display: grid;
+    align-content: start;
+    gap: 0.18rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.planner-print-meal li {
+    overflow-wrap: anywhere;
+    color: #171717;
+    font-size: 0.74rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.planner-print-empty-line {
+    min-height: 1.2rem;
+}
+
+.planner-print-notes {
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+.planner-print-notes-body {
+    min-height: 0;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 1.95rem,
+        #ececec 1.95rem,
+        #ececec 2rem
+    );
+}
+
 .quick-add-form {
     min-width: 0;
 }
@@ -1871,5 +2050,116 @@ h3:focus {
 
     .backlog-row-actions {
         justify-content: space-between;
+    }
+}
+
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 9mm;
+    }
+
+    html,
+    body {
+        width: auto;
+        min-height: auto;
+        background: #fff !important;
+    }
+
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .app-bar,
+    .bottom-nav,
+    .feedback-fab,
+    .planner-heading,
+    .recipe-ideas-section,
+    .planner-grid,
+    #blazor-error-ui {
+        display: none !important;
+    }
+
+    .mud-layout,
+    .mud-main-content,
+    .main-content,
+    .planner-shell,
+    .planner-shell > .mud-stack {
+        display: block !important;
+        width: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    .planner-print-sheet {
+        display: block !important;
+        width: 100%;
+        color: #161616;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    .planner-print-header {
+        margin-bottom: 6mm;
+        padding: 0 2mm;
+    }
+
+    .planner-print-header h1 {
+        font-size: 25pt;
+        letter-spacing: 0.18em;
+    }
+
+    .planner-print-kicker {
+        font-size: 7pt;
+    }
+
+    .planner-print-meta {
+        min-width: 48mm;
+        font-size: 7pt;
+    }
+
+    .planner-print-meta strong {
+        font-size: 7pt;
+    }
+
+    .planner-print-grid {
+        height: 159mm;
+        gap: 7mm 8mm;
+    }
+
+    .planner-print-card {
+        min-height: 0;
+        height: 76mm;
+        box-shadow: none;
+        page-break-inside: avoid;
+    }
+
+    .planner-print-card-header {
+        min-height: 8mm;
+        padding: 1.6mm 2.2mm;
+        font-size: 9pt;
+        letter-spacing: 0.18em;
+    }
+
+    .planner-print-card-header small {
+        font-size: 6.5pt;
+    }
+
+    .planner-print-meal {
+        padding: 1.7mm 2.2mm;
+    }
+
+    .planner-print-meal h2 {
+        font-size: 6.7pt;
+    }
+
+    .planner-print-meal li {
+        font-size: 7.2pt;
+    }
+
+    .planner-print-empty-line {
+        min-height: 4mm;
     }
 }
