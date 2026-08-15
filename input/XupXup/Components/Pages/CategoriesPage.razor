@@ -1,0 +1,154 @@
+@page "/categories"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@implements IDisposable
+
+<PageTitle>Categories</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-4">
+
+    <MudAlert Severity="Severity.Info" Class="mb-3" Dense="true">
+        Aquestes categories serveixen per classificar les <b>receptes</b> (ex: Italiana, Vegana, Ràpida...). 
+        Les categories d'ingredients (Carn, Peix, Verdura...) es gestionen a la 
+        <MudLink Href="/ingredients-db">Base d'ingredients</MudLink>.
+    </MudAlert>
+
+    <div class="d-flex align-center gap-2 mb-4">
+        <MudText Typo="Typo.h5"><b>🏷️ Categories de receptes</b></MudText>
+        <MudSpacer/>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            @AppState.Categories.Count categories
+        </MudText>
+    </div>
+
+    <!-- Llista de categories existents -->
+    <MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;" Class="mb-4">
+        @if (!AppState.Categories.Any())
+        {
+            <div class="pa-4 text-center">
+                <MudText Color="Color.Secondary">Encara no hi ha categories. Afegeix-ne una!</MudText>
+            </div>
+        }
+        else
+        {
+            @foreach (var cat in AppState.Categories)
+            {
+                var c = cat;
+                <div class="d-flex align-center pa-3" style="border-bottom:1px solid #F0F0F0;">
+                    @if (_editingId == c.Id)
+                    {
+                        <MudTextField @bind-Value="_editName"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense"
+                                      Style="flex:1;" @ref="_editField"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Check"
+                                       Color="Color.Success" Size="Size.Small"
+                                       OnClick="@(() => SaveEdit(c))"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                       Color="Color.Default" Size="Size.Small"
+                                       OnClick="@(() => _editingId = null)"/>
+                    }
+                    else
+                    {
+                        <MudText Style="flex:1;">@c.Name</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mr-2">
+                            @RecipeCount(c.Id) receptes
+                        </MudText>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Size="Size.Small"
+                                       OnClick="@(() => StartEdit(c))"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Size="Size.Small" Color="Color.Error"
+                                       Disabled="@(RecipeCount(c.Id) > 0)"
+                                       OnClick="@(() => DeleteCategory(c))"/>
+                    }
+                </div>
+            }
+        }
+    </MudPaper>
+
+    <!-- Afegir nova categoria -->
+    <MudPaper Elevation="0" Class="pa-4" Style="border:2px dashed #E0E0E0;border-radius:12px;">
+        <MudText Typo="Typo.subtitle2" Class="mb-3">➕ Nova categoria</MudText>
+        <div class="d-flex gap-2 align-center">
+            <MudTextField @ref="_newField"
+                          @bind-Value="_newName"
+                          Label="Nom de la categoria"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Style="flex:1;"
+                          @onkeydown="OnNewKeyDown"/>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="AddCategory"
+                       Disabled="@string.IsNullOrWhiteSpace(_newName)">
+                Afegir
+            </MudButton>
+        </div>
+    </MudPaper>
+
+</MudContainer>
+
+@code {
+    private string?  _editingId = null;
+    private string   _editName  = string.Empty;
+    private string   _newName   = string.Empty;
+
+    private MudTextField<string>? _newField;
+    private MudTextField<string>? _editField;
+
+    protected override void OnInitialized() =>
+        AppState.StateChanged += Refresh;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _newField != null)
+            await _newField.FocusAsync();
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    private int RecipeCount(string catId) =>
+        AppState.Recipes.Count(r => r.CategoryIds.Contains(catId));
+
+    private void StartEdit(Category cat)
+    {
+        _editingId = cat.Id;
+        _editName  = cat.Name;
+    }
+
+    private async Task SaveEdit(Category cat)
+    {
+        if (string.IsNullOrWhiteSpace(_editName)) return;
+        cat.Name   = _editName.Trim();
+        _editingId = null;
+        await AppState.SaveAsync();
+    }
+
+    private async Task DeleteCategory(Category cat)
+    {
+        AppState.Data.Categories.Remove(cat);
+        await AppState.SaveAsync();
+    }
+
+    private async Task AddCategory()
+    {
+        if (string.IsNullOrWhiteSpace(_newName)) return;
+        AppState.Data.Categories.Add(new Category
+        {
+            Id   = Guid.NewGuid().ToString(),
+            Name = _newName.Trim()
+        });
+        await AppState.SaveAsync();
+        _newName = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task OnNewKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await AddCategory();
+    }
+
+    public void Dispose() => AppState.StateChanged -= Refresh;
+}

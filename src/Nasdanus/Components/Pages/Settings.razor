@@ -660,7 +660,12 @@
                                     <MudPaper Class="freezer-inventory-row" Elevation="0">
                                         <MudTextField T="string" Label="Ingredient or preparation" @bind-Value="item.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
                                         <MudNumericField T="decimal?" Label="Quantity" @bind-Value="item.Quantity" Min="0" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                        <MudTextField T="string" Label="Unit" @bind-Value="item.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        <MudSelect T="string" Label="Unit" @bind-Value="item.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                            @foreach (var unit in IngredientUnits.OptionsIncluding(item.Unit))
+                                            {
+                                                <MudSelectItem T="string" Value="@unit.Value">@unit.Label</MudSelectItem>
+                                            }
+                                        </MudSelect>
                                         <MudDatePicker Label="Frozen date"
                                                        Date="@item.FrozenDate"
                                                        DateChanged="@((DateTime? value) => item.FrozenDate = value)"

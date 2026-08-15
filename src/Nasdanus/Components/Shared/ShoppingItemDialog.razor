@@ -18,11 +18,17 @@
                                   Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="5">
-                    <MudTextField T="string"
-                                  Label="Unitat"
-                                  @bind-Value="_request.Unit"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudSelect T="string"
+                               Label="Unitat"
+                               @bind-Value="_request.Unit"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Dense="true">
+                        @foreach (var unit in IngredientUnits.OptionsIncluding(_request.Unit))
+                        {
+                            <MudSelectItem T="string" Value="@unit.Value">@unit.Label</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudItem>
             </MudGrid>
 
@@ -95,13 +101,14 @@
         _request.Name = Item.Name;
         _request.Category = Item.Category;
         _request.QuantityText = Item.QuantityText;
-        _request.Unit = Item.Unit;
+        _request.Unit = IngredientUnits.Normalize(Item.Unit);
         _request.IsHouseholdItem = Item.IsHouseholdItem;
         _request.RecipeId = Item.RecipeId;
     }
 
     private void Save()
     {
+        _request.Unit = IngredientUnits.Normalize(_request.Unit);
         MudDialog.Close(DialogResult.Ok(_request));
     }
 

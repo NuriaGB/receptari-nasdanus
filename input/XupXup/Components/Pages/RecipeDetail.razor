@@ -1,0 +1,152 @@
+@page "/recipe/{Id}"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject IDialogService DialogService
+
+<PageTitle>@(_recipe?.Name ?? "Recepta") — Recetari</PageTitle>
+
+@if (_recipe == null)
+{
+    <MudContainer Class="py-8 d-flex justify-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+    </MudContainer>
+}
+else
+{
+    <!-- Imatge de capçalera -->
+    @if (!string.IsNullOrEmpty(_recipe.ImageBase64))
+    {
+        <img src="@_recipe.ImageBase64" alt="@_recipe.Name"
+             style="width:100%;max-height:300px;object-fit:cover;" />
+    }
+
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+
+        <!-- Títol i botons -->
+        <div class="d-flex align-start justify-space-between mb-2 flex-wrap gap-2">
+            <MudText Typo="Typo.h4"><b>@_recipe.Name</b></MudText>
+            <div class="d-flex gap-2">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                               OnClick='() => Nav.NavigateTo($"/recipe/edit/{_recipe.Id}")' />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                               OnClick="ConfirmDelete" />
+            </div>
+        </div>
+
+        <!-- Meta info -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <MudChip Icon="@Icons.Material.Filled.Timer" Size="Size.Small">@_recipe.TotalTimeText</MudChip>
+            <MudChip Icon="@Icons.Material.Filled.People" Size="Size.Small">@_recipe.Servings persones</MudChip>
+            <MudChip Size="Size.Small"
+                     Class="@(_recipe.Difficulty == 1 ? "badge-easy" : _recipe.Difficulty == 2 ? "badge-medium" : "badge-hard")">
+                @_recipe.DifficultyText
+            </MudChip>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_recipe.Description))
+        {
+            <MudText Typo="Typo.body1" Class="mb-4" Color="Color.Secondary">@_recipe.Description</MudText>
+        }
+
+        <!-- Botons d'acció -->
+        <MudGrid Spacing="2" Class="mb-4">
+            <MudItem xs="6">
+                <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.PlayArrow"
+                           OnClick='() => Nav.NavigateTo($"/recipe/{_recipe.Id}/steps")'>
+                    Pas a pas
+                </MudButton>
+            </MudItem>
+            <MudItem xs="6">
+                <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Balance"
+                           OnClick='() => Nav.NavigateTo($"/recipe/{_recipe.Id}/scale")'>
+                    Ajustar quantitats
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="mb-4"/>
+
+        <!-- Ingredients -->
+        <MudText Typo="Typo.h6" Class="mb-2">🥕 Ingredients</MudText>
+        <MudList Dense="true" Class="mb-4">
+            @foreach (var ing in _recipe.Ingredients)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.FiberManualRecord"
+                             IconColor="Color.Primary">
+                    @ing.DisplayText
+                </MudListItem>
+            }
+        </MudList>
+
+        <MudDivider Class="mb-4"/>
+
+        <!-- Material -->
+        <MudText Typo="Typo.h6" Class="mb-2">🍳 Material necessari</MudText>
+        <MudList Dense="true" Class="mb-4">
+            @foreach (var eq in _recipe.Equipment)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.FiberManualRecord"
+                             IconColor="Color.Success">
+                    @eq.Name
+                </MudListItem>
+            }
+        </MudList>
+
+        <MudDivider Class="mb-4"/>
+
+        <!-- Elaboració -->
+        <MudText Typo="Typo.h6" Class="mb-3">📋 Elaboració</MudText>
+        @foreach (var step in _recipe.Steps.OrderBy(s => s.StepNumber))
+        {
+            <div class="d-flex gap-3 mb-3">
+                <div class="step-number">@step.StepNumber</div>
+                <div class="flex-1 pt-1">
+                    <MudText>@step.Description</MudText>
+                    @if (step.TimerMinutes.HasValue)
+                    {
+                        <MudChip Size="Size.Small" Icon="@Icons.Material.Filled.Timer" Class="mt-1">
+                            @step.TimerMinutes min
+                        </MudChip>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Consells -->
+        @if (!string.IsNullOrEmpty(_recipe.Tips))
+        {
+            <MudDivider Class="mb-4 mt-2"/>
+            <MudText Typo="Typo.h6" Class="mb-2">💡 Consells</MudText>
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@_recipe.Tips</MudAlert>
+        }
+
+    </MudContainer>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private Recipe? _recipe;
+
+    protected override void OnParametersSet()
+    {
+        _recipe = AppState.GetRecipe(Id);
+    }
+
+    private async Task ConfirmDelete()
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Eliminar recepta",
+            $"Segur que vols eliminar \"{_recipe?.Name}\"? Aquesta acció no es pot desfer.",
+            yesText: "Eliminar", cancelText: "Cancel·lar");
+        if (result == true)
+        {
+            await AppState.DeleteRecipeAsync(Id);
+            Nav.NavigateTo("/");
+        }
+    }
+}

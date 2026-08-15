@@ -233,7 +233,7 @@ public sealed class RecipeService(BrowserAppStore store)
                 IngredientId = ingredientRequest.Ingredient.IngredientId,
                 Name = ingredientRequest.Ingredient.Name.Trim(),
                 Quantity = ingredientRequest.Ingredient.Quantity.Trim(),
-                Unit = ingredientRequest.Ingredient.Unit.Trim(),
+                Unit = IngredientUnits.Normalize(ingredientRequest.Ingredient.Unit),
                 ScalingMode = NormalizeScalingMode(ingredientRequest.Ingredient.ScalingMode),
                 Order = ingredientRequest.Order
             };
@@ -269,7 +269,7 @@ public sealed class RecipeService(BrowserAppStore store)
                     IngredientName = ingredient.Name,
                     Quantity = IngredientScaling.ParseQuantity(referenceRequest.Reference.QuantityText),
                     QuantityText = referenceRequest.Reference.QuantityText.Trim(),
-                    Unit = referenceRequest.Reference.Unit.Trim(),
+                    Unit = IngredientUnits.Normalize(referenceRequest.Reference.Unit),
                     Order = referenceRequest.Order
                 });
             }

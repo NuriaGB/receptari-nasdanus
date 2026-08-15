@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">XupXup app icon</title>
+  <desc id="desc">Modern logo mark combining a recipe card, shopping basket, knife, and leaf.</desc>
+  <defs>
+    <linearGradient id="bg" x1="88" y1="44" x2="424" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07172a"/>
+      <stop offset="1" stop-color="#020814"/>
+    </linearGradient>
+    <linearGradient id="tomato" x1="122" y1="312" x2="390" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff5034"/>
+      <stop offset="1" stop-color="#ff1f17"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="128" y1="84" x2="406" y2="370" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d7ff00"/>
+      <stop offset="1" stop-color="#97df00"/>
+    </linearGradient>
+    <filter id="lift" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000814" flood-opacity=".35"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <g filter="url(#lift)">
+    <path fill="url(#lime)" d="M145 294V162c0-44 36-80 80-80h139c43 0 78 35 78 78v76h-38v-76c0-22-18-40-40-40H225c-23 0-42 19-42 42v132h-38Z"/>
+    <circle cx="145" cy="294" r="31" fill="url(#lime)"/>
+    <circle cx="145" cy="294" r="13" fill="#061426"/>
+
+    <path fill="url(#tomato)" d="M111 304h288c12 0 21 11 18 23l-24 96c-7 28-32 47-61 47H178c-29 0-54-20-61-48l-24-95c-3-12 6-23 18-23Z"/>
+    <path fill="#061426" d="M181 359c10 0 18 8 18 18v46c0 10-8 18-18 18s-18-8-18-18v-46c0-10 8-18 18-18Zm75 0c10 0 18 8 18 18v46c0 10-8 18-18 18s-18-8-18-18v-46c0-10 8-18 18-18Zm75 0c10 0 18 8 18 18v46c0 10-8 18-18 18s-18-8-18-18v-46c0-10 8-18 18-18Z"/>
+
+    <path fill="#fff8e8" d="M166 133h143c20 0 36 16 36 36v118H166V133Z"/>
+    <path fill="#ff2f23" d="M194 133h42v54c0 6-7 9-11 5l-10-9-10 9c-4 4-11 1-11-5v-54Z"/>
+    <circle cx="200" cy="215" r="11" fill="#061426"/>
+    <circle cx="200" cy="248" r="11" fill="#061426"/>
+    <circle cx="200" cy="281" r="11" fill="#061426"/>
+    <path stroke="#061426" stroke-linecap="round" stroke-width="13" d="M226 215h73M226 248h61M226 281h46"/>
+
+    <path fill="#fff8e8" d="m360 135-14 153-61 50-39-28 87-128c7-11 16-21 27-47Z"/>
+    <path fill="#061426" d="m246 310 39 28-22 31h-61l44-59Z"/>
+    <circle cx="253" cy="334" r="11" fill="#fff8e8"/>
+
+    <path fill="url(#lime)" d="M327 353c29-94 91-117 125-119-6 36-28 92-105 127l57-83-77 75Z"/>
+    <path fill="url(#lime)" d="M313 355c-21-34-17-67-2-91 18 21 31 52 14 94l-8-54-4 51Z"/>
+  </g>
+</svg>

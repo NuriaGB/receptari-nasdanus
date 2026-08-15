@@ -1,0 +1,34 @@
+@using MudBlazor
+@using RecetariBlazor.Services
+@using RecetariBlazor.Components.Pages
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@if (!_driveService.IsAuthenticated)
+{
+    <LoginPage />
+}
+else
+{
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(Components.Layout.MainLayout)" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(Components.Layout.MainLayout)">
+                <MudText Typo="Typo.h5" Class="pa-4">Pàgina no trobada</MudText>
+            </LayoutView>
+        </NotFound>
+    </Router>
+}
+
+@code {
+    [Inject] GoogleDriveService _driveService { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        _driveService.AuthStateChanged += StateHasChanged;
+    }
+}

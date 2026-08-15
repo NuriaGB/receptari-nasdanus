@@ -1,0 +1,159 @@
+@page "/"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>Receptes — Recetari</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+
+    <!-- Capçalera -->
+    <div class="d-flex align-center justify-space-between mb-4">
+        <MudText Typo="Typo.h5"><b>Les meves receptes</b></MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="GoToNew">
+            Nova recepta
+        </MudButton>
+    </div>
+
+    <!-- Cercador -->
+    <MudTextField @ref="_searchField"
+                  Value="_search"
+                  Placeholder="Cercar receptes..."
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Variant="Variant.Outlined"
+                  Clearable="true"
+                  Class="mb-3"
+                  Immediate="true"
+                  ValueChanged="@((string v) => OnSearchChanged(v))" />
+
+    <!-- Filtres de categoria -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        @foreach (var cat in AppState.Categories)
+        {
+            var c = cat;
+            <span class="category-chip @(_selectedCats.Contains(c.Id) ? "selected" : "")"
+                  @onclick="@(() => ToggleCategory(c.Id))">
+                @c.Emoji @c.Name
+            </span>
+        }
+    </div>
+
+    <!-- Llista de receptes -->
+    @if (!AppState.IsLoaded)
+    {
+        <div class="d-flex justify-center py-8">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        </div>
+    }
+    else if (_filtered.Count == 0)
+    {
+        <MudPaper Class="pa-8 d-flex flex-column align-center" Elevation="0">
+            <MudText Typo="Typo.h3" Class="mb-2">🍽️</MudText>
+            <MudText Typo="Typo.h6">Cap recepta trobada</MudText>
+            <MudText Color="Color.Secondary" Class="mb-4">Crea la teva primera recepta!</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToNew">
+                Crear recepta
+            </MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            @foreach (var recipe in _filtered)
+            {
+                var r = recipe;
+                <MudItem xs="12" sm="6" md="4">
+                    <div class="recipe-card"
+                         @onclick="@(() => Nav.NavigateTo(string.Format("/recipe/{0}", r.Id)))">
+                        @if (!string.IsNullOrEmpty(r.ImageBase64))
+                        {
+                            <img src="@r.ImageBase64" alt="@r.Name"
+                                 style="width:100%;height:160px;object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div style="width:100%;height:120px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
+                                <MudText Typo="Typo.h3">🍳</MudText>
+                            </div>
+                        }
+                        <div class="pa-3">
+                            <MudText Typo="Typo.h6" Class="mb-1">@r.Name</MudText>
+                            @if (!string.IsNullOrEmpty(r.Description))
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-2"
+                                         Style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                                    @r.Description
+                                </MudText>
+                            }
+                            <div class="d-flex align-center gap-2 mt-2 flex-wrap">
+                                <MudChip Size="Size.Small" Icon="@Icons.Material.Filled.Timer">
+                                    @r.TotalTimeText
+                                </MudChip>
+                                <MudChip Size="Size.Small" Icon="@Icons.Material.Filled.People">
+                                    @r.Servings pers.
+                                </MudChip>
+                                <MudChip Size="Size.Small"
+                                         Class="@(r.Difficulty == 1 ? "badge-easy" : r.Difficulty == 2 ? "badge-medium" : "badge-hard")">
+                                    @r.DifficultyText
+                                </MudChip>
+                            </div>
+                        </div>
+                    </div>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private string       _search       = string.Empty;
+    private List<string> _selectedCats = new();
+    private List<Recipe> _filtered     = new();
+    private MudTextField<string>? _searchField;
+
+    protected override void OnInitialized()
+    {
+        AppState.StateChanged += OnStateChanged;
+        FilterRecipes();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _searchField != null)
+            await _searchField.FocusAsync();
+    }
+
+    private void GoToNew() => Nav.NavigateTo("/recipe/new");
+
+    private void OnStateChanged()
+    {
+        FilterRecipes();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnSearchChanged(string v)
+    {
+        _search = v;
+        FilterRecipes();
+    }
+
+    private void FilterRecipes()
+    {
+        _filtered = AppState.SearchRecipes(_search, _selectedCats.Count > 0 ? _selectedCats : null);
+    }
+
+    private void ToggleCategory(string id)
+    {
+        if (_selectedCats.Contains(id)) _selectedCats.Remove(id);
+        else _selectedCats.Add(id);
+        FilterRecipes();
+    }
+
+    public void Dispose() => AppState.StateChanged -= OnStateChanged;
+}

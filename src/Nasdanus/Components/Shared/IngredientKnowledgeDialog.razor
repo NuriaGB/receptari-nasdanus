@@ -55,11 +55,17 @@
                                   Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField T="string"
-                                  Label="Unitat per defecte"
-                                  @bind-Value="_defaultUnit"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    <MudSelect T="string"
+                               Label="Unitat per defecte"
+                               @bind-Value="_defaultUnit"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Dense="true">
+                        @foreach (var unit in IngredientUnits.OptionsIncluding(_defaultUnit))
+                        {
+                            <MudSelectItem T="string" Value="@unit.Value">@unit.Label</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
@@ -282,7 +288,7 @@
         _aliasesText = string.Join(Environment.NewLine, Ingredient.Aliases);
         _category = IngredientCategory.All.Contains(Ingredient.Category) ? Ingredient.Category : IngredientCategory.Other;
         _subcategory = Ingredient.Subcategory;
-        _defaultUnit = string.IsNullOrWhiteSpace(Ingredient.DefaultUnit) ? "g" : Ingredient.DefaultUnit;
+        _defaultUnit = string.IsNullOrWhiteSpace(Ingredient.DefaultUnit) ? "g" : IngredientUnits.Normalize(Ingredient.DefaultUnit);
         _pantryCategory = ShoppingCategory.DisplayOrder.Contains(Ingredient.PantryCategory) ? Ingredient.PantryCategory : ShoppingCategory.Other;
         _canFreeze = Ingredient.CanFreeze;
         _quantityConversions = Ingredient.QuantityConversions
@@ -319,7 +325,7 @@
             ParseAliases(_aliasesText),
             _category,
             _subcategory.Trim(),
-            string.IsNullOrWhiteSpace(_defaultUnit) ? "g" : _defaultUnit.Trim(),
+            string.IsNullOrWhiteSpace(_defaultUnit) ? "g" : IngredientUnits.Normalize(_defaultUnit),
             _pantryCategory,
             _canFreeze,
             ParseQuantityConversions(),
@@ -361,7 +367,7 @@
             .Where(conversion => !string.IsNullOrWhiteSpace(conversion.Measure) && conversion.Grams > 0)
             .Select(conversion => new IngredientQuantityConversion
             {
-                Measure = conversion.Measure.Trim(),
+                Measure = IngredientUnits.CanonicalizeForStorage(conversion.Measure),
                 Grams = conversion.Grams!.Value,
                 Notes = conversion.Notes.Trim()
             })

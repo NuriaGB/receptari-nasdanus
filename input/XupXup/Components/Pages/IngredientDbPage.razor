@@ -1,0 +1,310 @@
+@page "/ingredients-db"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject IngredientDbService IngDb
+@inject AppState AppState
+
+<PageTitle>Base d'ingredients</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+
+    <!-- Capçalera -->
+    <div class="d-flex align-center gap-3 mb-4 flex-wrap">
+        <MudText Typo="Typo.h5"><b>🥕 Base d'ingredients</b></MudText>
+        <MudSpacer/>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            @_allEntries.Count ingredients · @_customCount personalitzats
+        </MudText>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-center pa-8">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+        </div>
+    }
+    else
+    {
+
+    <!-- Cerca i filtres -->
+    <div class="d-flex gap-3 mb-4 flex-wrap align-center">
+        <MudTextField @ref="_searchField"
+                      @bind-Value="_search"
+                      Placeholder="Cercar ingredient..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Style="min-width:220px;"
+                      Clearable="true"/>
+
+        <MudSelect @bind-Value="_filterCat"
+                   Placeholder="Totes les categories"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Clearable="true"
+                   Style="min-width:200px;">
+            @foreach (var cat in _categories)
+            {
+                <MudSelectItem Value="@cat.Id">@cat.Emoji @cat.Nom</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudToggleIconButton @bind-Toggled="_onlyCustom"
+                             Icon="@Icons.Material.Filled.PersonOutline"
+                             ToggledIcon="@Icons.Material.Filled.Person"
+                             ToggledColor="Color.Primary"
+                             Title="Mostrar només els meus"/>
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Style="margin-left:-8px;">
+            Només els meus
+        </MudText>
+    </div>
+
+    <!-- Taula d'ingredients -->
+    <MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+        <MudTable Items="@Filtered" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm"
+                  RowStyleFunc="@((entry, i) => entry.IsCustom ? "background:#FFFDE7;" : "")">
+            <HeaderContent>
+                <MudTh Style="width:40px;"></MudTh>
+                <MudTh>Nom</MudTh>
+                <MudTh>Categoria</MudTh>
+                <MudTh>Sinònims</MudTh>
+                <MudTh Style="width:80px;"></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <span style="font-size:20px;">@GetEmoji(context.CategoriaId)</span>
+                </MudTd>
+                <MudTd>
+                    @if (_editingId == context.Id)
+                    {
+                        <MudTextField @bind-Value="context.Nom"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense"
+                                      Style="min-width:160px;"/>
+                    }
+                    else
+                    {
+                        <span style="@(context.IsCustom ? "font-weight:600;" : "")">@context.Nom</span>
+                        @if (context.IsCustom)
+                        {
+                            <MudChip Size="Size.Small" Color="Color.Warning"
+                                     Style="margin-left:6px;font-size:10px;height:18px;">meu</MudChip>
+                        }
+                    }
+                </MudTd>
+                <MudTd>
+                    @if (_editingId == context.Id)
+                    {
+                        <MudSelect @bind-Value="context.CategoriaId"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Style="min-width:180px;">
+                            @foreach (var cat in _categories)
+                            {
+                                <MudSelectItem Value="@cat.Id">@cat.Emoji @cat.Nom</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <span>@GetEmoji(context.CategoriaId) @GetCatName(context.CategoriaId)</span>
+                    }
+                </MudTd>
+                <MudTd>
+                    @if (_editingId == context.Id)
+                    {
+                        <MudTextField @bind-Value="context.SinonimsText"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense"
+                                      Placeholder="separats per comes"
+                                      Style="min-width:200px;"/>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            @(context.Sinonims.Count > 0 ? string.Join(", ", context.Sinonims.Take(3)) + (context.Sinonims.Count > 3 ? "..." : "") : "—")
+                        </MudText>
+                    }
+                </MudTd>
+                <MudTd>
+                    @if (_editingId == context.Id)
+                    {
+                        <div class="d-flex gap-1">
+                            <MudIconButton Icon="@Icons.Material.Filled.Check"
+                                           Color="Color.Success" Size="Size.Small"
+                                           OnClick="@(() => SaveEdit(context))"/>
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Color="Color.Default" Size="Size.Small"
+                                           OnClick="@(() => _editingId = null)"/>
+                        </div>
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Size="Size.Small" Color="Color.Default"
+                                       OnClick="@(() => StartEdit(context))"/>
+                    }
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="pa-4" Color="Color.Secondary">Cap ingredient trobat</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    </MudPaper>
+
+    <!-- Peu: afegir ingredient nou manualment -->
+    <MudPaper Elevation="0" Class="mt-4 pa-4" Style="border:2px dashed #E0E0E0;border-radius:12px;">
+        <MudText Typo="Typo.subtitle2" Class="mb-3">➕ Afegir ingredient manualment</MudText>
+        <div class="d-flex gap-2 flex-wrap align-end">
+            <MudTextField @bind-Value="_newNom"
+                          Label="Nom"
+                          Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Style="min-width:180px;"/>
+            <MudSelect @bind-Value="_newCat"
+                       Label="Categoria"
+                       Variant="Variant.Outlined" Margin="Margin.Dense"
+                       Style="min-width:180px;">
+                @foreach (var cat in _categories)
+                {
+                    <MudSelectItem Value="@cat.Id">@cat.Emoji @cat.Nom</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField @bind-Value="_newSinonims"
+                          Label="Sinònims (opcional, comes)"
+                          Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Style="min-width:220px;"/>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="AddManual"
+                       Disabled="@string.IsNullOrWhiteSpace(_newNom)">
+                Afegir
+            </MudButton>
+        </div>
+    </MudPaper>
+
+    } <!-- end else loading -->
+</MudContainer>
+
+@code {
+    private bool _loading = true;
+    private List<IngredientDbCategory> _categories = new();
+
+    // ─── Vista model (fusió BD base + personalitzats) ─────────────────────────
+    private class IngredientRow
+    {
+        public string       Id          { get; set; } = string.Empty;
+        public string       Nom         { get; set; } = string.Empty;
+        public string       CategoriaId { get; set; } = string.Empty;
+        public List<string> Sinonims    { get; set; } = new();
+        public bool         IsCustom    { get; set; }
+
+        // Camp editable per als sinònims
+        public string SinonimsText
+        {
+            get => string.Join(", ", Sinonims);
+            set => Sinonims = value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                   .Select(s => s.Trim())
+                                   .Where(s => !string.IsNullOrEmpty(s))
+                                   .ToList();
+        }
+    }
+
+    private List<IngredientRow> _allEntries = new();
+    private string?  _filterCat   = null;
+    private string   _search      = string.Empty;
+    private bool     _onlyCustom  = false;
+    private string?  _editingId   = null;
+    private int      _customCount = 0;
+
+    // Formulari nou ingredient
+    private string _newNom      = string.Empty;
+    private string _newCat      = "altres";
+    private string _newSinonims = string.Empty;
+
+    private MudTextField<string>? _searchField;
+
+    private IEnumerable<IngredientRow> Filtered => _allEntries
+        .Where(e => !_onlyCustom || e.IsCustom)
+        .Where(e => string.IsNullOrEmpty(_filterCat) || e.CategoriaId == _filterCat)
+        .Where(e => string.IsNullOrEmpty(_search) ||
+                    e.Nom.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                    e.Sinonims.Any(s => s.Contains(_search, StringComparison.OrdinalIgnoreCase)));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await IngDb.EnsureLoadedAsync();
+        _categories = IngDb.Categories;
+        LoadEntries();
+        _loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _searchField != null)
+            await _searchField.FocusAsync();
+    }
+
+    private void LoadEntries()
+    {
+        // Combinem BD base + personalitzats des del servei
+        var db      = IngDb.GetAllEntries();
+        var customs = IngDb.GetCustomIngredients().Select(c => c.Nom).ToHashSet();
+
+        _allEntries = db.Select(e => new IngredientRow
+        {
+            Id          = e.Id,
+            Nom         = e.Nom,
+            CategoriaId = e.Categoria,
+            Sinonims    = e.Sinonims.ToList(),
+            IsCustom    = e.Id.StartsWith("custom_") || customs.Contains(e.Nom)
+        }).OrderBy(e => e.CategoriaId).ThenBy(e => e.Nom).ToList();
+
+        _customCount = _allEntries.Count(e => e.IsCustom);
+    }
+
+    private void StartEdit(IngredientRow row) => _editingId = row.Id;
+
+    private async Task SaveEdit(IngredientRow row)
+    {
+        // Actualitzem al servei
+        IngDb.UpdateEntry(row.Id, row.Nom, row.CategoriaId, row.Sinonims);
+        _editingId = null;
+
+        // Persistim els personalitzats al Drive
+        await PersistCustoms();
+        LoadEntries();
+    }
+
+    private async Task AddManual()
+    {
+        if (string.IsNullOrWhiteSpace(_newNom)) return;
+        var sinonims = _newSinonims
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim()).Where(s => s.Length > 0).ToList();
+
+        IngDb.AddCustomIngredient(_newNom, _newCat, sinonims);
+        await PersistCustoms();
+
+        _newNom      = string.Empty;
+        _newSinonims = string.Empty;
+        LoadEntries();
+    }
+
+    private async Task PersistCustoms()
+    {
+        AppState.Data.CustomIngredients = IngDb.GetCustomIngredients();
+        await AppState.SaveAsync();
+    }
+
+    private string GetEmoji(string catId)
+    {
+        var cat = _categories.FirstOrDefault(c => c.Id == catId);
+        return cat?.Emoji ?? "🛒";
+    }
+
+    private string GetCatName(string catId)
+    {
+        var cat = _categories.FirstOrDefault(c => c.Id == catId);
+        return cat?.Nom ?? "Altres";
+    }
+}

@@ -1,0 +1,224 @@
+@page "/recipe/{Id}/steps"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+
+<PageTitle>Pas a pas — @(_recipe?.Name ?? "")</PageTitle>
+
+@if (_recipe == null)
+{
+    <MudContainer Class="py-8 d-flex justify-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+    </MudContainer>
+}
+else
+{
+    <div style="display:flex;flex-direction:column;height:100vh;max-width:680px;margin:0 auto;">
+
+        <!-- CAPÇALERA -->
+        <div style="padding:12px 16px 0 16px;">
+            <div class="d-flex align-center gap-2 mb-2">
+                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                               OnClick="@(() => Nav.NavigateTo(string.Format("/recipe/{0}", Id)))"/>
+                <MudText Typo="Typo.h6"><b>@_recipe.Name</b></MudText>
+            </div>
+            <MudText Typo="Typo.caption" Align="Align.Center" Class="d-block mb-1" Color="Color.Secondary">
+                @_progressText
+            </MudText>
+            <div class="step-progress mb-3">
+                <div class="step-progress-fill" style="@(string.Format("width:{0}%", _progressPct))"></div>
+            </div>
+        </div>
+
+        <!-- CONTINGUT CENTRAL -->
+        <div style="padding:0 16px;">
+
+            @if (_isFinished)
+            {
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:32px;">
+                    <MudText Typo="Typo.h2" Class="mb-2">🎉</MudText>
+                    <MudText Typo="Typo.h5" Class="mb-1"><b>Recepta completada!</b></MudText>
+                    <MudText Color="Color.Secondary" Class="mb-4">Bon profit!</MudText>
+                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Replay"
+                               OnClick="Restart">Repetir</MudButton>
+                </div>
+            }
+            else if (_currentStep != null)
+            {
+                <MudPaper Class="pa-4 mb-3" Elevation="2" Style="border-radius:16px;">
+                    <MudChip Color="Color.Primary" Size="Size.Small" Class="mb-3">
+                        @_currentStep.StepLabel
+                    </MudChip>
+
+                    <!-- Text rich amb ingredients linkats ressaltats -->
+                    <div style="font-size:1.1rem;line-height:1.8;">
+                        @((MarkupString)RenderStepText(_currentStep))
+                    </div>
+
+                    <!-- Foto del pas -->
+                    @if (!string.IsNullOrEmpty(_currentStep.ImageBase64))
+                    {
+                        <img src="@_currentStep.ImageBase64"
+                             style="max-width:100%;border-radius:8px;margin-top:12px;border:1px solid #E0E0E0;" />
+                    }
+
+                    @if (_currentStep.TimerMinutes.HasValue)
+                    {
+                        <MudAlert Severity="Severity.Warning" Class="mt-3" Variant="Variant.Outlined">
+                            ⏱️ Temps estimat: <b>@_currentStep.TimerMinutes min</b>
+                        </MudAlert>
+                    }
+                </MudPaper>
+
+                <!-- Ingredients linkats en aquest pas -->
+                @if (_linkedIngredients.Any())
+                {
+                    <MudPaper Class="pa-3 mb-3" Elevation="1"
+                              Style="border-radius:12px;border-left:4px solid #FF6B35;">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2 d-block">
+                            🥕 INGREDIENTS D'AQUEST PAS
+                        </MudText>
+                        @foreach (var ing in _linkedIngredients)
+                        {
+                            <div class="d-flex justify-space-between align-center py-1"
+                                 style="border-bottom:1px solid #F5F5F5;">
+                                <MudText Style="font-weight:600;color:#FF6B35;">@ing.Name</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@ing.DisplayText</MudText>
+                            </div>
+                        }
+                    </MudPaper>
+                }
+            }
+        </div>
+
+            <!-- Botons de navegació -->
+            <div class="d-flex justify-space-between pa-3 gap-3">
+                <MudButton Variant="Variant.Outlined"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           OnClick="GoBack"
+                           Disabled="@(_currentIndex == 0 && !_isFinished)">
+                    Anterior
+                </MudButton>
+                @if (!_isFinished)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.Check"
+                               OnClick="MarkDone"
+                               Style="font-size:1rem;padding:10px 24px;">
+                        ✓ Fet!
+                    </MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                               OnClick="@(() => Nav.NavigateTo(string.Format("/recipe/{0}", Id)))">
+                        Veure recepta
+                    </MudButton>
+                }
+            </div>
+        </div>
+
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private Recipe?          _recipe;
+    private List<RecipeStep> _steps            = new();
+    private int              _currentIndex;
+    private RecipeStep?      _currentStep;
+    private bool             _isFinished;
+    private bool             _showIngredients  = true;
+    private List<Ingredient> _linkedIngredients = new();
+
+    private string _progressText => _isFinished
+        ? "Recepta completada! 🎉"
+        : string.Format("Pas {0} de {1}", _currentIndex + 1, _steps.Count);
+
+    private double _progressPct => _steps.Count == 0 ? 0
+        : (_isFinished ? 100 : (double)(_currentIndex + 1) / _steps.Count * 100);
+
+    protected override void OnParametersSet()
+    {
+        _recipe = AppState.GetRecipe(Id);
+        if (_recipe == null) return;
+        _steps        = _recipe.Steps.OrderBy(s => s.StepNumber).ToList();
+        _currentIndex = 0;
+        _isFinished   = false;
+        foreach (var s in _steps) s.IsDone = false;
+        _currentStep  = _steps.FirstOrDefault();
+        UpdateLinkedIngredients();
+    }
+
+    private void MarkDone()
+    {
+        if (_currentStep == null || _isFinished) return;
+        _currentStep.IsDone = true;
+        _currentIndex++;
+        _isFinished  = _currentIndex >= _steps.Count;
+        _currentStep = _isFinished ? null : _steps[_currentIndex];
+        UpdateLinkedIngredients();
+    }
+
+    private void GoBack()
+    {
+        if (_isFinished) { _isFinished = false; _currentIndex = _steps.Count - 1; }
+        else if (_currentIndex > 0) { _currentIndex--; }
+        else return;
+        _steps[_currentIndex].IsDone = false;
+        _currentStep = _steps[_currentIndex];
+        UpdateLinkedIngredients();
+    }
+
+    private void Restart()
+    {
+        foreach (var s in _steps) s.IsDone = false;
+        _currentIndex = 0;
+        _isFinished   = false;
+        _currentStep  = _steps.FirstOrDefault();
+        UpdateLinkedIngredients();
+    }
+
+    private void ToggleIngredients() => _showIngredients = !_showIngredients;
+
+    /// <summary>Troba els ingredients linkats en el pas actual via Links.</summary>
+    private void UpdateLinkedIngredients()
+    {
+        _linkedIngredients = new();
+        if (_currentStep == null || _recipe == null) return;
+        var ingMap = _recipe.Ingredients.ToDictionary(i => i.Id);
+        var seen   = new HashSet<string>();
+        foreach (var link in _currentStep.Links)
+        {
+            if (!seen.Contains(link.IngredientId) && ingMap.TryGetValue(link.IngredientId, out var ing))
+            {
+                _linkedIngredients.Add(ing);
+                seen.Add(link.IngredientId);
+            }
+        }
+    }
+
+    /// <summary>Renderitza el text rich del pas ressaltant els ingredients linkats.</summary>
+    private string RenderStepText(RecipeStep step)
+    {
+        // Usem DescriptionHtml si existeix, sinó el text pla escapat
+        var html = !string.IsNullOrEmpty(step.DescriptionHtml)
+            ? step.DescriptionHtml
+            : System.Net.WebUtility.HtmlEncode(step.Description ?? string.Empty);
+
+        if (_recipe == null || !step.Links.Any()) return html;
+
+        foreach (var link in step.Links)
+        {
+            var encoded     = System.Net.WebUtility.HtmlEncode(link.DisplayText);
+            var highlighted = string.Format(
+                "<span style='background:#FFE0CC;color:#E55A24;font-weight:600;border-radius:4px;padding:1px 4px;border-bottom:2px solid #FF6B35;'>{0}</span>",
+                encoded);
+            html = html.Replace(encoded, highlighted);
+        }
+        return html;
+    }
+
+}

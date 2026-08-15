@@ -1,0 +1,180 @@
+@page "/recipe/{Id}/scale"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Ajustar quantitats — Recetari</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-4">
+
+    <div class="d-flex align-center gap-2 mb-4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       OnClick='() => Nav.NavigateTo($"/recipe/{Id}")'/>
+        <MudText Typo="Typo.h6"><b>Ajustar quantitats</b></MudText>
+    </div>
+
+    @if (_recipe == null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+    }
+    else
+    {
+        <!-- BLOC 1: Tria ingredient de referència -->
+        <MudText Typo="Typo.subtitle1" Class="mb-2"><b>1. Ingredient de referència</b></MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-2">
+            Toca l'ingredient sobre el qual vols basar el canvi:
+        </MudText>
+
+        @foreach (var ing in _scalable)
+        {
+            <MudPaper Class="pa-3 mb-2 d-flex justify-space-between align-center"
+                      Style="@($"border-radius:8px;cursor:pointer;border:2px solid {(_selected?.Id == ing.Id ? "#FF6B35" : "#E0E0E0")}")"
+                      @onclick="() => SelectReference(ing)">
+                <MudText>@ing.Name</MudText>
+                <MudText Color="Color.Primary"><b>@ing.DisplayText</b></MudText>
+            </MudPaper>
+        }
+
+        <!-- BLOC 2: Nova quantitat -->
+        <MudDivider Class="my-4"/>
+        <MudText Typo="Typo.subtitle1" Class="mb-2"><b>2. Nova quantitat</b></MudText>
+
+        @if (_selected != null)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3">
+                Referència: <b>@_selected.Name</b> (@_selected.Quantity @_selected.Unit)
+            </MudAlert>
+        }
+
+        <div class="d-flex gap-2 align-end mb-3">
+            <MudTextField @bind-Value="_newQtyText" Label="Nova quantitat"
+                          Variant="Variant.Outlined" InputType="InputType.Number"
+                          Style="flex:1"/>
+            <MudText Class="pb-3 pl-1">@(_selected?.Unit)</MudText>
+        </div>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+                   OnClick="Compute" Disabled="@(_selected == null || string.IsNullOrWhiteSpace(_newQtyText))">
+            🔢 Calcula l'ajust
+        </MudButton>
+
+        <!-- BLOC 3: Previsualització -->
+        @if (_preview != null)
+        {
+            <MudDivider Class="my-4"/>
+            <MudText Typo="Typo.subtitle1" Class="mb-2"><b>3. Previsualització</b></MudText>
+
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                Factor: <b>×@(_preview.Factor.ToString("0.###"))</b>
+            </MudAlert>
+
+            @if (_preview.GlobalWarning != null)
+            {
+                <div class="scaling-warning mb-3">⚠️ @_preview.GlobalWarning</div>
+            }
+
+            @foreach (var si in _preview.Ingredients)
+            {
+                <div class="d-flex justify-space-between align-center py-2"
+                     style="border-bottom:1px solid #F0F0F0;">
+                    <MudText>@si.Original.Name</MudText>
+                    <div class="d-flex align-center gap-2">
+                        <MudText Color="Color.Secondary" Typo="Typo.body2">@si.Original.DisplayText</MudText>
+                        <MudText>→</MudText>
+                        <MudText Color="Color.Primary"><b>@si.NewQuantityDisplay</b></MudText>
+                        @if (si.WasAdjusted) { <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small"/> }
+                    </div>
+                </div>
+                @if (si.WarningMessage != null)
+                {
+                    <div class="scaling-warning mb-1">@si.WarningMessage</div>
+                }
+            }
+
+            <MudGrid Spacing="2" Class="mt-4">
+                <MudItem xs="6">
+                    <MudButton FullWidth="true" Variant="Variant.Outlined"
+                               OnClick='() => Nav.NavigateTo($"/recipe/{Id}")'>
+                        Cancel·lar
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary"
+                               OnClick="Confirm">
+                        ✓ Confirmar
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        }
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private Recipe?          _recipe;
+    private List<Ingredient> _scalable = new();
+    private Ingredient?      _selected;
+    private string           _newQtyText = string.Empty;
+    private ScalingPreview?  _preview;
+
+    protected override void OnParametersSet()
+    {
+        _recipe   = AppState.GetRecipe(Id);
+        _scalable = _recipe?.Ingredients
+            .Where(i => IngredientScalingService.ClassifyUnit(i.Unit, i.Quantity) != UnitScalingBehavior.NoQuantity)
+            .ToList() ?? new();
+        _selected = _scalable.FirstOrDefault();
+        if (_selected != null) _newQtyText = _selected.Quantity;
+    }
+
+    private void SelectReference(Ingredient ing)
+    {
+        _selected   = ing;
+        _newQtyText = ing.Quantity;
+        _preview    = null;
+    }
+
+    private void Compute()
+    {
+        if (_recipe == null || _selected == null) return;
+        if (!IngredientScalingService.TryParseQuantity(_newQtyText, out double newVal)) return;
+        _preview = IngredientScalingService.ComputeScaling(_recipe.Ingredients, _selected, newVal);
+    }
+
+    private async Task Confirm()
+    {
+        if (_preview == null || _recipe == null) return;
+
+        if (_preview.NeedsConfirmation)
+        {
+            var warnings = string.Join("\n", _preview.Ingredients
+                .Where(s => s.WasAdjusted && s.WarningMessage != null)
+                .Select(s => $"• {s.WarningMessage}"));
+            var result = await DialogService.ShowMessageBox(
+                "Confirmar ajustos",
+                $"S'han detectat ajustos:\n\n{warnings}\n\nVols continuar?",
+                yesText: "Sí, continuar", cancelText: "Cancel·lar");
+            if (result != true) return;
+        }
+
+        // Aplicar canvis i desar
+        foreach (var scaled in _preview.Ingredients)
+        {
+            if (scaled.NewQuantityRaw == 0) continue;
+            var ing = _recipe.Ingredients.FirstOrDefault(i => i.Id == scaled.Original.Id);
+            if (ing == null) continue;
+            var parts = scaled.NewQuantityDisplay.Split(' ', 2);
+            if (parts.Length >= 1) ing.Quantity = parts[0];
+            if (parts.Length == 2) ing.Unit     = parts[1];
+        }
+
+        await AppState.SaveRecipeAsync(_recipe);
+        Snackbar.Add("Quantitats actualitzades ✓", Severity.Success);
+        Nav.NavigateTo($"/recipe/{Id}");
+    }
+}

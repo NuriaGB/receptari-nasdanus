@@ -413,38 +413,8 @@ public sealed class ShoppingListService(BrowserAppStore store)
     private static string AmountText(string quantityText, string unit) =>
         string.Join(" ", new[] { quantityText, unit }.Where(value => !string.IsNullOrWhiteSpace(value)));
 
-    private static string NormalizeUnit(string unit)
-    {
-        var normalized = unit.Trim().ToLowerInvariant();
-        return normalized switch
-        {
-            "u" => "unitat",
-            "unitats" => "unitat",
-            "cullerades" => "cullerada",
-            "culleradetes" => "culleradeta",
-            "grapats" => "grapat",
-            "trossos" => "tros",
-            "trossets" => "trosset",
-            _ => normalized
-        };
-    }
+    private static string NormalizeUnit(string unit) => IngredientUnits.Normalize(unit);
 
-    private static string DisplayUnit(string unit, decimal? quantity)
-    {
-        if (quantity is null || quantity.Value == 1)
-        {
-            return unit;
-        }
-
-        return unit switch
-        {
-            "unitat" => "unitats",
-            "cullerada" => "cullerades",
-            "culleradeta" => "culleradetes",
-            "grapat" => "grapats",
-            "tros" => "trossos",
-            "trosset" => "trossets",
-            _ => unit
-        };
-    }
+    private static string DisplayUnit(string unit, decimal? quantity) =>
+        IngredientUnits.DisplayUnit(unit, quantity);
 }

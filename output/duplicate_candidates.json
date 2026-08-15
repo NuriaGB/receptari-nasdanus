@@ -1,0 +1,415 @@
+{
+  "source": {
+    "docx_path": "input/_receptes N?ria.docx",
+    "xupxup_saved_json": "input/recetari_data.json",
+    "extracted_on": "2026-06-26"
+  },
+  "summary": {
+    "candidate_pair_count": 19,
+    "docx_internal_pair_count": 7,
+    "cross_source_pair_count": 6,
+    "xupxup_internal_pair_count": 6,
+    "note": "Similarity is a review queue, not an automatic merge list."
+  },
+  "duplicate_candidates": [
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-035",
+        "name": "Bunyols de vent",
+        "category": "Postres"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-044",
+        "name": "Bunyols de vent",
+        "category": ""
+      },
+      "candidate_type": "cross_source_exact_title",
+      "title_similarity": 1.0,
+      "content_similarity": 0.765,
+      "evidence": [
+        "Same normalized title across DOCX and XupXup."
+      ],
+      "recommendation": "Likely same recipe in both sources; compare structured XupXup ingredients/steps with DOCX text before merging."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-057",
+        "name": "Coca de Sant Joan (versió millorada)",
+        "category": "Receptes a provar"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-058",
+        "name": "Coca de Sant Joan (versió millorada)",
+        "category": "Receptes a provar"
+      },
+      "candidate_type": "exact_duplicate_title",
+      "title_similarity": 1.0,
+      "content_similarity": 1.0,
+      "evidence": [
+        "Same normalized title appears more than once."
+      ],
+      "recommendation": "Merge into one draft recipe; keep the better-formatted text and preserve source paragraph ranges from both copies."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-028",
+        "name": "Pollastre Rostit",
+        "category": "Segons"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-071",
+        "name": "Pollastre rostit",
+        "category": ""
+      },
+      "candidate_type": "cross_source_exact_title",
+      "title_similarity": 1.0,
+      "content_similarity": 0.042,
+      "evidence": [
+        "Same normalized title across DOCX and XupXup."
+      ],
+      "recommendation": "Likely same recipe in both sources; compare structured XupXup ingredients/steps with DOCX text before merging."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-036",
+        "name": "Bunyols de l’Empordà",
+        "category": "Postres"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-045",
+        "name": "Bunyols de l'Empordà",
+        "category": ""
+      },
+      "candidate_type": "cross_source_similar_title",
+      "title_similarity": 0.95,
+      "content_similarity": 0.8,
+      "evidence": [
+        "Shared useful tokens: bunyols"
+      ],
+      "recommendation": "Manual review: may be duplicate, variant, or only same meal family."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-048",
+        "name": "Massa Mare Iban Yarza",
+        "category": "Pa"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-049",
+        "name": "Pa de Massa Mare Iban Yarza",
+        "category": "Pa"
+      },
+      "candidate_type": "similar_title",
+      "title_similarity": 0.875,
+      "content_similarity": 0.026,
+      "evidence": [
+        "Shared title tokens: iban, mare, massa, yarza"
+      ],
+      "recommendation": "Manual review: decide whether these are separate recipes, a base recipe with adaptations, or duplicates."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-043",
+        "name": "Magdalenes",
+        "category": "Postres"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-044",
+        "name": "Magdalenes Dukan",
+        "category": "Postres"
+      },
+      "candidate_type": "diet_adaptation",
+      "title_similarity": 0.769,
+      "content_similarity": 0.05,
+      "evidence": [
+        "Curated migration relationship based on title and recipe role."
+      ],
+      "recommendation": "Model Dukan as a RecipeAdaptation of Magdalenes only if preparation and intended use are close enough after review."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-002",
+        "name": "Canelons de carbassó i llagostins",
+        "category": "Entrants i primers"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-061",
+        "name": "Canelons de carbassó amb formatge",
+        "category": "Receptes a provar"
+      },
+      "candidate_type": "similar_title",
+      "title_similarity": 0.727,
+      "content_similarity": 0.038,
+      "evidence": [
+        "Shared title tokens: canelons, carbasso"
+      ],
+      "recommendation": "Manual review: decide whether these are separate recipes, a base recipe with adaptations, or duplicates."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-028",
+        "name": "Pollastre Rostit",
+        "category": "Segons"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-073",
+        "name": "Croquetes de Pollastre rostit",
+        "category": ""
+      },
+      "candidate_type": "cross_source_similar_title",
+      "title_similarity": 0.711,
+      "content_similarity": 0.025,
+      "evidence": [
+        "Shared useful tokens: pollastre, rostit"
+      ],
+      "recommendation": "Manual review: may be duplicate, variant, or only same meal family."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-038",
+        "name": "Coca de Sant Joan",
+        "category": "Postres"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-057",
+        "name": "Coca de Sant Joan (versió millorada)",
+        "category": "Receptes a provar"
+      },
+      "candidate_type": "similar_title",
+      "title_similarity": 0.667,
+      "content_similarity": 0.178,
+      "evidence": [
+        "Shared title tokens: coca, joan, sant"
+      ],
+      "recommendation": "Manual review: decide whether these are separate recipes, a base recipe with adaptations, or duplicates."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-038",
+        "name": "Coca de Sant Joan",
+        "category": "Postres"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-058",
+        "name": "Coca de Sant Joan (versió millorada)",
+        "category": "Receptes a provar"
+      },
+      "candidate_type": "similar_title",
+      "title_similarity": 0.667,
+      "content_similarity": 0.178,
+      "evidence": [
+        "Shared title tokens: coca, joan, sant"
+      ],
+      "recommendation": "Manual review: decide whether these are separate recipes, a base recipe with adaptations, or duplicates."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-022",
+        "name": "Filet de porc amb salsa al pebre verd",
+        "category": "Segons"
+      },
+      "recipe_b": {
+        "source": "docx",
+        "source_id": "docx-060",
+        "name": "Filet de porc al forn",
+        "category": "Receptes a provar"
+      },
+      "candidate_type": "same_primary_ingredient",
+      "title_similarity": 0.621,
+      "content_similarity": 0.042,
+      "evidence": [
+        "Curated migration relationship based on title and recipe role."
+      ],
+      "recommendation": "Separate recipes; share ingredient canonicalization and freezer/shopping rules for filet de porc."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-001",
+        "name": "Arròs tres delícies",
+        "category": "Entrants i primers"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-025",
+        "name": "Salmó a la papillote amb arròs tres delícies",
+        "category": "Sopar"
+      },
+      "candidate_type": "cross_source_similar_title",
+      "title_similarity": 0.603,
+      "content_similarity": 0.087,
+      "evidence": [
+        "Shared useful tokens: arros, delicies, tres"
+      ],
+      "recommendation": "Manual review: may be duplicate, variant, or only same meal family."
+    },
+    {
+      "recipe_a": {
+        "source": "docx",
+        "source_id": "docx-022",
+        "name": "Filet de porc amb salsa al pebre verd",
+        "category": "Segons"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-016",
+        "name": "Filet de porc al forn amb salsa de mostassa i amanida",
+        "category": "Dinar"
+      },
+      "candidate_type": "cross_source_similar_title",
+      "title_similarity": 0.6,
+      "content_similarity": 0.117,
+      "evidence": [
+        "Shared useful tokens: filet, porc, salsa"
+      ],
+      "recommendation": "Manual review: may be duplicate, variant, or only same meal family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-017",
+        "name": "Crema de carbassa i ou poché",
+        "category": "Sopar"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-063",
+        "name": "Crema de carbassó i ou poché",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.964,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: crema, ou, poche"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-011",
+        "name": "Amanida d'esqueixada de Bacallà",
+        "category": "Sopar"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-061",
+        "name": "Amanida amb esqueixada de bacallà",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.906,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: bacalla"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-034",
+        "name": "Iogurt amb maduixes i xocolata negra",
+        "category": ""
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-039",
+        "name": "Iogurt amb noux i xocolata negra",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.882,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: iogurt, negra, xocolata"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-034",
+        "name": "Iogurt amb maduixes i xocolata negra",
+        "category": ""
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-036",
+        "name": "Iogurt amb avellanes i xocolata negra",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.849,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: iogurt, negra, xocolata"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-036",
+        "name": "Iogurt amb avellanes i xocolata negra",
+        "category": ""
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-039",
+        "name": "Iogurt amb noux i xocolata negra",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.841,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: iogurt, negra, xocolata"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    },
+    {
+      "recipe_a": {
+        "source": "xupxup",
+        "source_id": "xupxup-032",
+        "name": "Truita francesa amb crema de carbassó",
+        "category": "Sopar"
+      },
+      "recipe_b": {
+        "source": "xupxup",
+        "source_id": "xupxup-049",
+        "name": "Truita Francesa amb formatge ratllat i carbassó",
+        "category": ""
+      },
+      "candidate_type": "xupxup_internal_similar",
+      "title_similarity": 0.786,
+      "content_similarity": null,
+      "evidence": [
+        "Shared useful tokens: carbasso, francesa, truita"
+      ],
+      "recommendation": "Manual review: decide whether these are duplicates, variants, or menu ideas under one template/family."
+    }
+  ]
+}

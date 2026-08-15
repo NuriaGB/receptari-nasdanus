@@ -162,7 +162,12 @@
                                               Margin="Margin.Dense"
                                               Class="edit-ingredient-name" />
                                 <MudTextField T="string" Label="Quantitat" @bind-Value="ingredient.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                <MudTextField T="string" Label="Unitat" @bind-Value="ingredient.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudSelect T="string" Label="Unitat" @bind-Value="ingredient.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                    @foreach (var unit in IngredientUnits.OptionsIncluding(ingredient.Unit))
+                                    {
+                                        <MudSelectItem T="string" Value="@unit.Value">@unit.Label</MudSelectItem>
+                                    }
+                                </MudSelect>
                                 <MudSelect T="string" Label="Escala" @bind-Value="ingredient.ScalingMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
                                     <MudSelectItem T="string" Value="@IngredientScalingMode.Linear">Linear</MudSelectItem>
                                     <MudSelectItem T="string" Value="@IngredientScalingMode.Fixed">Fixed</MudSelectItem>
@@ -330,7 +335,12 @@
                                                         @IngredientNameFor(reference)
                                                     </span>
                                                     <MudTextField T="string" Label="Quantitat" @bind-Value="reference.QuantityText" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                                    <MudTextField T="string" Label="Unitat" @bind-Value="reference.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                                    <MudSelect T="string" Label="Unitat" @bind-Value="reference.Unit" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                                                        @foreach (var unit in IngredientUnits.OptionsIncluding(reference.Unit))
+                                                        {
+                                                            <MudSelectItem T="string" Value="@unit.Value">@unit.Label</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
                                                     <MudIconButton OnClick="@(() => RemoveStepIngredient(step, reference))"
                                                                    Icon="@Icons.Material.Filled.Close"
                                                                    Color="Color.Secondary"
@@ -446,7 +456,7 @@
                 IngredientId = knownIngredientId ?? FindKnownIngredientId(ingredient.Name),
                 Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
-                Unit = ingredient.Unit,
+                Unit = IngredientUnits.Normalize(ingredient.Unit),
                 ScalingMode = ingredient.ScalingMode,
                 IsManualLink = knownIngredientId is not null,
                 KnownIngredientSearch = KnownIngredientSearchText(knownIngredientId, ingredient.Name)
@@ -471,7 +481,7 @@
                         IngredientKey = ingredientKey,
                         IngredientName = reference.Ingredient?.Name ?? reference.IngredientName,
                         QuantityText = reference.QuantityText,
-                        Unit = reference.Unit
+                        Unit = IngredientUnits.Normalize(reference.Unit)
                     });
                 }
             }
@@ -585,7 +595,7 @@
             IngredientKey = ingredient.Key,
             IngredientName = ingredient.Name,
             QuantityText = ingredient.Quantity,
-            Unit = ingredient.Unit
+            Unit = IngredientUnits.Normalize(ingredient.Unit)
         });
         step.SelectedIngredientKey = string.Empty;
     }
@@ -630,7 +640,7 @@
                 IngredientId = KnownIngredientIdFor(ingredient),
                 Name = ingredient.Name,
                 Quantity = ingredient.Quantity,
-                Unit = ingredient.Unit,
+                Unit = IngredientUnits.Normalize(ingredient.Unit),
                 ScalingMode = ingredient.ScalingMode,
                 Order = index + 1
             })
@@ -647,7 +657,7 @@
                     {
                         IngredientKey = reference.IngredientKey,
                         QuantityText = reference.QuantityText,
-                        Unit = reference.Unit,
+                        Unit = IngredientUnits.Normalize(reference.Unit),
                         Order = referenceIndex + 1
                     })
                     .ToList()
@@ -699,15 +709,17 @@
 
     private int? FindKnownIngredientId(string name)
     {
-        var normalizedName = IngredientNameNormalizer.Normalize(name);
+        var normalizedName = NormalizeKnownIngredientSearch(name);
         if (string.IsNullOrWhiteSpace(normalizedName))
         {
             return null;
         }
 
-        var match = _knownIngredients.FirstOrDefault(ingredient =>
-            IngredientNameNormalizer.Normalize(ingredient.Name) == normalizedName
-            || ingredient.Aliases.Any(alias => IngredientNameNormalizer.Normalize(alias) == normalizedName));
+        var match = _knownIngredients
+            .Where(ingredient => KnownIngredientNormalizedKeys(ingredient).Any(key => IsExactOrEmbeddedKnownIngredientMatch(normalizedName, key)))
+            .OrderBy(ingredient => KnownIngredientScore(ingredient, name))
+            .ThenBy(ingredient => ingredient.Name, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault();
 
         return match?.Id;
     }
@@ -768,23 +780,22 @@
 
     private static bool MatchesKnownIngredient(Ingredient knownIngredient, string search)
     {
-        var normalizedSearch = FoodText.Normalize(search);
+        var normalizedSearch = NormalizeKnownIngredientSearch(search);
         if (string.IsNullOrWhiteSpace(normalizedSearch))
         {
             return false;
         }
 
-        return KnownIngredientKeys(knownIngredient)
-            .Select(FoodText.Normalize)
-            .Any(key => key.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase));
+        return KnownIngredientNormalizedKeys(knownIngredient)
+            .Any(key =>
+                key.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
+                || IsEmbeddedKnownIngredientMatch(normalizedSearch, key));
     }
 
     private static int KnownIngredientScore(Ingredient knownIngredient, string search)
     {
-        var normalizedSearch = FoodText.Normalize(search);
-        var keys = KnownIngredientKeys(knownIngredient)
-            .Select(FoodText.Normalize)
-            .Where(key => !string.IsNullOrWhiteSpace(key))
+        var normalizedSearch = NormalizeKnownIngredientSearch(search);
+        var keys = KnownIngredientNormalizedKeys(knownIngredient)
             .ToList();
 
         if (keys.Any(key => key == normalizedSearch))
@@ -797,15 +808,19 @@
             return 1;
         }
 
-        return 2;
+        if (keys.Any(key => IsEmbeddedKnownIngredientMatch(normalizedSearch, key)))
+        {
+            return 2;
+        }
+
+        return 3;
     }
 
     private static bool IsExactKnownIngredientMatch(Ingredient knownIngredient, string search)
     {
-        var normalizedSearch = FoodText.Normalize(search);
+        var normalizedSearch = NormalizeKnownIngredientSearch(search);
         return !string.IsNullOrWhiteSpace(normalizedSearch)
-            && KnownIngredientKeys(knownIngredient)
-                .Select(FoodText.Normalize)
+            && KnownIngredientNormalizedKeys(knownIngredient)
                 .Any(key => key == normalizedSearch);
     }
 
@@ -813,6 +828,29 @@
         new[] { knownIngredient.Name, knownIngredient.CatalanName, knownIngredient.SpanishName }
             .Concat(knownIngredient.Aliases)
             .Where(value => !string.IsNullOrWhiteSpace(value));
+
+    private static IEnumerable<string> KnownIngredientNormalizedKeys(Ingredient knownIngredient) =>
+        KnownIngredientKeys(knownIngredient)
+            .Select(NormalizeKnownIngredientSearch)
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+    private static string NormalizeKnownIngredientSearch(string value) =>
+        IngredientNameNormalizer.Normalize(value);
+
+    private static bool IsExactOrEmbeddedKnownIngredientMatch(string normalizedSearch, string normalizedKnownKey) =>
+        string.Equals(normalizedSearch, normalizedKnownKey, StringComparison.OrdinalIgnoreCase)
+        || IsEmbeddedKnownIngredientMatch(normalizedSearch, normalizedKnownKey);
+
+    private static bool IsEmbeddedKnownIngredientMatch(string normalizedSearch, string normalizedKnownKey)
+    {
+        if (string.IsNullOrWhiteSpace(normalizedKnownKey) || normalizedKnownKey.Length < 5)
+        {
+            return false;
+        }
+
+        return $" {normalizedSearch} ".Contains($" {normalizedKnownKey} ", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static string KnownIngredientDisplayName(Ingredient knownIngredient) =>
         knownIngredient.Name;

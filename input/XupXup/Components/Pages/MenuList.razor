@@ -1,0 +1,86 @@
+@page "/menus"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject IDialogService DialogService
+@implements IDisposable
+
+<PageTitle>Menús — Recetari</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+
+    <div class="d-flex align-center justify-space-between mb-4">
+        <MudText Typo="Typo.h5"><b>Menús</b></MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="GoToNew">
+            Nou menú
+        </MudButton>
+    </div>
+
+    @if (!AppState.Menus.Any())
+    {
+        <MudPaper Class="pa-8 d-flex flex-column align-center" Elevation="0">
+            <MudText Typo="Typo.h3" Class="mb-2">📅</MudText>
+            <MudText Typo="Typo.h6" Class="mb-2">Encara no tens cap menú</MudText>
+            <MudText Color="Color.Secondary" Class="mb-4">Planifica els teus àpats setmanals</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToNew">
+                Crear menú
+            </MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            @foreach (var plan in AppState.Menus.OrderByDescending(m => m.StartDate))
+            {
+                var p = plan;
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard Style="border-radius:12px;cursor:pointer;"
+                             @onclick="@(() => Nav.NavigateTo(string.Format("/menu/{0}", p.Id)))">
+                        <MudCardContent>
+                            <MudText Typo="Typo.h6"><b>@p.Name</b></MudText>
+                            <MudText Color="Color.Secondary" Typo="Typo.body2" Class="mb-2">
+                                📅 @p.DateRangeText
+                            </MudText>
+                            <div class="d-flex gap-3">
+                                <MudChip Size="Size.Small">@p.Days.Count dies</MudChip>
+                                <MudChip Size="Size.Small">@p.TotalRecipes receptes</MudChip>
+                            </div>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Size="Size.Small"
+                                       OnClick="@(() => Nav.NavigateTo(string.Format("/menu/edit/{0}", p.Id)))">
+                                Editar
+                            </MudButton>
+                            <MudButton Size="Size.Small" Color="Color.Error"
+                                       OnClick="@(async () => await DeleteMenu(p))">
+                                Eliminar
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    protected override void OnInitialized() => AppState.StateChanged += Refresh;
+    private void Refresh() => InvokeAsync(StateHasChanged);
+    private void GoToNew() => Nav.NavigateTo("/menu/new");
+
+    private async Task DeleteMenu(MenuPlan plan)
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Eliminar menú",
+            string.Format("Segur que vols eliminar \"{0}\"?", plan.Name),
+            yesText: "Eliminar", cancelText: "Cancel·lar");
+        if (result == true)
+            await AppState.DeleteMenuAsync(plan.Id);
+    }
+
+    public void Dispose() => AppState.StateChanged -= Refresh;
+}

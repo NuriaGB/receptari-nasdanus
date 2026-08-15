@@ -1,0 +1,64 @@
+@inherits LayoutComponentBase
+@using MudBlazor
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+
+<MudLayout>
+    <MudAppBar Elevation="1" Color="Color.Primary">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
+                       Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudText Typo="Typo.h6" Class="ml-2">🍳 Recetari</MudText>
+        <MudSpacer />
+        @if (AppState.IsSaving)
+        {
+            <MudProgressCircular Size="Size.Small" Color="Color.Inherit" Indeterminate="true" Class="mr-2"/>
+            <MudText Typo="Typo.caption" Color="Color.Inherit">Desant...</MudText>
+        }
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
+        <MudNavMenu>
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.MenuBook" Match="NavLinkMatch.All">
+                Receptes
+            </MudNavLink>
+            <MudNavLink Href="/menus" Icon="@Icons.Material.Filled.CalendarMonth">
+                Menús
+            </MudNavLink>
+            <MudDivider Class="my-2"/>
+            <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Label">
+                Categories
+            </MudNavLink>
+            <MudDivider Class="my-2"/>
+            <MudNavLink Href="/ingredients-db" Icon="@Icons.Material.Filled.LocalDining">
+                Base d'ingredients
+            </MudNavLink>
+            <MudNavLink OnClick="SignOut" Icon="@Icons.Material.Filled.Logout">
+                Tancar sessió
+            </MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        @if (!string.IsNullOrEmpty(AppState.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Class="ma-2" ShowCloseIcon="true">
+                @AppState.ErrorMessage
+            </MudAlert>
+        }
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [Inject] GoogleDriveService DriveService { get; set; } = default!;
+    private bool _drawerOpen = false;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+
+    private async Task SignOut()
+    {
+        await DriveService.SignOutAsync();
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+}

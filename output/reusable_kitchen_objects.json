@@ -1,0 +1,3877 @@
+{
+  "source": {
+    "docx_path": "input/_receptes Núria.docx",
+    "generated_on": "2026-06-26",
+    "xupxup_saved_json": "input/recetari_data.json"
+  },
+  "summary": {
+    "base_preparation_candidate_count": 20,
+    "cooking_technique_candidate_count": 15,
+    "kitchen_knowledge_candidate_count": 9,
+    "role_count": 10,
+    "note": "Candidates are evidence-based and should be reviewed before promotion to canonical objects."
+  },
+  "base_preparation_candidates": [
+    {
+      "name": "Beixamel",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-002",
+          "recipe": "Canelons de carbassó i llagostins",
+          "snippet": "En una altre cassola, afegeix una mica d’oli i mantega i afegeix la farina, afegeix la llet poc a poc sense deixar de remenar, ratlla una mica de nou moscada i cuina la beixamel durant uns 6-8’."
+        },
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "Preparem la beixamel."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable sauce base for canelons, gratins, and pasta bakes."
+    },
+    {
+      "name": "Brou de pollastre",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-024",
+          "name": "Gall d’indi a la mostassa",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Afegim el caldo de pollastre i deixem coure les patates i els porros a foc mig-baix durant 30 minuts (aprox.)"
+        },
+        {
+          "source_id": "docx-024",
+          "recipe": "Gall d’indi a la mostassa",
+          "snippet": "Afegim el brou de pollastre"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable stock; can connect pantry/freezer to meal planning."
+    },
+    {
+      "name": "Caramel",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-039",
+          "recipe": "Crema Catalana",
+          "snippet": "Perquè la capa de caramel quedi perfecte, s’ha de cremar immediatament, no posar el sucre amb antel·lació perquè es dissoldrà i no quedarà cruixent."
+        },
+        {
+          "source_id": "docx-041",
+          "recipe": "Flam d’Ou",
+          "snippet": "Es prepara el caramel posant el sucre amb unes gotetes d’aigua al foc. S’ha de deixar fondre sense remenar. A la que comenci a agafar color daurat, vigilar, ja que es pot cremar ràpidament."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable dessert component."
+    },
+    {
+      "name": "Ceba caramelitzada",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-003",
+          "recipe": "Cous cous Marroquí",
+          "snippet": "Amb samfaina o ceba caramelitzada està de vici!"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable topping/side."
+    },
+    {
+      "name": "Crema catalana / crema pastissera",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-035",
+          "recipe": "Bunyols de vent",
+          "snippet": "Plat típic de Setmana Santa. N’hi ha un munt de varietats, bunyols de l’Empordà. Els Bunyols de vent permeten farcir-los amb crema catalana o pastissera-"
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Mentre la massa fermenta, prepararem la crema pastissera, es barregen tots els ingredients en fred, i quan tot estigui ben dissolt es porta a foc mig, fins que arrenqui el bull i agafi la consistència desitjada. Deixem temperar, i ho passem directament a una m"
+        },
+        {
+          "source_id": "docx-039",
+          "recipe": "Crema Catalana",
+          "snippet": "Crema Catalana"
+        },
+        {
+          "source_id": "docx-057",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Crema pastissera:"
+        },
+        {
+          "source_id": "docx-058",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Crema pastissera:"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Dessert filling/topping component."
+    },
+    {
+      "name": "Fumet / brou de peix",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Quan es comenci a enganxar hi tirarem el fumet de peix i l’aigua dels musclos. Aproximadament hem d’afegir el doble de brou que d’arròs."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable stock for paella and seafood dishes."
+    },
+    {
+      "name": "Gremolada",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-026",
+          "recipe": "Ossobuco",
+          "snippet": "L’osobuco (ínsubre: oss bus en ortografia clàssica o escrit com òs büüs) que en italià significa os buit és un tall de carn bovina amb el qual es fa un plat típic de la gastronomia milanesa. Hi ha diverses maneres de preparar aquest plat. Es pot servir com a s"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable finishing condiment."
+    },
+    {
+      "name": "Massa mare",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 8,
+      "matched_recipes": [
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Barrejar tots els ingredients de la massa mare, i deixar-ho fermentar 12h per sobre de 20ºC, idealment al voltant de 25ºC"
+        },
+        {
+          "source_id": "docx-048",
+          "recipe": "Massa Mare Iban Yarza",
+          "snippet": "Massa Mare Iban Yarza"
+        },
+        {
+          "source_id": "docx-049",
+          "recipe": "Pa de Massa Mare Iban Yarza",
+          "snippet": "Pa de Massa Mare Iban Yarza"
+        },
+        {
+          "source_id": "docx-053",
+          "recipe": "Pa Turris",
+          "snippet": "Quan veiem que la consistencia de la massa comença a ser elàstica, afegim la massa mare i continuem el procés d’amassar amb l’amassat fancès i deixant-lo repossar 10’ per tornar-lo a amassar."
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Posem tots els ingredients en un bol (ferment (o massa mare), farines, llevat, sal i aigua, i ho barregem bé."
+        },
+        {
+          "source_id": "docx-057",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans):"
+        },
+        {
+          "source_id": "docx-058",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans):"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Clearly reusable starter for bread recipes."
+    },
+    {
+      "name": "Merengue suís",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-042",
+          "recipe": "LemonPie",
+          "snippet": "Pel merengue suís:"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable topping for pies/desserts."
+    },
+    {
+      "name": "Mousse de formatge",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Preparem una mousse de formatge:"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Component inside layered savory cake."
+    },
+    {
+      "name": "Preferment / ferment",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-051",
+          "recipe": "Pa Rústic Webos",
+          "snippet": "Primer prepararem el pre-ferment, barrejant la farina, l’aigua i el llevat. Un cop ben barrejat ho deixarem reposar una hora."
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Es prepara el ferment la nit abans i es deixa descansar tota la nit (12 h >20ºC)."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable bread-process component with lead time."
+    },
+    {
+      "name": "Salsa de tomàquet",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-005",
+          "recipe": "Espaguetis amb salsa putanesca",
+          "snippet": "Donem un parell de voltes i hi afegim la salsa de tomàquet (veure recepta del llibre)."
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Abans de que es cremi l’all, afegirem la salsa de tomàquet (amb pebre dolç i la melsa)"
+        },
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Posar en un bol els ous ben batuts, el sucre, la sal, la salsa de tomàquet, la farina, la maicena i el llevat."
+        },
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "el tomàquet triturat"
+        },
+        {
+          "source_id": "docx-050",
+          "recipe": "Pizza Iban Yarza",
+          "snippet": "Els ingredients a posar sobre la massa han d’estar ben escorreguts, amb la menor quantitat d’aigua possible, ja sigui la salsa de tomàquet, formatge mozzarela fresc, les anxoves, etc, per minimitzar que la massa s’estovi."
+        },
+        {
+          "source_id": "docx-061",
+          "recipe": "Canelons de carbassó amb formatge",
+          "snippet": "En el fons d’una placa pel forn, posem una capa de salsa de tomàquet i hi distribuïm els canelons i ho cobrim amb més formatge ratllat."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Frequently referenced sauce; should be reusable rather than copied into every recipe."
+    },
+    {
+      "name": "Samfaina",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 3,
+      "matched_recipes": [
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-003",
+          "recipe": "Cous cous Marroquí",
+          "snippet": "Amb samfaina o ceba caramelitzada està de vici!"
+        },
+        {
+          "source_id": "docx-019",
+          "recipe": "Bacallà amb samfaina",
+          "snippet": "Bacallà amb samfaina"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable vegetable preparation/sauce."
+    },
+    {
+      "name": "Truita fina",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-001",
+          "recipe": "Arròs tres delícies",
+          "snippet": "Fer la truita, que quedi el més fina possible."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Small reusable egg preparation used inside rice/noodle dishes."
+    },
+    {
+      "name": "Vinagreta",
+      "object_type": "base_preparation",
+      "target_model": "BasePreparations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-005",
+          "recipe": "Espaguetis amb salsa putanesca",
+          "snippet": "A la vinagreta hi podeu posar una mica de mostassa, si us agrada, i una mica de pebre."
+        },
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Preparem primer la vinagreta:"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable dressing pattern."
+    },
+    {
+      "name": "Pa de pessic",
+      "object_type": "base_preparation_or_recipe_family",
+      "target_model": "BasePreparations + RecipeFamilies",
+      "matched_recipe_count": 3,
+      "matched_recipes": [
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Ha de quedar un pa de pessic molt fi i prim."
+        },
+        {
+          "source_id": "docx-045",
+          "recipe": "Pa de pessic de Vic",
+          "snippet": "Pa de pessic de Vic"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "Pa de pessic taronja i civada"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Appears as standalone recipe and as component in another recipe."
+    },
+    {
+      "name": "Marinada",
+      "object_type": "base_preparation_or_technique",
+      "target_model": "BasePreparations + CookingTechniques",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Posem a bullir l’aigua per als fideus i tallem la ceba a juliana. Podem menjar-la crua o saltejada. Si opteu per menjar-la crua, deixeu-la marinar amb vinagre d’arròs."
+        },
+        {
+          "source_id": "docx-012",
+          "recipe": "Quiche de Pastanaga",
+          "snippet": "Posar al foc una paella a foc mig-alt amb una mica d’AOVEi posar els filets de salmó pel costat sense pell. Cuinar no més de 2 minuts. Donar la volta i posar-hi la salsa amb la que s’ha marinat. Acabar de cuinar (2 minuts aprox)."
+        },
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Talleu a daus els pits de pollastre i els barregeu bé en un bol amb la marinada, reservant-ho a la nevera unes tres hortes."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Marinar les contra-cuixes, la llet i ½ culleradeta de sal . barregem bé i cobrim amb film transparent i deixem marinar a la nevera 30 minuts."
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amb tot això untarem el xai fent-li prèviament una sèrie de talls a fi que la marinada penetri millor dins la carn. Ho posem dins d’un tupper i ho guardem a la nevera un mínim de dues hores, to t i que es millor fer-ho tota la nit."
+        },
+        {
+          "source_id": "docx-032",
+          "recipe": "Xai al vi negre",
+          "snippet": "Quan s’hagi refredat, mulleu la peça de carn amb el marinat. Li heu de donar la volta cada 4/5 hores."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Reusable flavor object with lead-time rules."
+    },
+    {
+      "name": "Sofregit",
+      "object_type": "base_preparation_or_technique",
+      "target_model": "BasePreparations + CookingTechniques",
+      "matched_recipe_count": 7,
+      "matched_recipes": [
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-016",
+          "name": "Spanakopita (pasta fullada grega amb espinacs)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-024",
+          "name": "Gall d’indi a la mostassa",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-059",
+          "name": "Verdinas amb xoriço i verdures",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "Sofregim la ceba amb un parell de guindilles."
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Sofregim la ceba a foc mig-suau, vigilant que no es cremi. Si cal, afegiu més oli. Ha de quedar un bonic color daurat, pràcticament transparent."
+        },
+        {
+          "source_id": "docx-016",
+          "recipe": "Spanakopita (pasta fullada grega amb espinacs)",
+          "snippet": "Feu un sofregit amb les escalunyes i el porro"
+        },
+        {
+          "source_id": "docx-019",
+          "recipe": "Bacallà amb samfaina",
+          "snippet": "Enfarinem els lloms de bacallà, i els sofregim en una cassola. Un cop daurats, els reservem."
+        },
+        {
+          "source_id": "docx-023",
+          "recipe": "Fricandó amb moixernons *",
+          "snippet": "En una altra cassola amb oli feu un sofregit amb la ceba i la pastanaga pelades i ben picades. Quan comencin a estar fetes, afegiu-hi el tomàquet trinxat i deixeu que es concentri bé."
+        },
+        {
+          "source_id": "docx-024",
+          "recipe": "Gall d’indi a la mostassa",
+          "snippet": "Sofregim la ceba i l’all amb l’oli."
+        },
+        {
+          "source_id": "docx-059",
+          "recipe": "Verdinas amb xoriço i verdures",
+          "snippet": "En un cassó, posem un bon raig d’AOVE i sofregim les verdures amb mitja culleradeta de sal durant uns 10 minuts"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Can be both a technique and a reusable aromatic base."
+    },
+    {
+      "name": "Mahonesa / lactonesa",
+      "object_type": "base_preparation_or_template_recipe",
+      "target_model": "BasePreparations + TemplateRecipes",
+      "matched_recipe_count": 3,
+      "matched_recipes": [
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-033",
+          "recipe": "Mahonesa / Lactonesa",
+          "snippet": "Mahonesa / Lactonesa"
+        },
+        {
+          "source_id": "docx-034",
+          "recipe": "Salsa BURGER",
+          "snippet": "Salsa molt gustosa, forta de gust, però que està boníssima per acompanyar una hamburguesa menjada a l’estil “McDonald’s” o “Burger King” En comptes de fer-ho amb llet (a l’estil de la lactonesa), es pot fer amb un ou (mahonesa), quedará un sabor més potent."
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Emulsified sauce template with egg/milk variants."
+    },
+    {
+      "name": "Massa de pizza",
+      "object_type": "base_preparation_or_template_recipe",
+      "target_model": "BasePreparations + TemplateRecipes",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-050",
+          "recipe": "Pizza Iban Yarza",
+          "snippet": "Aquesta recepta correspon a la recepta de massa de pizza d’Iban Yarza. Recomanació: quan es tregui la massa de pizza de la nevera, posar també els ingredients a fer servir en un colador perquè perdin el màxim d’aigua i la pizza quedi més bona."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Can become a template with toppings as variants."
+    }
+  ],
+  "cooking_technique_candidates": [
+    {
+      "name": "Air fryer",
+      "object_type": "equipment_method",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-015",
+          "recipe": "Sopa de Meló",
+          "snippet": "Poc abans de menjar, posarem unes llenques de pernil a l’airfryer a 205º 8 min."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Escorrem el pollastre marinat i l’arrebossem amb els cereals i el coem a l’airfryer durant 30-35 minuts a 230ºC girant-los a mitja cocció."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Bany maria",
+      "object_type": "gentle_heat",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-041",
+          "recipe": "Flam d’Ou",
+          "snippet": "S’escalfa el forn a 160ºC (per sota), i es posen els flams al bany maria durant 40-45 min o fins que estiguin quallats."
+        },
+        {
+          "source_id": "docx-042",
+          "recipe": "LemonPie",
+          "snippet": "Cloca les clares en un bol al bany maria juntament amb el sucre i el suc de llimona i bateu-ho amb un batedor de mà fins que el sucre es dissolgui. En aquest moment veuràs que la barreja es torna blanca i espumosa."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Cassola / guisat",
+      "object_type": "one_pot_method",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 9,
+      "matched_recipes": [
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-002",
+          "recipe": "Canelons de carbassó i llagostins",
+          "snippet": "En una cassola amb abundant aigua i sal, escalda les làmines de carbassó 2’. Escorre-les bé."
+        },
+        {
+          "source_id": "docx-014",
+          "recipe": "Sopa de Ceba",
+          "snippet": "En una cassola posem un tros de mantega amb un rajolí d’oli, per evitar que es cremi. I un cop la mantega fosa, hi afegim la ceba tallada amb juliana."
+        },
+        {
+          "source_id": "docx-019",
+          "recipe": "Bacallà amb samfaina",
+          "snippet": "Enfarinem els lloms de bacallà, i els sofregim en una cassola. Un cop daurats, els reservem."
+        },
+        {
+          "source_id": "docx-022",
+          "recipe": "Filet de porc amb salsa al pebre verd",
+          "snippet": "Salpebrem el filet de porc i en una cassola ben calenta amb un rajolí d’oli el marquem sense que es cogui per dintre."
+        },
+        {
+          "source_id": "docx-023",
+          "recipe": "Fricandó amb moixernons *",
+          "snippet": "El fricandó és un dels guisats de carn més típics de la nostra cuina, un clàssic que encara avui dia es fa a gairebé totes les cases de menjars i del qual se’n té constància almenys des del segle XVII. Probablement el nom deriva del fricassé francès, un tipus "
+        },
+        {
+          "source_id": "docx-026",
+          "recipe": "Ossobuco",
+          "snippet": "En una cassola fonem una part de mantega amb un rajolinet d’oli (perquè no es cremi), i daurem la ceba finament picada, a foc ben lent."
+        },
+        {
+          "source_id": "docx-028",
+          "recipe": "Pollastre Rostit",
+          "snippet": "Rostiu en una cassola amb oli d’oliva el pollastre tallat a quarts i salpebrat, i també la carn de porc a trossos grans. Deixeu que es rosteixi lentament durant almenys 30 minuts perquè es dauri i doni més gust."
+        },
+        {
+          "source_id": "docx-031",
+          "recipe": "Vedella rostida",
+          "snippet": "En una cassola gran, tirarem un bon raig d’AOVE i aromatitzem amb 8 o 10 alls, no s’han de daurar, només aromatitzar l’oli."
+        },
+        {
+          "source_id": "docx-053",
+          "recipe": "Pa Turris",
+          "snippet": "Ho posarem en una cassola amb paper de forn amb farina i al forn escalfat a 250ºC"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Emulsionar",
+      "object_type": "sauce_technique",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 3,
+      "matched_recipes": [
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-033",
+          "recipe": "Mahonesa / Lactonesa",
+          "snippet": "Mahonesa / Lactonesa"
+        },
+        {
+          "source_id": "docx-034",
+          "recipe": "Salsa BURGER",
+          "snippet": "Salsa molt gustosa, forta de gust, però que està boníssima per acompanyar una hamburguesa menjada a l’estil “McDonald’s” o “Burger King” En comptes de fer-ho amb llet (a l’estil de la lactonesa), es pot fer amb un ou (mahonesa), quedará un sabor més potent."
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Fermentar / llevar",
+      "object_type": "dough_process",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 18,
+      "matched_recipes": [
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-043",
+          "name": "Magdalenes",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-052",
+          "name": "Panets de llavors Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-055",
+          "name": "Pa de Llet Alma",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Posar en un bol els ous ben batuts, el sucre, la sal, la salsa de tomàquet, la farina, la maicena i el llevat."
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amassar tots els ingredients (farina, sal i aigua), afegint el llevat. Dividim la massa en peces de 80 g arrodonint-les fins que siguin unes boles llises i ben compactades. Deixem fermentar les boles, tapades amb un drap humit, 45 minuts. Enfarinem una superfí"
+        },
+        {
+          "source_id": "docx-036",
+          "recipe": "Bunyols de l’Empordà",
+          "snippet": "Amb la farina, el sucre, la mantega, el llevat premsat i la sal, fem una massa ben homogènia"
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Barrejar tots els ingredients de la massa mare, i deixar-ho fermentar 12h per sobre de 20ºC, idealment al voltant de 25ºC"
+        },
+        {
+          "source_id": "docx-043",
+          "recipe": "Magdalenes",
+          "snippet": "Tamissem la farina, el llevat químic i la canyella"
+        },
+        {
+          "source_id": "docx-045",
+          "recipe": "Pa de pessic de Vic",
+          "snippet": "Un cop els rovells estan de color crema i ben esponjosos (han triplicat o quadriplicat el volum), es comença a afegir, a poc a poc, les farines i el llevat prèviament tamitzats."
+        },
+        {
+          "source_id": "docx-048",
+          "recipe": "Massa Mare Iban Yarza",
+          "snippet": "Aquesta recepta correspon a la recepta de massa mare d’Iban Yarza #retocucharilla Guardem sempre una petita quantitat (5g) a la nevera i així només l’haurem de refrescar abans de fer-la servir amb farina i aigua dos o tres cops."
+        },
+        {
+          "source_id": "docx-049",
+          "recipe": "Pa de Massa Mare Iban Yarza",
+          "snippet": "Deixar fermentar 2-3 h."
+        },
+        {
+          "source_id": "docx-050",
+          "recipe": "Pizza Iban Yarza",
+          "snippet": "En un bol, barrejar els dos tipus de farina, la sal i el llevat."
+        },
+        {
+          "source_id": "docx-051",
+          "recipe": "Pa Rústic Webos",
+          "snippet": "Primer prepararem el pre-ferment, barrejant la farina, l’aigua i el llevat. Un cop ben barrejat ho deixarem reposar una hora."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Forn / baked",
+      "object_type": "heat_method",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 29,
+      "matched_recipes": [
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-004",
+          "name": "Endívies al forn amb tomàquets i espècies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-016",
+          "name": "Spanakopita (pasta fullada grega amb espinacs)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-037",
+          "name": "Coca de iogurt",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-043",
+          "name": "Magdalenes",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-044",
+          "name": "Magdalenes Dukan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-046",
+          "name": "Panellets",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-052",
+          "name": "Panets de llavors Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-060",
+          "name": "Filet de porc al forn",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-002",
+          "recipe": "Canelons de carbassó i llagostins",
+          "snippet": "En una placa de forn, posem una capa de beixamel, hi distribuïm els canelons a sobre."
+        },
+        {
+          "source_id": "docx-004",
+          "recipe": "Endívies al forn amb tomàquets i espècies",
+          "snippet": "Endívies al forn amb tomàquets i espècies"
+        },
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "Afegim els macarrons sobre el sofregit i una mica de beixamel. Ho remenem bé perquè quedi tot ben barrejat i ho passem a una font per posar-ho al forn."
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Quan l’arròs està cuit, el posarem a gratinar al forn durant uns 5-7 minuts."
+        },
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Ho barregem fins que quedi una pasta. La posem al motlle sobre un paper de forn untat amb mantega."
+        },
+        {
+          "source_id": "docx-012",
+          "recipe": "Quiche de Pastanaga",
+          "snippet": "Porta-ho al forn 15’ a 200ºC"
+        },
+        {
+          "source_id": "docx-016",
+          "recipe": "Spanakopita (pasta fullada grega amb espinacs)",
+          "snippet": "Pinteu amb mantega una safata per anar al forn, poseu la primera làmina de pasta i amb un pinzell la pinteu amb la barreja d’oli i mantega, i així successivament 5 o 6 làmines. Llavors escampeu la barreja d’espinacs amb el sofregit d’escalunya i porro i format"
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amb el forn a 170 graus posem el xai en una safata i mitja hora més tard el ruixem amb una tassa d’aigua bullint, que ens servirà per anar mullant la carn durant les quatre hores que encara haurem de tenir el xai al forn, les darreres tres hores, cobert amb un"
+        },
+        {
+          "source_id": "docx-032",
+          "recipe": "Xai al vi negre",
+          "snippet": "Quan arribi el moment de coure-ho, heu d’eixugar l’espatlla i amb el forn a 160 graus la teniu en una horeta."
+        },
+        {
+          "source_id": "docx-037",
+          "recipe": "Coca de iogurt",
+          "snippet": "Preescalfar el forn a 180ºC, a dalt i abaix (sense ventilador)."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Fregir",
+      "object_type": "fat_cooking",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 7,
+      "matched_recipes": [
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-029",
+          "name": "Sardines en escabetx",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Fregim l’albergínia tallada a daus"
+        },
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Assequem bé els lloms de bacallà, els passem per farina i els fregim a foc fort , un minut per costat."
+        },
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Es poden tenir crostons de pa fregits per donar un toc cruixent."
+        },
+        {
+          "source_id": "docx-023",
+          "recipe": "Fricandó amb moixernons *",
+          "snippet": "Salpebreu els filets de vedella i enfarineu-los bé, retirant l’excés de farina. Fregiu-los en una cassola amb oli calent fins que quedin rossos. Retireu-los i reserveu-los."
+        },
+        {
+          "source_id": "docx-027",
+          "recipe": "Pollastre al curry",
+          "snippet": "Escalfem l’AOVE i fregim la ceba 5-10 minuts. Afegim l’all el gingebre i el bitxo donem un parell de voltes i afegim el tomàquet. Quan s’hagi evaporat l’aigua afegim el curri i la cúrcuma i barregem bé."
+        },
+        {
+          "source_id": "docx-029",
+          "recipe": "Sardines en escabetx",
+          "snippet": "Amb les sardines netes (sense espines ni cap, i obertes com un llibre), salpebreu-les, enfarineu-les i fregiu-les. Reserveu-les"
+        },
+        {
+          "source_id": "docx-036",
+          "recipe": "Bunyols de l’Empordà",
+          "snippet": "En una paella escalfem l’oli. Quan és roent, no abans hi fregim els bunyols. No els donem la volta fins que es daurin. No els traurem fins que el daurat no sigui més aviat fosc."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Gratinar",
+      "object_type": "finishing",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 4,
+      "matched_recipes": [
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-002",
+          "recipe": "Canelons de carbassó i llagostins",
+          "snippet": "Cobrim els canelons amb una mica més de beixamel i ho cobrim amb formatge ratllat, i ho portem a gratinar a 200ºC uns 10’."
+        },
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "Posem una mica de beixamel per sobre, formatge ratllat i uns bocinets de mantega i ho gratinem fins que formatge estigui ros."
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Quan l’arròs està cuit, el posarem a gratinar al forn durant uns 5-7 minuts."
+        },
+        {
+          "source_id": "docx-014",
+          "recipe": "Sopa de Ceba",
+          "snippet": "En una cassoleta (per persona) hi posem la sopa, i a sobre la llesca de pa i formatge per gratinar."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Marinar",
+      "object_type": "prep_lead_time",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Posem a bullir l’aigua per als fideus i tallem la ceba a juliana. Podem menjar-la crua o saltejada. Si opteu per menjar-la crua, deixeu-la marinar amb vinagre d’arròs."
+        },
+        {
+          "source_id": "docx-012",
+          "recipe": "Quiche de Pastanaga",
+          "snippet": "Posar al foc una paella a foc mig-alt amb una mica d’AOVEi posar els filets de salmó pel costat sense pell. Cuinar no més de 2 minuts. Donar la volta i posar-hi la salsa amb la que s’ha marinat. Acabar de cuinar (2 minuts aprox)."
+        },
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Talleu a daus els pits de pollastre i els barregeu bé en un bol amb la marinada, reservant-ho a la nevera unes tres hortes."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Marinar les contra-cuixes, la llet i ½ culleradeta de sal . barregem bé i cobrim amb film transparent i deixem marinar a la nevera 30 minuts."
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amb tot això untarem el xai fent-li prèviament una sèrie de talls a fi que la marinada penetri millor dins la carn. Ho posem dins d’un tupper i ho guardem a la nevera un mínim de dues hores, to t i que es millor fer-ho tota la nit."
+        },
+        {
+          "source_id": "docx-032",
+          "recipe": "Xai al vi negre",
+          "snippet": "Quan s’hagi refredat, mulleu la peça de carn amb el marinat. Li heu de donar la volta cada 4/5 hores."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Olla / bullit",
+      "object_type": "wet_heat",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 32,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-008",
+          "name": "Llenties a la riojana",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-024",
+          "name": "Gall d’indi a la mostassa",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-037",
+          "name": "Coca de iogurt",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-044",
+          "name": "Magdalenes Dukan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-059",
+          "name": "Verdinas amb xoriço i verdures",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-001",
+          "recipe": "Arròs tres delícies",
+          "snippet": "Posem a coure l’arròs amb el doble d’aigua i una mica de sal. Deixem coure a foc suau."
+        },
+        {
+          "source_id": "docx-003",
+          "recipe": "Cous cous Marroquí",
+          "snippet": "Mentrestant, posem una cassoleta amb aigua abundant al foc, la vaporera i ho tapem i esperem que arrenqui el bull. S’hi pot posar alguna espècie com clau, llorer, etc per aromatitzar el couscous."
+        },
+        {
+          "source_id": "docx-005",
+          "recipe": "Espaguetis amb salsa putanesca",
+          "snippet": "Posar a bullir l’aigua pels espaguetis. Recordeu de deixar el punt de cocció just perque quedin al dente."
+        },
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Posem a bullir l’aigua per als fideus i tallem la ceba a juliana. Podem menjar-la crua o saltejada. Si opteu per menjar-la crua, deixeu-la marinar amb vinagre d’arròs."
+        },
+        {
+          "source_id": "docx-008",
+          "recipe": "Llenties a la riojana",
+          "snippet": "En una olla posem l’oli i quan estigui calent, afegim les verdures perquè suïn amb una mica de sal a foc mig."
+        },
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "Posem a bullir la pasta de macarrons fins que estiguin al dente."
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Remeneu-ho be i deixeu-ho coure a foc mig durant uns 15-20 minuts"
+        },
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Escalfem la llet al foc i quan trenqui el bull, l’apartem. Dissolem la gelatina hidratada en la llet fins a la completa dissolució. Barregem la llet amb la gelatina amb la crema de formatge fins a completa integració"
+        },
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Afegim les seques i ho cobrim amb aigua freda. Deixem cuinar fins que comenci a bullir i baixem el foc i que continuï cuinant. Durant la cocció afegim un got d’aigua freda. Ho repetim un parell de cops."
+        },
+        {
+          "source_id": "docx-014",
+          "recipe": "Sopa de Ceba",
+          "snippet": "La deixarem coure fins que quedi ben transparent, no ha de quedar rossa."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Paella / pan saute",
+      "object_type": "pan_method",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 19,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-024",
+          "name": "Gall d’indi a la mostassa",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-029",
+          "name": "Sardines en escabetx",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-040",
+          "name": "Doriyakis",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-043",
+          "name": "Magdalenes",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-001",
+          "recipe": "Arròs tres delícies",
+          "snippet": "En una paella amb foc fort, daurem el pollastre, quan estigui daurat afegim l’arròs, els pèsols i la pastanaga. Afegim la truita tallada a dauets i salsa de soja. Cuinar un parell de minuts"
+        },
+        {
+          "source_id": "docx-005",
+          "recipe": "Espaguetis amb salsa putanesca",
+          "snippet": "Mentres posem a bullir l’aigua dels espaguets, en una paella posem oli, quan aquest estigui ben calent hi posarem la cayena i l’all trinxat. Vigileu que l’all no es cremi!"
+        },
+        {
+          "source_id": "docx-010",
+          "recipe": "Paella de Marisc",
+          "snippet": "Paella de Marisc"
+        },
+        {
+          "source_id": "docx-012",
+          "recipe": "Quiche de Pastanaga",
+          "snippet": "Posar al foc una paella a foc mig-alt amb una mica d’AOVEi posar els filets de salmó pel costat sense pell. Cuinar no més de 2 minuts. Donar la volta i posar-hi la salsa amb la que s’ha marinat. Acabar de cuinar (2 minuts aprox)."
+        },
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Piquem els porros i les cebes i ho saltarem a foc lent en una olla amb mantega i oli. No s’ha de daurar"
+        },
+        {
+          "source_id": "docx-020",
+          "recipe": "Crespells de Bacallà",
+          "snippet": "Poseu la paella al foc amb força oli i quan estigui ben calent, aneu posant amb una cullera porcions de la massa per coure."
+        },
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Saltegeu al wok l’all i la ceba, els xilis, l’anís, la canyella i els claus. Tot seguit el gingebre, una mica de líquid de la cocció, sal i la resta del sucre i deixeu-ho bullir uns minutets i al final afegiu-hi la pinya."
+        },
+        {
+          "source_id": "docx-022",
+          "recipe": "Filet de porc amb salsa al pebre verd",
+          "snippet": "En la paella hi posarem la mantega, que un cop estigui desfeta hi posarem el pebre i deixarem que alliberi les aromes."
+        },
+        {
+          "source_id": "docx-024",
+          "recipe": "Gall d’indi a la mostassa",
+          "snippet": "Daurem el pit de gall d’indi tallat a daus."
+        },
+        {
+          "source_id": "docx-026",
+          "recipe": "Ossobuco",
+          "snippet": "En una cassola fonem una part de mantega amb un rajolinet d’oli (perquè no es cremi), i daurem la ceba finament picada, a foc ben lent."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Rostir",
+      "object_type": "dry_heat",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 4,
+      "matched_recipes": [
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-060",
+          "name": "Filet de porc al forn",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-028",
+          "recipe": "Pollastre Rostit",
+          "snippet": "Pollastre Rostit"
+        },
+        {
+          "source_id": "docx-031",
+          "recipe": "Vedella rostida",
+          "snippet": "Vedella rostida"
+        },
+        {
+          "source_id": "docx-060",
+          "recipe": "Filet de porc al forn",
+          "snippet": "Col·locar al forn ja calent i rostir fins que la carn quedi daurada, aproximadament uns 20-30 minuts."
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Triturar / blender",
+      "object_type": "texture",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 9,
+      "matched_recipes": [
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-059",
+          "name": "Verdinas amb xoriço i verdures",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-012",
+          "recipe": "Quiche de Pastanaga",
+          "snippet": "Triturar les pastanagues i barreja amb els ous, la farina d’ametlles i sal fins que quedi pasta homogènia."
+        },
+        {
+          "source_id": "docx-015",
+          "recipe": "Sopa de Meló",
+          "snippet": "Triturem i colem"
+        },
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Quan les patates estiguin cuites, ho retirem del foc i ho triturem en la batedora de vas."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Ratllem el formatge, afegim els flocs de blat de moro un pesic de sal i pebre i el pebre vermell i ho triturem."
+        },
+        {
+          "source_id": "docx-033",
+          "recipe": "Mahonesa / Lactonesa",
+          "snippet": "Es posen tots els ingredients al vas del minipímer i a màxima potencia sense aixecar el braç. Quan la mahonesa comença a tocar la superfície, amb moviments molts suaus podem començar a pujar i baixar el braç."
+        },
+        {
+          "source_id": "docx-034",
+          "recipe": "Salsa BURGER",
+          "snippet": "Es posen tots els ingredients al vas del minipímer i es procedeix igual que si fos una mahonesa."
+        },
+        {
+          "source_id": "docx-035",
+          "recipe": "Bunyols de vent",
+          "snippet": "Es deixa temperar uns minuts i es va afegint els ous un a un sense parar de remenar i assegurant que l’anterior està ben integrat abans d’afegir el següent (no fer-ho amb minipímer, però sí que es pot fer amb un batedor d’arbre o K)"
+        },
+        {
+          "source_id": "docx-042",
+          "recipe": "LemonPie",
+          "snippet": "Col·loca la farina a la batedora, un polsim de sal i el sucre. Barrejar lleugerament per homogeneïtzar amb batedor de K."
+        },
+        {
+          "source_id": "docx-059",
+          "recipe": "Verdinas amb xoriço i verdures",
+          "snippet": "A l’hora i mitja treure un cullerot de verdines amb caldo, triturar-ho i afegir-ho a la cocció."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Vaporera / steam",
+      "object_type": "wet_heat",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 5,
+      "matched_recipes": [
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-003",
+          "recipe": "Cous cous Marroquí",
+          "snippet": "Mentrestant, posem una cassoleta amb aigua abundant al foc, la vaporera i ho tapem i esperem que arrenqui el bull. S’hi pot posar alguna espècie com clau, llorer, etc per aromatitzar el couscous."
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Posar al forn uns 20-22 minuts a 200ºC amb calor a sobre i sota (sense ventilador, ni vapor)."
+        },
+        {
+          "source_id": "docx-051",
+          "recipe": "Pa Rústic Webos",
+          "snippet": "Mantindrem el forn a 250ºC duran 5’. Passat aquest temps, opbrirem la porta del forn perquè surti el vapor i abaixarem la temperatura a 220ºC i ho deixarem durant 35’."
+        },
+        {
+          "source_id": "docx-053",
+          "recipe": "Pa Turris",
+          "snippet": "Deixarem al pa al forn a 250ºC (vapor) durant 5’, i després baixarem a 220ºC durant 45-50’"
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Amb el forn a 250ºC (a dalt i abaix, sense ventilador), posem els panets al forn durant 10-13’ (sense vapor)."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    },
+    {
+      "name": "Wok",
+      "object_type": "equipment_method",
+      "target_model": "CookingTechniques",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Saltegeu al wok l’all i la ceba, els xilis, l’anís, la canyella i els claus. Tot seguit el gingebre, una mica de líquid de la cocció, sal i la resta del sucre i deixeu-ho bullir uns minutets i al final afegiu-hi la pinya."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": ""
+    }
+  ],
+  "recipe_role_candidates": [
+    {
+      "role": "bread_or_dough",
+      "matched_recipe_count": 34,
+      "matched_recipes": [
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-037",
+          "name": "Coca de iogurt",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-040",
+          "name": "Doriyakis",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-044",
+          "name": "Magdalenes Dukan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-046",
+          "name": "Panellets",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-052",
+          "name": "Panets de llavors Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-055",
+          "name": "Pa de Llet Alma",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "dessert",
+      "matched_recipe_count": 13,
+      "matched_recipes": [
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-037",
+          "name": "Coca de iogurt",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-040",
+          "name": "Doriyakis",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-043",
+          "name": "Magdalenes",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-044",
+          "name": "Magdalenes Dukan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-046",
+          "name": "Panellets",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        }
+      ]
+    },
+    {
+      "role": "draft_to_test",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-059",
+          "name": "Verdinas amb xoriço i verdures",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-060",
+          "name": "Filet de porc al forn",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "family_feast_or_seasonal",
+      "matched_recipe_count": 8,
+      "matched_recipes": [
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-046",
+          "name": "Panellets",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "main",
+      "matched_recipe_count": 14,
+      "matched_recipes": [
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-024",
+          "name": "Gall d’indi a la mostassa",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-029",
+          "name": "Sardines en escabetx",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        }
+      ]
+    },
+    {
+      "role": "make_ahead",
+      "matched_recipe_count": 31,
+      "matched_recipes": [
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-007",
+          "name": "Gaspatxo de síndria",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-017",
+          "name": "Tzatziki (Amanida de cogombre i iogurt grec)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-052",
+          "name": "Panets de llavors Webos",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-060",
+          "name": "Filet de porc al forn",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "one_pot",
+      "matched_recipe_count": 26,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-008",
+          "name": "Llenties a la riojana",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-016",
+          "name": "Spanakopita (pasta fullada grega amb espinacs)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-029",
+          "name": "Sardines en escabetx",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-031",
+          "name": "Vedella rostida",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-040",
+          "name": "Doriyakis",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-056",
+          "name": "Fajitas Dürum",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "sauce",
+      "matched_recipe_count": 16,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "side_or_component",
+      "matched_recipe_count": 24,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-023",
+          "name": "Fricandó amb moixernons *",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ]
+    },
+    {
+      "role": "starter",
+      "matched_recipe_count": 18,
+      "matched_recipes": [
+        {
+          "source_id": "docx-001",
+          "name": "Arròs tres delícies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-003",
+          "name": "Cous cous Marroquí",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-004",
+          "name": "Endívies al forn amb tomàquets i espècies",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-005",
+          "name": "Espaguetis amb salsa putanesca",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-007",
+          "name": "Gaspatxo de síndria",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-008",
+          "name": "Llenties a la riojana",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-010",
+          "name": "Paella de Marisc",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-012",
+          "name": "Quiche de Pastanaga",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-016",
+          "name": "Spanakopita (pasta fullada grega amb espinacs)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-017",
+          "name": "Tzatziki (Amanida de cogombre i iogurt grec)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        }
+      ]
+    }
+  ],
+  "kitchen_knowledge_candidates": [
+    {
+      "name": "Advance desalting rule: bacallà",
+      "object_type": "prep_lead_time_rule",
+      "target_model": "PrepLeadTimeRules",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Dessalem el bacallà. Millor deixar en la primera aigua uns 10 dies, i després fer un parell o tres canvis d’aigua fins que estigui al punt de sal."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Desalting bacalla is long lead-time kitchen knowledge."
+    },
+    {
+      "name": "Advance soak rule: llegums",
+      "object_type": "prep_lead_time_rule",
+      "target_model": "PrepLeadTimeRules",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Posem en remull les seques la nit anterior. Han d’estar en remull unes 8-12 hores."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Soaking legumes should become a planner reminder."
+    },
+    {
+      "name": "Child-friendly texture adaptation",
+      "object_type": "adaptation_rule",
+      "target_model": "RecipeAdaptations",
+      "matched_recipe_count": 2,
+      "matched_recipes": [
+        {
+          "source_id": "docx-014",
+          "name": "Sopa de Ceba",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-014",
+          "recipe": "Sopa de Ceba",
+          "snippet": "Tritureu la sopa perquè quedi com una crema, i els nens i no tant nens que no els hi agradi trobar els fils de la ceba se la menjaran com si res!"
+        },
+        {
+          "source_id": "docx-041",
+          "recipe": "Flam d’Ou",
+          "snippet": "El flam d’ou és un postre que encanta a nens i amb adults i que admet moltes variacions. A continuació detallarem al recepta bàsica."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Blend/stringy soups for children or texture-sensitive diners."
+    },
+    {
+      "name": "Dough fermentation timing",
+      "object_type": "prep_lead_time_rule",
+      "target_model": "PrepLeadTimeRules",
+      "matched_recipe_count": 8,
+      "matched_recipes": [
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Barrejar tots els ingredients de la massa mare, i deixar-ho fermentar 12h per sobre de 20ºC, idealment al voltant de 25ºC"
+        },
+        {
+          "source_id": "docx-048",
+          "recipe": "Massa Mare Iban Yarza",
+          "snippet": "Massa Mare Iban Yarza"
+        },
+        {
+          "source_id": "docx-049",
+          "recipe": "Pa de Massa Mare Iban Yarza",
+          "snippet": "Pa de Massa Mare Iban Yarza"
+        },
+        {
+          "source_id": "docx-053",
+          "recipe": "Pa Turris",
+          "snippet": "Quan veiem que la consistencia de la massa comença a ser elàstica, afegim la massa mare i continuem el procés d’amassar amb l’amassat fancès i deixant-lo repossar 10’ per tornar-lo a amassar."
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Es prepara el ferment la nit abans i es deixa descansar tota la nit (12 h >20ºC)."
+        },
+        {
+          "source_id": "docx-057",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans):"
+        },
+        {
+          "source_id": "docx-058",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans):"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Bread and coca recipes need reminders well before cooking."
+    },
+    {
+      "name": "Leftover transformation: rostit",
+      "object_type": "reuse_rule",
+      "target_model": "LeftoverRules + BasePreparations",
+      "matched_recipe_count": 1,
+      "matched_recipes": [
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-028",
+          "recipe": "Pollastre Rostit",
+          "snippet": "Pollastre Rostit"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Cooked roast chicken can be base stock for future meals."
+    },
+    {
+      "name": "Marinade timing",
+      "object_type": "prep_lead_time_rule",
+      "target_model": "PrepLeadTimeRules",
+      "matched_recipe_count": 7,
+      "matched_recipes": [
+        {
+          "source_id": "docx-006",
+          "name": "Fideus amb albergínia i mango",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-006",
+          "recipe": "Fideus amb albergínia i mango",
+          "snippet": "Posem a bullir l’aigua per als fideus i tallem la ceba a juliana. Podem menjar-la crua o saltejada. Si opteu per menjar-la crua, deixeu-la marinar amb vinagre d’arròs."
+        },
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Talleu a daus els pits de pollastre i els barregeu bé en un bol amb la marinada, reservant-ho a la nevera unes tres hortes."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Marinar les contra-cuixes, la llet i ½ culleradeta de sal . barregem bé i cobrim amb film transparent i deixem marinar a la nevera 30 minuts."
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amb tot això untarem el xai fent-li prèviament una sèrie de talls a fi que la marinada penetri millor dins la carn. Ho posem dins d’un tupper i ho guardem a la nevera un mínim de dues hores, to t i que es millor fer-ho tota la nit."
+        },
+        {
+          "source_id": "docx-032",
+          "recipe": "Xai al vi negre",
+          "snippet": "Per fer la salsa, daureu les verdures, afegint-hi una bona cullerada de mantega i després mullant-ho amb brou de carn i el vi de la marinada. Ho deixeu coure una bona estona destapat que ja vagi reduint, i al final ho coleu. Si veieu que la salsa no queda prou"
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Es posa a bullir la llet amb la canyella i la pell de llimona. Quan bulli, s’apaga el foc i es deixa reposar tota la nit, ben tapada."
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Es prepara el ferment la nit abans i es deixa descansar tota la nit (12 h >20ºC)."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Marinades should schedule reminders and affect meal planning."
+    },
+    {
+      "name": "Massa mare maintenance",
+      "object_type": "storage_rule",
+      "target_model": "StorageRules",
+      "matched_recipe_count": 22,
+      "matched_recipes": [
+        {
+          "source_id": "docx-007",
+          "name": "Gaspatxo de síndria",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-017",
+          "name": "Tzatziki (Amanida de cogombre i iogurt grec)",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-030",
+          "name": "Shawarma de xai",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-032",
+          "name": "Xai al vi negre",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-041",
+          "name": "Flam d’Ou",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-042",
+          "name": "LemonPie",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-047",
+          "name": "Pastís de Formatge sense forn",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-007",
+          "recipe": "Gaspatxo de síndria",
+          "snippet": "Se pasa después por el pasapurés o un 5 colador, para que quede más fino, y se reserva en la nevera hasta el momento de servir."
+        },
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Muntem la clara d’ou a punt de neu i reservem a la nevera."
+        },
+        {
+          "source_id": "docx-015",
+          "recipe": "Sopa de Meló",
+          "snippet": "Ho portem a la nevera per un mínim de 3h, o al congelador. Perquè estigui ben fresc."
+        },
+        {
+          "source_id": "docx-017",
+          "recipe": "Tzatziki (Amanida de cogombre i iogurt grec)",
+          "snippet": "Ho incorporem bé i ho tapem amb paper de film i ho reservem un parell d’horetes a la nevera."
+        },
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Reservem-ho a la nevera perquè estigui ben fred abans de servir."
+        },
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Talleu a daus els pits de pollastre i els barregeu bé en un bol amb la marinada, reservant-ho a la nevera unes tres hortes."
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Marinar les contra-cuixes, la llet i ½ culleradeta de sal . barregem bé i cobrim amb film transparent i deixem marinar a la nevera 30 minuts."
+        },
+        {
+          "source_id": "docx-030",
+          "recipe": "Shawarma de xai",
+          "snippet": "Amb tot això untarem el xai fent-li prèviament una sèrie de talls a fi que la marinada penetri millor dins la carn. Ho posem dins d’un tupper i ho guardem a la nevera un mínim de dues hores, to t i que es millor fer-ho tota la nit."
+        },
+        {
+          "source_id": "docx-032",
+          "recipe": "Xai al vi negre",
+          "snippet": "Ho podeu deixar en un lloc fresc a Tº ambient (4 dies) o a la nevera (6)-"
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Barrejar tots els ingredients de la massa mare, i deixar-ho fermentar 12h per sobre de 20ºC, idealment al voltant de 25ºC"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Starter maintenance is a reusable storage/process object."
+    },
+    {
+      "name": "Seasonal feast knowledge",
+      "object_type": "seasonality_rule",
+      "target_model": "SeasonalityRules",
+      "matched_recipe_count": 8,
+      "matched_recipes": [
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-039",
+          "name": "Crema Catalana",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-046",
+          "name": "Panellets",
+          "category": "Postres"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Plat típic de quaresma i setmana santa."
+        },
+        {
+          "source_id": "docx-035",
+          "recipe": "Bunyols de vent",
+          "snippet": "Plat típic de Setmana Santa. N’hi ha un munt de varietats, bunyols de l’Empordà. Els Bunyols de vent permeten farcir-los amb crema catalana o pastissera-"
+        },
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Coca de Sant Joan"
+        },
+        {
+          "source_id": "docx-039",
+          "recipe": "Crema Catalana",
+          "snippet": "Postre típic de cuina catalana que recorda una mica a la “Crème brûlée” francesa. Postre típic del día de Sant Josep"
+        },
+        {
+          "source_id": "docx-046",
+          "recipe": "Panellets",
+          "snippet": "Els panellets, son el dolç típic del dia de tots sants. Hi ha moltes varietats però els clàssics son de pinyons, tot i que els d’ametlla i coco, també agraden molt"
+        },
+        {
+          "source_id": "docx-057",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Coca de Sant Joan (versió millorada)"
+        },
+        {
+          "source_id": "docx-058",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Coca de Sant Joan (versió millorada)"
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Seasonal recipes should surface around family/calendar moments."
+    },
+    {
+      "name": "Serve-with-bread rule for saucy dishes",
+      "object_type": "serving_rule",
+      "target_model": "ServingSuggestions",
+      "matched_recipe_count": 6,
+      "matched_recipes": [
+        {
+          "source_id": "docx-009",
+          "name": "Macarrons de Pernil i Xoriço",
+          "category": "Entrants i primers"
+        },
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-026",
+          "name": "Ossobuco",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-009",
+          "recipe": "Macarrons de Pernil i Xoriço",
+          "snippet": "De una bona barra de pa per escurar bé el plat!"
+        },
+        {
+          "source_id": "docx-019",
+          "recipe": "Bacallà amb samfaina",
+          "snippet": "Ja es pot servir amb una bona ració de pà per deixar el plat més net que una patena."
+        },
+        {
+          "source_id": "docx-022",
+          "recipe": "Filet de porc amb salsa al pebre verd",
+          "snippet": "L’ingredient estrella Una bona barra de pa per sucar i deixar el plat ben llustrós!"
+        },
+        {
+          "source_id": "docx-026",
+          "recipe": "Ossobuco",
+          "snippet": "L’osobuco (ínsubre: oss bus en ortografia clàssica o escrit com òs büüs) que en italià significa os buit és un tall de carn bovina amb el qual es fa un plat típic de la gastronomia milanesa. Hi ha diverses maneres de preparar aquest plat. Es pot servir com a s"
+        },
+        {
+          "source_id": "docx-027",
+          "recipe": "Pollastre al curry",
+          "snippet": "L’ingredient estrella Una bona barra de pa per poder sucar a la salsa."
+        },
+        {
+          "source_id": "docx-028",
+          "recipe": "Pollastre Rostit",
+          "snippet": "L’ingredient estrella Una bona barra de pa per poder sucar a la salsa."
+        }
+      ],
+      "confidence": "candidate",
+      "notes": "Repeated family knowledge: saucy dishes need bread on the shopping/serving list."
+    }
+  ],
+  "xupxup_saved_data_notes": {
+    "complete_recipes_with_structured_steps": 21,
+    "meal_ideas_or_placeholders": 52,
+    "additional_template_candidates": [
+      "Rotllets de primavera",
+      "Iogurt bowls/snacks",
+      "Amanides r?pides",
+      "Truita francesa",
+      "Samuses",
+      "Llenties amb verduretes"
+    ],
+    "additional_technique_evidence": [
+      "air fryer appears in complete and placeholder XupXup recipes",
+      "planxa/forn/bullida appear in meal ideas",
+      "structured ingredient quantities exist for 21 recipes"
+    ]
+  }
+}

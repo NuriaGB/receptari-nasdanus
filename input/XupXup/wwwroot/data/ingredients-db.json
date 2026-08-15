@@ -1,0 +1,961 @@
+{
+  "version": "1.0",
+  "categories": [
+    { "id": "carn_blanca",   "nom": "Carn blanca",          "emoji": "🍗", "ordre": 1 },
+    { "id": "carn_vermella", "nom": "Carn vermella",         "emoji": "🥩", "ordre": 2 },
+    { "id": "peix_marisc",   "nom": "Peix i marisc",         "emoji": "🐟", "ordre": 3 },
+    { "id": "ous_lactics",   "nom": "Ous i làctics",         "emoji": "🥚", "ordre": 4 },
+    { "id": "verdura",       "nom": "Verdura i hortalisses", "emoji": "🥦", "ordre": 5 },
+    { "id": "fruita",        "nom": "Fruita",                "emoji": "🍎", "ordre": 6 },
+    { "id": "llegums",       "nom": "Llegums",               "emoji": "🫘", "ordre": 7 },
+    { "id": "cereals",       "nom": "Cereals i farinetes",   "emoji": "🌾", "ordre": 8 },
+    { "id": "fruits_secs",   "nom": "Fruits secs i llavors", "emoji": "🥜", "ordre": 9 },
+    { "id": "condiments",    "nom": "Condiments i espècies", "emoji": "🧂", "ordre": 10 },
+    { "id": "oli_salses",    "nom": "Oli, vinagre i salses", "emoji": "🫙", "ordre": 11 },
+    { "id": "altres",        "nom": "Altres",                "emoji": "🛒", "ordre": 12 }
+  ],
+  "ingredients": [
+    {
+      "id": "i001",
+      "nom": "pollastre",
+      "categoria": "carn_blanca",
+      "sinonims": [ "pollo", "pit de pollastre", "cuixa de pollastre", "pollastre sencer" ]
+    },
+    {
+      "id": "i002",
+      "nom": "pit de pollastre",
+      "categoria": "carn_blanca",
+      "sinonims": [ "pechuga", "pit pollastre", "filet de pollastre" ]
+    },
+    {
+      "id": "i003",
+      "nom": "cuixa de pollastre",
+      "categoria": "carn_blanca",
+      "sinonims": [ "muslo", "cuixes de pollastre", "contramuslo" ]
+    },
+    {
+      "id": "i004",
+      "nom": "gall dindi",
+      "categoria": "carn_blanca",
+      "sinonims": [ "pavo", "pit de gall dindi", "filet de gall dindi" ]
+    },
+    {
+      "id": "i005",
+      "nom": "conill",
+      "categoria": "carn_blanca",
+      "sinonims": [ "conejo", "cuixes de conill" ]
+    },
+    {
+      "id": "i006",
+      "nom": "llom de porc",
+      "categoria": "carn_blanca",
+      "sinonims": [ "lomo", "filet de porc", "solomillo de cerdo", "llom" ]
+    },
+    {
+      "id": "i007",
+      "nom": "pernil dolç",
+      "categoria": "carn_blanca",
+      "sinonims": [ "jamon york", "jamón dulce", "pernil cuit" ]
+    },
+    {
+      "id": "i008",
+      "nom": "vedella",
+      "categoria": "carn_vermella",
+      "sinonims": [ "ternera", "carne de vaca", "vaca", "bou" ]
+    },
+    {
+      "id": "i009",
+      "nom": "filet de vedella",
+      "categoria": "carn_vermella",
+      "sinonims": [ "solomillo", "entrecot", "bistec" ]
+    },
+    {
+      "id": "i010",
+      "nom": "carn picada",
+      "categoria": "carn_vermella",
+      "sinonims": [ "carne picada", "carne molida", "carn picada de vedella", "carn picada mixta" ]
+    },
+    {
+      "id": "i011",
+      "nom": "porc",
+      "categoria": "carn_vermella",
+      "sinonims": [ "cerdo", "carne de cerdo", "costella de porc", "costilla" ]
+    },
+    {
+      "id": "i012",
+      "nom": "xai",
+      "categoria": "carn_vermella",
+      "sinonims": [ "cordero", "corder", "cuixa de xai", "costella de xai" ]
+    },
+    {
+      "id": "i013",
+      "nom": "anec",
+      "categoria": "carn_vermella",
+      "sinonims": [ "pato", "pit d'anec", "magret", "magret d'anec" ]
+    },
+    {
+      "id": "i014",
+      "nom": "botifarra",
+      "categoria": "carn_vermella",
+      "sinonims": [ "butifarra", "botifarra negra", "botifarra blanca" ]
+    },
+    {
+      "id": "i015",
+      "nom": "llonganissa",
+      "categoria": "carn_vermella",
+      "sinonims": [ "longaniza", "fuet", "salami", "xoriço", "chorizo" ]
+    },
+    {
+      "id": "i016",
+      "nom": "pernil salat",
+      "categoria": "carn_vermella",
+      "sinonims": [ "jamon serrano", "pernil", "jamon" ]
+    },
+    {
+      "id": "i017",
+      "nom": "salmó",
+      "categoria": "peix_marisc",
+      "sinonims": [ "salmon", "salmó fumat", "salmón ahumado" ]
+    },
+    {
+      "id": "i018",
+      "nom": "tonyina",
+      "categoria": "peix_marisc",
+      "sinonims": [ "atún", "atun", "ventresca de tonyina", "tonyina en llauna" ]
+    },
+    {
+      "id": "i019",
+      "nom": "bacallà",
+      "categoria": "peix_marisc",
+      "sinonims": [ "bacalao", "llom de bacallà", "bacallà dessalat" ]
+    },
+    {
+      "id": "i020",
+      "nom": "lluç",
+      "categoria": "peix_marisc",
+      "sinonims": [ "merluza", "filet de lluç" ]
+    },
+    {
+      "id": "i021",
+      "nom": "rap",
+      "categoria": "peix_marisc",
+      "sinonims": [ "rape", "cua de rap" ]
+    },
+    {
+      "id": "i022",
+      "nom": "dorada",
+      "categoria": "peix_marisc",
+      "sinonims": [ "dorada", "orada" ]
+    },
+    {
+      "id": "i023",
+      "nom": "llobarro",
+      "categoria": "peix_marisc",
+      "sinonims": [ "lubina", "llop de mar" ]
+    },
+    {
+      "id": "i024",
+      "nom": "sardina",
+      "categoria": "peix_marisc",
+      "sinonims": [ "sardines", "sardinas" ]
+    },
+    {
+      "id": "i025",
+      "nom": "anxova",
+      "categoria": "peix_marisc",
+      "sinonims": [ "anchoa", "boquerones", "seitó" ]
+    },
+    {
+      "id": "i026",
+      "nom": "gamba",
+      "categoria": "peix_marisc",
+      "sinonims": [ "gambas", "gambes", "gamba pelada", "llagostí", "langostino" ]
+    },
+    {
+      "id": "i027",
+      "nom": "cloïssa",
+      "categoria": "peix_marisc",
+      "sinonims": [ "almeja", "cloïsses", "musclo", "mejillon", "mejillones" ]
+    },
+    {
+      "id": "i028",
+      "nom": "calamar",
+      "categoria": "peix_marisc",
+      "sinonims": [ "calamar", "calamars", "anelles de calamar", "sípia", "sepia" ]
+    },
+    {
+      "id": "i029",
+      "nom": "pop",
+      "categoria": "peix_marisc",
+      "sinonims": [ "pulpo", "tentacle de pop" ]
+    },
+    {
+      "id": "i030",
+      "nom": "ou",
+      "categoria": "ous_lactics",
+      "sinonims": [ "ous", "huevo", "huevos", "ou de gallina", "clara", "rovell" ]
+    },
+    {
+      "id": "i031",
+      "nom": "llet",
+      "categoria": "ous_lactics",
+      "sinonims": [ "leche", "llet sencera", "llet desnatada", "llet semi", "llet d'avena", "llet d'ametlla" ]
+    },
+    {
+      "id": "i032",
+      "nom": "nata",
+      "categoria": "ous_lactics",
+      "sinonims": [ "crema de leche", "nata líquida", "nata per cuinar", "nata per muntar", "crème fraîche" ]
+    },
+    {
+      "id": "i033",
+      "nom": "mantega",
+      "categoria": "ous_lactics",
+      "sinonims": [ "mantequilla", "mantega sense sal", "mantega salada" ]
+    },
+    {
+      "id": "i034",
+      "nom": "iogurt",
+      "categoria": "ous_lactics",
+      "sinonims": [ "yogur", "yogurt", "iogurt natural", "iogurt grec" ]
+    },
+    {
+      "id": "i035",
+      "nom": "formatge",
+      "categoria": "ous_lactics",
+      "sinonims": [ "queso", "queso rallado", "formatge ratllat", "formatge fresc" ]
+    },
+    {
+      "id": "i036",
+      "nom": "mozzarella",
+      "categoria": "ous_lactics",
+      "sinonims": [ "mozarella", "mozzarella fresca" ]
+    },
+    {
+      "id": "i037",
+      "nom": "parmesà",
+      "categoria": "ous_lactics",
+      "sinonims": [ "parmesano", "parmigiano", "grana padano" ]
+    },
+    {
+      "id": "i038",
+      "nom": "ricotta",
+      "categoria": "ous_lactics",
+      "sinonims": [ "ricota", "mató" ]
+    },
+    {
+      "id": "i039",
+      "nom": "tomàquet",
+      "categoria": "verdura",
+      "sinonims": [ "tomate", "tomates", "tomàquets", "tomata", "cherry" ]
+    },
+    {
+      "id": "i040",
+      "nom": "ceba",
+      "categoria": "verdura",
+      "sinonims": [ "cebolla", "cebes", "ceba tendra", "ceba de Figueres", "ceba morada" ]
+    },
+    {
+      "id": "i041",
+      "nom": "all",
+      "categoria": "verdura",
+      "sinonims": [ "ajo", "alls", "cap d'all", "gra d'all" ]
+    },
+    {
+      "id": "i042",
+      "nom": "pastanaga",
+      "categoria": "verdura",
+      "sinonims": [ "zanahoria", "pastanagues", "zanahorias" ]
+    },
+    {
+      "id": "i043",
+      "nom": "patata",
+      "categoria": "verdura",
+      "sinonims": [ "papa", "patatas", "patates" ]
+    },
+    {
+      "id": "i044",
+      "nom": "pebrot",
+      "categoria": "verdura",
+      "sinonims": [ "pimiento", "pebrot vermell", "pebrot verd", "pebrot groc", "pimiento rojo", "pimiento verde" ]
+    },
+    {
+      "id": "i045",
+      "nom": "carbassó",
+      "categoria": "verdura",
+      "sinonims": [ "calabacín", "zucchini", "carbassons" ]
+    },
+    {
+      "id": "i046",
+      "nom": "albergínia",
+      "categoria": "verdura",
+      "sinonims": [ "berenjena", "albergínies" ]
+    },
+    {
+      "id": "i047",
+      "nom": "espinacs",
+      "categoria": "verdura",
+      "sinonims": [ "espinacas", "baby espinacs" ]
+    },
+    {
+      "id": "i048",
+      "nom": "enciam",
+      "categoria": "verdura",
+      "sinonims": [ "lechuga", "lechugas", "encians", "rúcula", "rucula" ]
+    },
+    {
+      "id": "i049",
+      "nom": "bròquil",
+      "categoria": "verdura",
+      "sinonims": [ "brocoli", "brócoli", "broquil" ]
+    },
+    {
+      "id": "i050",
+      "nom": "coliflor",
+      "categoria": "verdura",
+      "sinonims": [ "coliflor" ]
+    },
+    {
+      "id": "i051",
+      "nom": "col",
+      "categoria": "verdura",
+      "sinonims": [ "repollo", "col rizada", "kale", "col llombarda" ]
+    },
+    {
+      "id": "i052",
+      "nom": "porro",
+      "categoria": "verdura",
+      "sinonims": [ "puerro", "puerros", "porros" ]
+    },
+    {
+      "id": "i053",
+      "nom": "api",
+      "categoria": "verdura",
+      "sinonims": [ "apio", "tiges d'api" ]
+    },
+    {
+      "id": "i054",
+      "nom": "mongeta verda",
+      "categoria": "verdura",
+      "sinonims": [ "judía verde", "bajoqueta", "judias verdes", "mongetes verdes" ]
+    },
+    {
+      "id": "i055",
+      "nom": "carbassa",
+      "categoria": "verdura",
+      "sinonims": [ "calabaza", "carbasses" ]
+    },
+    {
+      "id": "i056",
+      "nom": "bolet",
+      "categoria": "verdura",
+      "sinonims": [ "seta", "xampinyó", "champiñón", "champiñones", "ceps", "rovellons", "shiitake" ]
+    },
+    {
+      "id": "i057",
+      "nom": "espàrrec",
+      "categoria": "verdura",
+      "sinonims": [ "esparrago", "espárragos", "espàrrecs verds", "espàrrecs blancs" ]
+    },
+    {
+      "id": "i058",
+      "nom": "carxofa",
+      "categoria": "verdura",
+      "sinonims": [ "alcachofa", "carxofes" ]
+    },
+    {
+      "id": "i059",
+      "nom": "pèsols",
+      "categoria": "verdura",
+      "sinonims": [ "guisantes", "guisants", "pèsol" ]
+    },
+    {
+      "id": "i060",
+      "nom": "blat de moro",
+      "categoria": "verdura",
+      "sinonims": [ "maíz", "maiz", "choclo", "elote" ]
+    },
+    {
+      "id": "i061",
+      "nom": "remolatxa",
+      "categoria": "verdura",
+      "sinonims": [ "remolacha", "betabel" ]
+    },
+    {
+      "id": "i062",
+      "nom": "nap",
+      "categoria": "verdura",
+      "sinonims": [ "nabo", "naps" ]
+    },
+    {
+      "id": "i063",
+      "nom": "poma",
+      "categoria": "fruita",
+      "sinonims": [ "manzana", "pomes" ]
+    },
+    {
+      "id": "i064",
+      "nom": "pera",
+      "categoria": "fruita",
+      "sinonims": [ "pera", "peres" ]
+    },
+    {
+      "id": "i065",
+      "nom": "taronja",
+      "categoria": "fruita",
+      "sinonims": [ "naranja", "taronges", "suc de taronja" ]
+    },
+    {
+      "id": "i066",
+      "nom": "llimona",
+      "categoria": "fruita",
+      "sinonims": [ "limón", "limon", "suc de llimona", "pell de llimona", "ratlladura de llimona" ]
+    },
+    {
+      "id": "i067",
+      "nom": "llima",
+      "categoria": "fruita",
+      "sinonims": [ "lima", "suc de llima" ]
+    },
+    {
+      "id": "i068",
+      "nom": "maduixa",
+      "categoria": "fruita",
+      "sinonims": [ "fresa", "fresas", "maduixes", "fresón" ]
+    },
+    {
+      "id": "i069",
+      "nom": "raïm",
+      "categoria": "fruita",
+      "sinonims": [ "uva", "uvas" ]
+    },
+    {
+      "id": "i070",
+      "nom": "plàtan",
+      "categoria": "fruita",
+      "sinonims": [ "plátano", "banana" ]
+    },
+    {
+      "id": "i071",
+      "nom": "mango",
+      "categoria": "fruita",
+      "sinonims": [ "mangos" ]
+    },
+    {
+      "id": "i072",
+      "nom": "pinya",
+      "categoria": "fruita",
+      "sinonims": [ "piña", "ananàs" ]
+    },
+    {
+      "id": "i073",
+      "nom": "alvocat",
+      "categoria": "fruita",
+      "sinonims": [ "aguacate", "palta", "avocado" ]
+    },
+    {
+      "id": "i074",
+      "nom": "préssec",
+      "categoria": "fruita",
+      "sinonims": [ "melocotón", "melocoton", "nectarina" ]
+    },
+    {
+      "id": "i075",
+      "nom": "coco",
+      "categoria": "fruita",
+      "sinonims": [ "coco rallado", "llet de coco", "leche de coco", "crema de coco" ]
+    },
+    {
+      "id": "i076",
+      "nom": "figues",
+      "categoria": "fruita",
+      "sinonims": [ "higo", "higos", "figa" ]
+    },
+    {
+      "id": "i077",
+      "nom": "cigrons",
+      "categoria": "llegums",
+      "sinonims": [ "garbanzos", "garbanzo" ]
+    },
+    {
+      "id": "i078",
+      "nom": "llenties",
+      "categoria": "llegums",
+      "sinonims": [ "lentejas", "lenteja" ]
+    },
+    {
+      "id": "i079",
+      "nom": "mongetes blanques",
+      "categoria": "llegums",
+      "sinonims": [ "alubias blancas", "judías blancas", "fesols" ]
+    },
+    {
+      "id": "i080",
+      "nom": "mongetes negres",
+      "categoria": "llegums",
+      "sinonims": [ "alubias negras", "frijoles negros" ]
+    },
+    {
+      "id": "i081",
+      "nom": "tofu",
+      "categoria": "llegums",
+      "sinonims": [ "tofu ferme", "tofu seda", "soja" ]
+    },
+    {
+      "id": "i082",
+      "nom": "arròs",
+      "categoria": "cereals",
+      "sinonims": [ "arroz", "arròs rodó", "arròs llarg", "arroz redondo", "arròs integral" ]
+    },
+    {
+      "id": "i083",
+      "nom": "pasta",
+      "categoria": "cereals",
+      "sinonims": [ "espaguetis", "macarrons", "fideus", "penne", "tallarines", "rigatoni" ]
+    },
+    {
+      "id": "i084",
+      "nom": "farina",
+      "categoria": "cereals",
+      "sinonims": [ "harina", "farina de blat", "harina de trigo", "farina integral", "farina de força" ]
+    },
+    {
+      "id": "i085",
+      "nom": "pa",
+      "categoria": "cereals",
+      "sinonims": [ "pan", "pa de motlle", "pan de molde", "pa de pagès", "baguette" ]
+    },
+    {
+      "id": "i086",
+      "nom": "pa ratllat",
+      "categoria": "cereals",
+      "sinonims": [ "pan rallado", "panko", "pa sec ratllat" ]
+    },
+    {
+      "id": "i087",
+      "nom": "civada",
+      "categoria": "cereals",
+      "sinonims": [ "avena", "flocs de civada", "copos de avena" ]
+    },
+    {
+      "id": "i088",
+      "nom": "quinoa",
+      "categoria": "cereals",
+      "sinonims": [ "quinua" ]
+    },
+    {
+      "id": "i089",
+      "nom": "cuscús",
+      "categoria": "cereals",
+      "sinonims": [ "cous cous", "couscous" ]
+    },
+    {
+      "id": "i090",
+      "nom": "midó de blat de moro",
+      "categoria": "cereals",
+      "sinonims": [ "maizena", "fécula de maíz", "almidón", "fècula", "maicena" ]
+    },
+    {
+      "id": "i091",
+      "nom": "ametlla",
+      "categoria": "fruits_secs",
+      "sinonims": [ "almendra", "ametlles", "ametlla molida", "almendras" ]
+    },
+    {
+      "id": "i092",
+      "nom": "nous",
+      "categoria": "fruits_secs",
+      "sinonims": [ "nuez", "nueces" ]
+    },
+    {
+      "id": "i093",
+      "nom": "avellana",
+      "categoria": "fruits_secs",
+      "sinonims": [ "avellanas", "avellanes" ]
+    },
+    {
+      "id": "i094",
+      "nom": "anacard",
+      "categoria": "fruits_secs",
+      "sinonims": [ "anacardo", "cashew", "nous de cajú" ]
+    },
+    {
+      "id": "i095",
+      "nom": "pinyons",
+      "categoria": "fruits_secs",
+      "sinonims": [ "piñones", "piñon" ]
+    },
+    {
+      "id": "i096",
+      "nom": "pistache",
+      "categoria": "fruits_secs",
+      "sinonims": [ "pistacho", "pistachos", "pistaches" ]
+    },
+    {
+      "id": "i097",
+      "nom": "cacauet",
+      "categoria": "fruits_secs",
+      "sinonims": [ "cacahuete", "maní", "cacahuetes" ]
+    },
+    {
+      "id": "i098",
+      "nom": "llavors de sèsam",
+      "categoria": "fruits_secs",
+      "sinonims": [ "sésamo", "sesamo", "tahina", "tahini" ]
+    },
+    {
+      "id": "i099",
+      "nom": "llavors de xia",
+      "categoria": "fruits_secs",
+      "sinonims": [ "chia", "semillas de chía" ]
+    },
+    {
+      "id": "i100",
+      "nom": "sal",
+      "categoria": "condiments",
+      "sinonims": [ "sal marina", "sal gruesa", "sal fina", "sal maldon" ]
+    },
+    {
+      "id": "i101",
+      "nom": "pebre negre",
+      "categoria": "condiments",
+      "sinonims": [ "pimienta", "pimienta negra", "pebre", "pebre blanc", "pebre de Jamaica" ]
+    },
+    {
+      "id": "i102",
+      "nom": "pebre vermell",
+      "categoria": "condiments",
+      "sinonims": [ "pimentón", "paprika", "pebre vermell dolç", "pebre vermell picant", "pebre vermell fumat" ]
+    },
+    {
+      "id": "i103",
+      "nom": "comí",
+      "categoria": "condiments",
+      "sinonims": [ "comino", "comins" ]
+    },
+    {
+      "id": "i104",
+      "nom": "cúrcuma",
+      "categoria": "condiments",
+      "sinonims": [ "turmeric", "curcuma" ]
+    },
+    {
+      "id": "i105",
+      "nom": "curri",
+      "categoria": "condiments",
+      "sinonims": [ "curry", "curry en polvo", "garam masala" ]
+    },
+    {
+      "id": "i106",
+      "nom": "canyella",
+      "categoria": "condiments",
+      "sinonims": [ "canela", "canyella en pols", "canela en rama" ]
+    },
+    {
+      "id": "i107",
+      "nom": "nou moscada",
+      "categoria": "condiments",
+      "sinonims": [ "nuez moscada" ]
+    },
+    {
+      "id": "i108",
+      "nom": "llorer",
+      "categoria": "condiments",
+      "sinonims": [ "laurel", "fulla de llorer" ]
+    },
+    {
+      "id": "i109",
+      "nom": "orenga",
+      "categoria": "condiments",
+      "sinonims": [ "orégano", "oregano" ]
+    },
+    {
+      "id": "i110",
+      "nom": "farigola",
+      "categoria": "condiments",
+      "sinonims": [ "tomillo", "thyme" ]
+    },
+    {
+      "id": "i111",
+      "nom": "romaní",
+      "categoria": "condiments",
+      "sinonims": [ "romero", "rosemary" ]
+    },
+    {
+      "id": "i112",
+      "nom": "julivert",
+      "categoria": "condiments",
+      "sinonims": [ "perejil", "persil" ]
+    },
+    {
+      "id": "i113",
+      "nom": "alfàbrega",
+      "categoria": "condiments",
+      "sinonims": [ "albahaca", "basil", "basilic" ]
+    },
+    {
+      "id": "i114",
+      "nom": "menta",
+      "categoria": "condiments",
+      "sinonims": [ "hierbabuena", "menta fresca" ]
+    },
+    {
+      "id": "i115",
+      "nom": "coriandre",
+      "categoria": "condiments",
+      "sinonims": [ "cilantro", "cilandro" ]
+    },
+    {
+      "id": "i116",
+      "nom": "sucre",
+      "categoria": "condiments",
+      "sinonims": [ "azúcar", "sucre blanc", "sucre morè", "azúcar moreno", "sucre glas", "panela" ]
+    },
+    {
+      "id": "i117",
+      "nom": "mel",
+      "categoria": "condiments",
+      "sinonims": [ "miel" ]
+    },
+    {
+      "id": "i118",
+      "nom": "mostassa",
+      "categoria": "condiments",
+      "sinonims": [ "mostaza", "mostassa de Dijon" ]
+    },
+    {
+      "id": "i119",
+      "nom": "oli d'oliva",
+      "categoria": "oli_salses",
+      "sinonims": [ "aceite de oliva", "oli", "aove", "aceite" ]
+    },
+    {
+      "id": "i120",
+      "nom": "oli de gira-sol",
+      "categoria": "oli_salses",
+      "sinonims": [ "aceite de girasol" ]
+    },
+    {
+      "id": "i121",
+      "nom": "vinagre",
+      "categoria": "oli_salses",
+      "sinonims": [ "vinagre de vi", "vinagre balsàmic", "vinagre de poma", "vinagre de manzana" ]
+    },
+    {
+      "id": "i122",
+      "nom": "salsa de soja",
+      "categoria": "oli_salses",
+      "sinonims": [ "soja", "soya", "tamari" ]
+    },
+    {
+      "id": "i123",
+      "nom": "salsa de tomàquet",
+      "categoria": "oli_salses",
+      "sinonims": [ "tomate frito", "tomàquet fregit", "sofregit", "passata", "tomàquet triturat" ]
+    },
+    {
+      "id": "i124",
+      "nom": "ketchup",
+      "categoria": "oli_salses",
+      "sinonims": [ "catsup" ]
+    },
+    {
+      "id": "i125",
+      "nom": "maionesa",
+      "categoria": "oli_salses",
+      "sinonims": [ "mayonesa", "mayo" ]
+    },
+    {
+      "id": "i126",
+      "nom": "caldo de pollastre",
+      "categoria": "oli_salses",
+      "sinonims": [ "caldo de pollo", "brou de pollastre", "pastilla de caldo" ]
+    },
+    {
+      "id": "i127",
+      "nom": "caldo de verdures",
+      "categoria": "oli_salses",
+      "sinonims": [ "caldo vegetal", "brou de verdures" ]
+    },
+    {
+      "id": "i128",
+      "nom": "caldo de peix",
+      "categoria": "oli_salses",
+      "sinonims": [ "fumet", "brou de peix" ]
+    },
+    {
+      "id": "i129",
+      "nom": "vi blanc",
+      "categoria": "oli_salses",
+      "sinonims": [ "vino blanco" ]
+    },
+    {
+      "id": "i130",
+      "nom": "vi negre",
+      "categoria": "oli_salses",
+      "sinonims": [ "vino tinto", "vino negro" ]
+    },
+    {
+      "id": "i131",
+      "nom": "xocolata",
+      "categoria": "altres",
+      "sinonims": [ "chocolate", "xocolata negra", "xocolata amb llet", "chocolate negro", "cacau" ]
+    },
+    {
+      "id": "i132",
+      "nom": "llevat",
+      "categoria": "altres",
+      "sinonims": [ "levadura", "llevat de forner", "llevat químic", "royal", "impulsor" ]
+    },
+    {
+      "id": "i133",
+      "nom": "gelatina",
+      "categoria": "altres",
+      "sinonims": [ "gelatina en fulles", "agar agar", "cola de peix" ]
+    },
+    {
+      "id": "i134",
+      "nom": "crema de cacauet",
+      "categoria": "oli_salses",
+      "sinonims": [ "mantequilla de cacahuete", "peanut butter" ]
+    },
+    {
+      "id": "i135",
+      "nom": "concentrat de tomàquet",
+      "categoria": "oli_salses",
+      "sinonims": [ "concentrado de tomate", "pasta de tomàquet", "pasta de tomate" ]
+    },
+    {
+      "id": "i136",
+      "nom": "gingebre fresc",
+      "categoria": "condiments",
+      "sinonims": [ "gingebre fresc" ]
+    },
+    {
+      "id": "i137",
+      "nom": "gingebre en pols",
+      "categoria": "condiments",
+      "sinonims": [ "gingebre en polvo", "jengibre en polvo" ]
+    },
+    {
+      "id": "i138",
+      "nom": "jalapeños",
+      "categoria": "condiments",
+      "sinonims": [ "jalapeños" ]
+    },
+    {
+      "id": "i139",
+      "nom": "pebre de cayena",
+      "categoria": "condiments",
+      "sinonims": [ "pebre de cayena", "pimienta de cayena" ]
+    },
+    {
+      "id": "i140",
+      "nom": "pebre de caiena en pols",
+      "categoria": "condiments",
+      "sinonims": [ "pebre de caiena en polvo", "pimienta de cayena en polvo" ]
+    },
+    {
+      "id": "i141",
+      "nom": "pebre de caiena en escames",
+      "categoria": "condiments",
+      "sinonims": [ "pebre de caiena en escamas", "pimienta de cayena en escamas", "flocs de pebre de cayena", "flocs de pimienta de cayena" ]
+    },
+    {
+      "id": "i142",
+      "nom": "pebre de caiena sencer",
+      "categoria": "condiments",
+      "sinonims": [ "pebre de cayena sencer", "pimienta de cayena entera" ]
+    },
+    {
+      "id": "i143",
+      "nom": "garam masala",
+      "categoria": "condiments",
+      "sinonims": [ "garam massala" ]
+    },
+    {
+      "id": "i144",
+      "nom": "oblees d'arròs",
+      "categoria": "cereals",
+      "sinonims": [ "obleas de arroz", "oblees de arròs" ]
+    },
+    {
+      "id": "i145",
+      "nom": "farina de cigró",
+      "categoria": "cereals",
+      "sinonims": [ "harina de garbanzo", "farina de cigró" ]
+    },
+    {
+      "id": "i146",
+      "nom": "farina de blat sarraí",
+      "categoria": "cereals",
+      "sinonims": [ "harina de trigo sarraceno", "farina de blat sarraí" ]
+    },
+    {
+      "id": "i147",
+      "nom": "farina de blat de moro",
+      "categoria": "cereals",
+      "sinonims": [ "harina de maíz", "farina de blat de moro" ]
+    },
+    {
+      "id": "i148",
+      "nom": "farina de blat integral",
+      "categoria": "cereals",
+      "sinonims": [ "harina de trigo integral", "farina de blat integral" ]
+    },
+    {
+      "id": "i149",
+      "nom": "farina de blat de força",
+      "categoria": "cereals",
+      "sinonims": [ "harina de trigo de fuerza", "farina de blat de força" ]
+    },
+    {
+      "id": "i150",
+      "nom": "farina de blat tendre",
+      "categoria": "cereals",
+      "sinonims": [ "harina de trigo blando", "farina de blat tendre" ]
+    },
+    {
+      "id": "i151",
+      "nom": "pasta filo",
+      "categoria": "cereals",
+      "sinonims": [ "pasta filo" ]
+    },
+    {
+      "id": "i152",
+      "nom": "musclos",
+      "categoria": "peix_marisc",
+      "sinonims": [ "musclos", "musclos de roca" ]
+    },
+    {
+      "id": "i153",
+      "nom": "anís verd",
+      "categoria": "condiments",
+      "sinonims": [ "matafaluga", "anís verd" ]
+    },
+    {
+      "id": "i154",
+      "nom": "coriandre",
+      "categoria": "condiments",
+      "sinonims": [ "coriandre", "cilantre" ]
+    },
+    {
+      "id": "i155",
+      "nom": "aigua d'azahar'",
+      "categoria": "condiments",
+      "sinonims": [ "aigua de taronger", "aiguanaf" ]
+    },
+    {
+      "id": "i156",
+      "nom": "garnatxa",
+      "categoria": "condiments",
+      "sinonims": [ "garnatxa" ]
+    },
+    {
+      "id": "i157",
+      "nom": "arengada",
+      "categoria": "peix_marisc",
+      "sinonims": ["arengada", "caballa"]
+    }
+  ]
+}

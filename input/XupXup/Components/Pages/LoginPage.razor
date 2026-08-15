@@ -1,0 +1,89 @@
+@using MudBlazor
+@using RecetariBlazor.Services
+@inject GoogleDriveService DriveService
+@inject AppState AppState
+
+<MudContainer MaxWidth="MaxWidth.Small"
+              Style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;">
+    <MudPaper Elevation="3" Class="pa-8 d-flex flex-column align-center"
+              Style="border-radius:16px;width:100%;max-width:420px;">
+
+        <MudText Typo="Typo.h3" Class="mb-2">🍳</MudText>
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-2"><b>Recetari</b></MudText>
+        <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6" Color="Color.Secondary">
+            El teu receptari personal guardat al teu Google Drive.
+        </MudText>
+
+        <MudAlert Severity="Severity.Info" Class="mb-4" Style="width:100%;">
+            Les receptes es guarden a <b>recetari_data.json</b> al teu Drive personal.
+            Cap dada passa per cap servidor extern.
+        </MudAlert>
+
+        @if (_error != null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4" Style="width:100%;">@_error</MudAlert>
+        }
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   OnClick="SignIn"
+                   Disabled="_loading"
+                   FullWidth="true"
+                   Style="padding:14px;">
+            @if (_loading)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2"/>
+                <span>Connectant...</span>
+            }
+            else
+            {
+                <span>🔑 Connecta amb Google Drive</span>
+            }
+        </MudButton>
+
+        <MudText Typo="Typo.caption" Class="mt-4" Align="Align.Center" Color="Color.Secondary">
+            Només es demana permís per als fitxers creats per aquesta app.
+        </MudText>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private bool    _loading;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await DriveService.TryRestoreSessionAsync();
+            if (DriveService.IsAuthenticated)
+                await AppState.LoadAsync();
+        }
+        catch
+        {
+            // Sessió no restaurada — mostrar pantalla de login normalment
+        }
+    }
+
+    private async Task SignIn()
+    {
+        _loading = true;
+        _error   = null;
+        StateHasChanged();
+        try
+        {
+            await DriveService.SignInAsync();
+            await AppState.LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = string.Format("Error d'autenticació: {0}", ex.Message);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+}

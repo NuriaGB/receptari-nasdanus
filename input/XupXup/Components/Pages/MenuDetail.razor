@@ -1,0 +1,249 @@
+@page "/menu/{Id}"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>@(_plan?.Name ?? "Menú") — Recetari</PageTitle>
+
+@if (_plan == null)
+{
+    <MudContainer Class="py-8 d-flex justify-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+
+        <!-- Capçalera -->
+        <div class="d-flex align-center gap-2 mb-1 flex-wrap">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                           OnClick='() => Nav.NavigateTo("/menus")'/>
+            <div style="flex:1;">
+                <MudText Typo="Typo.h5"><b>@_plan.Name</b></MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">📅 @_plan.DateRangeText</MudText>
+            </div>
+            <MudButton Variant="Variant.Outlined" Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick='() => Nav.NavigateTo(string.Format("/menu/edit/{0}", _plan.Id))'>
+                Editar
+            </MudButton>
+        </div>
+
+        <!-- Toggle vista setmanal / dia a dia -->
+        <div class="d-flex align-center gap-2 mb-4 mt-3 flex-wrap">
+            <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                <MudButton Color="@(!_dayView ? Color.Primary : Color.Default)"
+                           Variant="@(!_dayView ? Variant.Filled : Variant.Outlined)"
+                           OnClick="() => _dayView = false"
+                           StartIcon="@Icons.Material.Filled.CalendarViewWeek">
+                    Setmana
+                </MudButton>
+                <MudButton Color="@(_dayView ? Color.Primary : Color.Default)"
+                           Variant="@(_dayView ? Variant.Filled : Variant.Outlined)"
+                           OnClick="() => _dayView = true"
+                           StartIcon="@Icons.Material.Filled.CalendarViewDay">
+                    Dia a dia
+                </MudButton>
+            </MudButtonGroup>
+
+            @if (_dayView)
+            {
+                <!-- Navegació dia a dia -->
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                               Disabled="@(_currentDayIdx <= 0)"
+                               OnClick="PrevDay"/>
+                <MudText Style="min-width:140px;text-align:center;font-weight:600;text-transform:capitalize;">
+                    @CurrentDay?.DayLabel
+                </MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                               Disabled="@(_currentDayIdx >= _plan.Days.Count - 1)"
+                               OnClick="NextDay"/>
+
+                @if (TodayIndex >= 0)
+                {
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Today"
+                               OnClick="GoToToday"
+                               Disabled="@(_currentDayIdx == TodayIndex)">
+                        Avui
+                    </MudButton>
+                }
+            }
+        </div>
+
+        <!-- ════════════════════════════════════
+             VISTA SETMANAL
+             ════════════════════════════════════ -->
+        @if (!_dayView)
+        {
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;min-width:600px;">
+                    <!-- Capçalera amb dies -->
+                    <thead>
+                        <tr>
+                            <th style="width:90px;padding:8px;background:#F5F5F5;border:1px solid #E0E0E0;font-size:12px;color:#777;">
+                                TORN
+                            </th>
+                            @foreach (var day in _plan.Days)
+                            {
+                                <th style="@(day.IsToday ? "background:#FFF3E0;border:2px solid #FF6B35;" : "background:#F5F5F5;border:1px solid #E0E0E0;")padding:8px;text-align:center;">
+                                    <div style="font-size:11px;color:#777;text-transform:uppercase;">
+                                        @day.Date.ToString("ddd", new System.Globalization.CultureInfo("ca-ES"))
+                                    </div>
+                                    <div style="font-weight:@(day.IsToday ? "700" : "500");color:@(day.IsToday ? "#FF6B35" : "inherit");">
+                                        @day.Date.Day
+                                    </div>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var slotType in SlotTypes)
+                        {
+                            <tr>
+                                <td style="padding:6px 8px;border:1px solid #E0E0E0;background:#FAFAFA;font-size:12px;font-weight:600;color:#666;white-space:nowrap;">
+                                    @slotType.ToDisplay()
+                                </td>
+                                @foreach (var day in _plan.Days)
+                                {
+                                    var slot = day.Slots.FirstOrDefault(s => s.SlotType == slotType);
+                                    <td style="@(day.IsToday ? "background:#FFFBF5;border:2px solid #FF6B35;" : "border:1px solid #E0E0E0;")padding:4px;vertical-align:top;">
+                                        @if (slot?.HasRecipe == true)
+                                        {
+                                            @foreach (var r in slot.Recipes)
+                                            {
+                                                var recipe = r;
+                                                <div style="background:#E8F5E9;border-radius:6px;padding:4px 6px;font-size:12px;cursor:pointer;line-height:1.3;margin-bottom:2px;"
+                                                     @onclick='() => Nav.NavigateTo(string.Format("/recipe/{0}", recipe.Id))'>
+                                                    <span style="color:#2E7D32;font-weight:500;">@recipe.Name</span>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div style="color:#CCC;font-size:11px;padding:2px 4px;">—</div>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <!-- ════════════════════════════════════
+             VISTA DIA A DIA
+             ════════════════════════════════════ -->
+        @if (_dayView && CurrentDay != null)
+        {
+            <MudPaper Elevation="2" Style="border-radius:16px;overflow:hidden;">
+                <!-- Capçalera del dia -->
+                <div style="padding:16px 20px;background:@(CurrentDay.IsToday ? "#FF6B35" : "#37474F");color:white;">
+                    <MudText Typo="Typo.h6" Style="text-transform:capitalize;color:white;">
+                        @CurrentDay.DayLabel
+                        @if (CurrentDay.IsToday)
+                        {
+                            <MudChip Size="Size.Small" Style="background:white;color:#FF6B35;margin-left:8px;font-weight:700;">AVUI</MudChip>
+                        }
+                    </MudText>
+                </div>
+
+                <!-- Torns del dia -->
+                @foreach (var slot in CurrentDay.Slots.OrderBy(s => s.SlotType))
+                {
+                    <div style="display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid #F0F0F0;">
+                        <div style="width:110px;flex-shrink:0;">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary" Style="font-weight:600;">
+                                @slot.SlotLabel
+                            </MudText>
+                        </div>
+                        @if (slot.HasRecipe)
+                        {
+                            <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                                @foreach (var r in slot.Recipes)
+                                {
+                                    var recipe = r;
+                                    <div style="background:#E8F5E9;border-radius:8px;padding:8px 12px;cursor:pointer;"
+                                         @onclick='() => Nav.NavigateTo(string.Format("/recipe/{0}", recipe.Id))'>
+                                        <MudText Style="color:#2E7D32;font-weight:500;">@recipe.Name</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            ⏱ @recipe.TotalTimeText · @recipe.Servings pers.
+                                        </MudText>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="flex:1;color:#BDBDBD;font-style:italic;font-size:13px;">
+                                Sense recepta assignada
+                            </div>
+                        }
+                    </div>
+                }
+            </MudPaper>
+
+            <!-- Navegació inferior (duplicada per comoditat) -->
+            <div class="d-flex justify-space-between mt-4">
+                <MudButton Variant="Variant.Outlined"
+                           StartIcon="@Icons.Material.Filled.ChevronLeft"
+                           Disabled="@(_currentDayIdx <= 0)"
+                           OnClick="PrevDay">
+                    @(_currentDayIdx > 0 ? _plan.Days[_currentDayIdx - 1].Date.ToString("ddd d MMM", new System.Globalization.CultureInfo("ca-ES")) : "")
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           EndIcon="@Icons.Material.Filled.ChevronRight"
+                           Disabled="@(_currentDayIdx >= _plan.Days.Count - 1)"
+                           OnClick="NextDay">
+                    @(_currentDayIdx < _plan.Days.Count - 1 ? _plan.Days[_currentDayIdx + 1].Date.ToString("ddd d MMM", new System.Globalization.CultureInfo("ca-ES")) : "")
+                </MudButton>
+            </div>
+        }
+
+    </MudContainer>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private MenuPlan? _plan;
+    private bool      _dayView       = false;
+    private int       _currentDayIdx = 0;
+
+    private static readonly MealSlotType[] SlotTypes =
+        { MealSlotType.Esmorzar, MealSlotType.MigMati, MealSlotType.Dinar, MealSlotType.Berenar, MealSlotType.Sopar };
+
+    private MenuDay? CurrentDay =>
+        _plan != null && _currentDayIdx >= 0 && _currentDayIdx < _plan.Days.Count
+            ? _plan.Days[_currentDayIdx] : null;
+
+    private int TodayIndex =>
+        _plan?.Days.FindIndex(d => d.Date.Date == DateTime.Today) ?? -1;
+
+    protected override void OnParametersSet()
+    {
+        AppState.StateChanged += Refresh;
+        _plan = AppState.GetMenu(Id);
+        if (_plan == null) return;
+
+        // Ordenar dies per data
+        _plan.Days = _plan.Days.OrderBy(d => d.Date).ToList();
+
+        // Navegar a avui si hi és, sinó al primer dia
+        var todayIdx = TodayIndex;
+        _currentDayIdx = todayIdx >= 0 ? todayIdx : 0;
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+    private void PrevDay()  { if (_currentDayIdx > 0) _currentDayIdx--; }
+    private void NextDay()  { if (_currentDayIdx < (_plan?.Days.Count ?? 1) - 1) _currentDayIdx++; }
+    private void GoToToday(){ var i = TodayIndex; if (i >= 0) _currentDayIdx = i; }
+
+    public void Dispose() => AppState.StateChanged -= Refresh;
+}

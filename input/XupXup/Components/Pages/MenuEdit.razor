@@ -1,0 +1,307 @@
+@page "/menu/new"
+@page "/menu/edit/{Id}"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isNew ? "Nou menú" : "Editar menú") — Recetari</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+
+    <div class="d-flex align-center gap-2 mb-4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="GoToMenus"/>
+        <MudText Typo="Typo.h5"><b>@(_isNew ? "Nou menú" : "Editar menú")</b></MudText>
+    </div>
+
+    <!-- Capçalera del menú -->
+    <MudPaper Class="pa-4 mb-4" Elevation="1" Style="border-radius:12px;">
+        <MudGrid Spacing="3">
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_plan.Name" Label="Nom del menú *"
+                              Variant="Variant.Outlined" Required="true"/>
+            </MudItem>
+            <MudItem xs="12" sm="5">
+                <MudDatePicker Date="_startDate" Label="Data inici"
+                               Variant="Variant.Outlined" DateFormat="dd/MM/yyyy"
+                               DateChanged="OnStartDateChanged"/>
+            </MudItem>
+            <MudItem xs="12" sm="5">
+                <MudDatePicker Date="_endDate" Label="Data fi"
+                               Variant="Variant.Outlined" DateFormat="dd/MM/yyyy"
+                               DateChanged="OnEndDateChanged"/>
+            </MudItem>
+            <MudItem xs="12" sm="2" Class="d-flex align-end">
+                <MudButton Variant="Variant.Outlined" FullWidth="true"
+                           OnClick="RegenerateDays" StartIcon="@Icons.Material.Filled.Refresh">
+                    Regenerar
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_plan.Notes" Label="Notes opcionals"
+                              Variant="Variant.Outlined" Lines="2"/>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <!-- Botó afegir dia -->
+    <div class="d-flex justify-end mb-3">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.AddCircleOutline"
+                   OnClick="AddDay">
+            Afegir dia
+        </MudButton>
+    </div>
+
+    <!-- Dies i torns -->
+    @foreach (var day in _plan.Days)
+    {
+        <MudPaper Class="pa-4 mb-3" Elevation="1" Style="border-radius:12px;">
+            <div class="d-flex align-center justify-space-between mb-3">
+                <MudText Typo="Typo.subtitle1" Style="text-transform:capitalize;font-weight:600;">
+                    @day.DayLabel
+                    @if (day.IsToday)
+                    {
+                        <MudChip Size="Size.Small" Color="Color.Primary" Class="ml-2">Avui</MudChip>
+                    }
+                </MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                               Color="Color.Error" Size="Size.Small"
+                               Disabled="@(_plan.Days.Count <= 1)"
+                               OnClick="@(() => RemoveDay(day))"/>
+            </div>
+
+            <MudGrid Spacing="2">
+                @foreach (var slot in day.Slots.OrderBy(s => s.SlotType))
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-1">
+                                @slot.SlotLabel
+                            </MudText>
+                            @if (!slot.HasRecipe)
+                            {
+                                <div class="menu-slot empty-slot mb-1"
+                                     @onclick="@(() => OpenRecipePicker(slot))">
+                                    — sense recepta —
+                                </div>
+                            }
+                            @foreach (var recipe in slot.Recipes.ToList())
+                            {
+                                var r = recipe;
+                                <div class="d-flex align-center gap-1 mb-1">
+                                    <div class="menu-slot flex-1 has-recipe">@r.Name</div>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                   Size="Size.Small" Color="Color.Error"
+                                                   OnClick="@(() => RemoveRecipeFromSlot(slot, r))"/>
+                                </div>
+                            }
+                            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Add"
+                                       OnClick="@(() => OpenRecipePicker(slot))">
+                                Afegir plat
+                            </MudButton>
+                        </div>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudPaper>
+    }
+
+    <!-- Botons finals -->
+    <div class="d-flex gap-3 justify-end mt-4 mb-6">
+        <MudButton Variant="Variant.Outlined" OnClick="GoToMenus">
+            Cancel·lar
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="Save" Disabled="AppState.IsSaving">
+            Desar menú
+        </MudButton>
+    </div>
+</MudContainer>
+
+<!-- Diàleg per triar recepta (bottom sheet) -->
+@if (_pickerOpen)
+{
+    <MudOverlay Visible="true" DarkBackground="true" ZIndex="1000" OnClick="ClosePicker"/>
+    <div style="position:fixed;bottom:0;left:0;right:0;z-index:1001;max-height:70vh;overflow-y:auto;background:white;border-radius:16px 16px 0 0;padding:16px;">
+        <MudText Typo="Typo.h6" Class="mb-3">
+            Recepta per a <b>@_pendingSlot?.SlotLabel</b>
+        </MudText>
+
+        <MudTextField Value="_pickerSearch" Label="Cercar..."
+                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-3"
+                      Immediate="true"
+                      ValueChanged="@((string v) => _pickerSearch = v)"/>
+
+        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.Add" Class="mb-3"
+                   OnClick="GoToCreateRecipe">
+            Crear recepta nova
+        </MudButton>
+
+        @foreach (var r in FilteredPickerRecipes)
+        {
+            var recipe = r;
+            <MudPaper Class="pa-3 mb-2" Style="cursor:pointer;border-radius:8px;"
+                      @onclick="@(() => AssignRecipe(recipe))">
+                <MudText><b>@recipe.Name</b></MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @recipe.TotalTimeText · @recipe.Servings pers.
+                </MudText>
+            </MudPaper>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string? Id { get; set; }
+
+    private MenuPlan  _plan      = new();
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+    private bool      _isNew     => string.IsNullOrEmpty(Id);
+
+    // Picker
+    private bool      _pickerOpen   = false;
+    private MenuSlot? _pendingSlot;
+    private string    _pickerSearch = string.Empty;
+
+    private static readonly MealSlotType[] DefaultSlots =
+        { MealSlotType.Esmorzar, MealSlotType.MigMati, MealSlotType.Dinar, MealSlotType.Berenar, MealSlotType.Sopar };
+
+    private IEnumerable<Recipe> FilteredPickerRecipes =>
+        AppState.Recipes
+            .Where(r => string.IsNullOrWhiteSpace(_pickerSearch) ||
+                        r.Name.Contains(_pickerSearch, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(r => r.Name);
+
+    protected override void OnParametersSet()
+    {
+        if (!_isNew)
+        {
+            var existing = AppState.GetMenu(Id!);
+            if (existing != null)
+            {
+                _plan = System.Text.Json.JsonSerializer.Deserialize<MenuPlan>(
+                        System.Text.Json.JsonSerializer.Serialize(existing))!;
+                // Migrar RecipeId vell → RecipeIds
+                foreach (var s in _plan.Days.SelectMany(d => d.Slots))
+                {
+                    if (s.RecipeId != null && !s.RecipeIds.Contains(s.RecipeId))
+                        s.RecipeIds.Add(s.RecipeId);
+                    s.RecipeId = null;
+                }
+                // Rehidratar receptes
+                var map = AppState.Recipes.ToDictionary(r => r.Id);
+                foreach (var day in _plan.Days)
+                    foreach (var slot in day.Slots)
+                        slot.Recipes = slot.RecipeIds
+                            .Select(id => map.TryGetValue(id, out var r) ? r : null)
+                            .Where(r => r != null).Cast<Recipe>().ToList();
+                _startDate = _plan.StartDate;
+                _endDate   = _plan.EndDate;
+                return;
+            }
+        }
+        // Nou menú per defecte
+        _startDate = DateTime.Today;
+        _endDate   = DateTime.Today.AddDays(6);
+        _plan.Name = string.Format("Menú del {0:dd MMM}", _startDate);
+        RegenerateDays();
+    }
+
+    private void OnStartDateChanged(DateTime? d)
+    {
+        if (d.HasValue) { _startDate = d; _plan.StartDate = d.Value; }
+    }
+
+    private void OnEndDateChanged(DateTime? d)
+    {
+        if (d.HasValue) { _endDate = d; _plan.EndDate = d.Value; }
+    }
+
+    private void RegenerateDays()
+    {
+        var start = _startDate ?? DateTime.Today;
+        var end   = _endDate   ?? start.AddDays(6);
+        if (end < start) end = start.AddDays(6);
+
+        _plan.StartDate = start;
+        _plan.EndDate   = end;
+        _plan.Days.Clear();
+
+        for (var d = start; d <= end; d = d.AddDays(1))
+        {
+            var day = new MenuDay { Date = d };
+            day.Slots = DefaultSlots.Select(t => new MenuSlot { SlotType = t }).ToList();
+            _plan.Days.Add(day);
+        }
+    }
+
+    private void AddDay()
+    {
+        var last = _plan.Days.Any() ? _plan.Days.Last().Date.AddDays(1) : DateTime.Today;
+        var day  = new MenuDay { Date = last };
+        day.Slots = DefaultSlots.Select(t => new MenuSlot { SlotType = t }).ToList();
+        _plan.Days.Add(day);
+        _plan.EndDate = last;
+        _endDate      = last;
+    }
+
+    private void RemoveDay(MenuDay day)
+    {
+        if (_plan.Days.Count > 1) _plan.Days.Remove(day);
+    }
+
+    private void OpenRecipePicker(MenuSlot slot)
+    {
+        _pendingSlot  = slot;
+        _pickerSearch = string.Empty;
+        _pickerOpen   = true;
+    }
+
+    private void ClosePicker() => _pickerOpen = false;
+
+    private void AssignRecipe(Recipe r)
+    {
+        if (_pendingSlot == null) return;
+        if (!_pendingSlot.RecipeIds.Contains(r.Id))
+        {
+            _pendingSlot.RecipeIds.Add(r.Id);
+            _pendingSlot.Recipes.Add(r);
+        }
+        _pickerOpen = false;
+    }
+
+    private void RemoveRecipeFromSlot(MenuSlot slot, Recipe r)
+    {
+        slot.RecipeIds.Remove(r.Id);
+        slot.Recipes.Remove(r);
+    }
+
+    private void GoToMenus() => Nav.NavigateTo("/menus");
+
+    private void GoToCreateRecipe()
+    {
+        _pickerOpen = false;
+        Nav.NavigateTo("/recipe/new");
+    }
+
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(_plan.Name))
+        {
+            Snackbar.Add("El menú necessita un nom", Severity.Warning);
+            return;
+        }
+        await AppState.SaveMenuAsync(_plan);
+        Snackbar.Add("Menú desat! ✓", Severity.Success);
+        Nav.NavigateTo("/menus");
+    }
+}

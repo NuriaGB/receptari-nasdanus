@@ -148,7 +148,7 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
             if (!string.IsNullOrWhiteSpace(edit.DefaultUnit)
                 && !string.Equals(edit.DefaultUnit, "g", StringComparison.OrdinalIgnoreCase))
             {
-                ingredient.DefaultUnit = edit.DefaultUnit.Trim();
+                ingredient.DefaultUnit = IngredientUnits.Normalize(edit.DefaultUnit);
             }
 
             if (!string.Equals(edit.PantryCategory, ShoppingCategory.Other, StringComparison.OrdinalIgnoreCase))
@@ -162,7 +162,7 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
         {
             ingredient.Category = NormalizeIngredientCategory(edit.Category);
             ingredient.Subcategory = edit.Subcategory.Trim();
-            ingredient.DefaultUnit = string.IsNullOrWhiteSpace(edit.DefaultUnit) ? "g" : edit.DefaultUnit.Trim();
+            ingredient.DefaultUnit = string.IsNullOrWhiteSpace(edit.DefaultUnit) ? "g" : IngredientUnits.Normalize(edit.DefaultUnit);
             ingredient.PantryCategory = NormalizeShoppingCategory(edit.PantryCategory);
             ingredient.CanFreeze = edit.CanFreeze;
         }
@@ -272,11 +272,11 @@ public sealed class IngredientKnowledgeService(BrowserAppStore store)
             .Where(conversion => !string.IsNullOrWhiteSpace(conversion.Measure) && conversion.Grams > 0)
             .Select(conversion => new IngredientQuantityConversion
             {
-                Measure = conversion.Measure.Trim(),
+                Measure = IngredientUnits.CanonicalizeForStorage(conversion.Measure),
                 Grams = conversion.Grams,
                 Notes = conversion.Notes?.Trim() ?? string.Empty
             })
-            .GroupBy(conversion => FoodText.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
+            .GroupBy(conversion => IngredientUnits.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
             .Select(group => group.Last())
             .OrderBy(conversion => conversion.Measure, StringComparer.OrdinalIgnoreCase)
             .ToList();

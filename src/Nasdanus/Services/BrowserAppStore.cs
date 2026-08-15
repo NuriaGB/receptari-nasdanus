@@ -556,6 +556,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 .ToList();
             ingredient.Category = NormalizeIngredientCategory(ingredient.Category);
             ingredient.Subcategory = ingredient.Subcategory.Trim();
+            ingredient.DefaultUnit = DefaultUnitFor(ingredient.DefaultUnit);
             ingredient.NutritionState = NormalizeNutritionState(ingredient.NutritionState);
             ingredient.PantryCategory = NormalizeShoppingCategory(ingredient.PantryCategory);
             ingredient.QuantityConversions = NormalizeQuantityConversions(ingredient.QuantityConversions);
@@ -626,6 +627,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                 item.ShoppingListId = list.Id;
                 item.ShoppingList = null;
                 item.Recipe = item.RecipeId is int recipeId ? FindRecipe(appState, recipeId) : null;
+                item.Unit = IngredientUnits.Normalize(item.Unit);
             }
         }
 
@@ -646,6 +648,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             {
                 ingredient.Name = ingredient.Ingredient?.Name ?? string.Empty;
             }
+            ingredient.Unit = IngredientUnits.Normalize(ingredient.Unit);
             ingredient.ScalingMode = NormalizeScalingMode(ingredient.ScalingMode);
         }
 
@@ -666,6 +669,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
                     ? ingredient
                     : null;
                 reference.RecipeIngredientId = reference.Ingredient?.Id ?? ingredientId;
+                reference.Unit = IngredientUnits.Normalize(reference.Unit);
                 if (string.IsNullOrWhiteSpace(reference.IngredientName))
                 {
                     reference.IngredientName = reference.Ingredient?.Name ?? string.Empty;
@@ -1585,7 +1589,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         normalized.Quantity = normalized.Quantity is null
             ? null
             : Math.Max(0, normalized.Quantity.Value);
-        normalized.Unit = normalized.Unit.Trim();
+        normalized.Unit = IngredientUnits.Normalize(normalized.Unit);
         normalized.FrozenDate = normalized.FrozenDate?.Date;
         normalized.BestBeforeDate = normalized.BestBeforeDate?.Date;
         normalized.Notes = normalized.Notes.Trim();
@@ -1720,11 +1724,11 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             .Where(conversion => !string.IsNullOrWhiteSpace(conversion.Measure) && conversion.Grams > 0)
             .Select(conversion => new IngredientQuantityConversion
             {
-                Measure = conversion.Measure.Trim(),
+                Measure = IngredientUnits.CanonicalizeForStorage(conversion.Measure),
                 Grams = conversion.Grams,
                 Notes = conversion.Notes?.Trim() ?? string.Empty
             })
-            .GroupBy(conversion => FoodText.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
+            .GroupBy(conversion => IngredientUnits.Normalize(conversion.Measure), StringComparer.OrdinalIgnoreCase)
             .Select(group => group.Last())
             .OrderBy(conversion => conversion.Measure, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -1764,16 +1768,15 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
 
     private static string DefaultUnitFor(string unit)
     {
-        var normalized = unit.Trim().ToLowerInvariant();
+        var normalized = IngredientUnits.Normalize(unit);
         return normalized switch
         {
             "kg" => "g",
-            "grams" => "g",
-            "gram" => "g",
-            "gr" => "g",
-            "ml" => "ml",
+            "mg" => "g",
             "l" => "ml",
-            _ => string.IsNullOrWhiteSpace(normalized) ? "g" : normalized
+            "cl" => "ml",
+            "" => "g",
+            _ => normalized
         };
     }
 

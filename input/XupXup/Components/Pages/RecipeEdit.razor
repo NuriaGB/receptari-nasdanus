@@ -1,0 +1,488 @@
+@page "/recipe/new"
+@page "/recipe/edit/{Id}"
+@using MudBlazor
+@using RecetariBlazor.Models
+@using RecetariBlazor.Services
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject IngredientDbService IngDb
+@using RecetariBlazor.Components.Shared
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+
+<PageTitle>@(_isNew ? "Nova recepta" : "Editar recepta") — Recetari</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+
+    <div class="d-flex align-center gap-2 mb-4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" OnClick="GoBack"/>
+        <MudText Typo="Typo.h5"><b>@(_isNew ? "Nova recepta" : "Editar recepta")</b></MudText>
+    </div>
+
+    <MudForm @ref="_form">
+
+        <!-- NOM I DESCRIPCIÓ -->
+        <MudTextField @bind-Value="_recipe.Name" Label="Nom de la recepta *"
+                      Required="true" Variant="Variant.Outlined" Class="mb-3"/>
+        <MudTextField @bind-Value="_recipe.Description" Label="Descripció breu"
+                      Variant="Variant.Outlined" Lines="2" Class="mb-3"/>
+
+        <!-- TEMPS I PERSONES -->
+        <MudGrid Spacing="2" Class="mb-3">
+            <MudItem xs="4">
+                <MudNumericField @bind-Value="_recipe.PrepTimeMinutes" Label="Prep. (min)"
+                                 Variant="Variant.Outlined" Min="0"/>
+            </MudItem>
+            <MudItem xs="4">
+                <MudNumericField @bind-Value="_recipe.CookTimeMinutes" Label="Cuinat (min)"
+                                 Variant="Variant.Outlined" Min="0"/>
+            </MudItem>
+            <MudItem xs="4">
+                <MudNumericField @bind-Value="_recipe.Servings" Label="Persones"
+                                 Variant="Variant.Outlined" Min="1"/>
+            </MudItem>
+        </MudGrid>
+
+        <!-- DIFICULTAT -->
+        <MudText Typo="Typo.subtitle2" Class="mb-1">Dificultat</MudText>
+        <MudRadioGroup @bind-SelectedOption="_recipe.Difficulty" Class="mb-4">
+            <MudRadio Option="1" Color="Color.Success">Fàcil</MudRadio>
+            <MudRadio Option="2" Color="Color.Warning">Mitjana</MudRadio>
+            <MudRadio Option="3" Color="Color.Error">Difícil</MudRadio>
+        </MudRadioGroup>
+
+        <!-- CATEGORIES -->
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Categories</MudText>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            @foreach (var cat in AppState.Categories)
+            {
+                var c = cat;
+                <span class="category-chip @(_recipe.CategoryIds.Contains(c.Id) ? "selected" : "")"
+                      @onclick="@(() => ToggleCategory(c.Id))">
+                    @c.Emoji @c.Name
+                </span>
+            }
+        </div>
+
+        <MudDivider Class="mb-4"/>
+
+        <!-- INGREDIENTS -->
+        <div class="d-flex align-center justify-space-between mb-2">
+            <MudText Typo="Typo.h6">🥕 Ingredients</MudText>
+            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add" OnClick="AddIngredient">
+                Afegir
+            </MudButton>
+        </div>
+        @if (!_dbReady)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-2"/>
+        }
+        @foreach (var ing in _recipe.Ingredients)
+        {
+            var i = ing;
+            <MudGrid Spacing="2" Class="mb-2" AlignItems="AlignItems.Center">
+                <MudItem xs="5">
+                    <div class="d-flex align-center gap-1">
+                        @if (!string.IsNullOrEmpty(i.CategoriaId))
+                        {
+                            <span style="font-size:18px;" title="@GetCategoryName(i)">@GetIngredientEmoji(i)</span>
+                        }
+                        <div style="flex:1;">
+                            <IngredientAutocomplete
+                                InitialValue="@i.Name"
+                                OnIngredientConfirmed="@((r) => OnIngredientConfirmed(i, r.nom, r.categoriaId))"/>
+                        </div>
+                    </div>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="i.Quantity" Placeholder="Quantitat"
+                                  Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="i.Unit" Placeholder="Unitat"
+                                  Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                </MudItem>
+                <MudItem xs="1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error"
+                                   Size="Size.Small" OnClick="@(() => RemoveIngredient(i))"/>
+                </MudItem>
+            </MudGrid>
+        }
+
+        <MudDivider Class="my-4"/>
+
+        <!-- MATERIAL -->
+        <div class="d-flex align-center justify-space-between mb-2">
+            <MudText Typo="Typo.h6">🍳 Material necessari</MudText>
+            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.Add" OnClick="AddEquipment">
+                Afegir
+            </MudButton>
+        </div>
+        @foreach (var eq in _recipe.Equipment)
+        {
+            var e = eq;
+            <MudGrid Spacing="2" Class="mb-2" AlignItems="AlignItems.Center">
+                <MudItem xs="11">
+                    <MudTextField @bind-Value="e.Name" Placeholder="Ex: Olla gran"
+                                  Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                </MudItem>
+                <MudItem xs="1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error"
+                                   Size="Size.Small" OnClick="@(() => _recipe.Equipment.Remove(e))"/>
+                </MudItem>
+            </MudGrid>
+        }
+
+        <MudDivider Class="my-4"/>
+
+        <!-- PASSOS -->
+        <div class="d-flex align-center justify-space-between mb-2">
+            <MudText Typo="Typo.h6">📋 Passos</MudText>
+            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Add" OnClick="AddStep">
+                Afegir pas
+            </MudButton>
+        </div>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3" Dense="true">
+            💡 Selecciona text al pas i apreta <b>"🔗 Llinka ingredient"</b> per connectar-lo amb un ingredient de la llista.
+        </MudAlert>
+
+        @foreach (var step in _recipe.Steps.OrderBy(s => s.StepNumber))
+        {
+            var s = step;
+            var textareaId = string.Format("step-textarea-{0}", s.Id);
+
+            <MudPaper Class="pa-3 mb-3" Elevation="1" Style="border-radius:10px;">
+                <div class="d-flex gap-3 align-start">
+                    <div class="step-number mt-1">@s.StepNumber</div>
+                    <div style="flex:1;">
+
+                        <!-- Editor rich text -->
+                        <RichStepEditor Step="s"
+                                        OnSelectionChanged="@((txt) => OnRichSelection(s, txt))"/>
+
+                        <!-- Barra d'eines -->
+                        <div class="d-flex align-center gap-2 mt-2 flex-wrap">
+
+                            <MudButton Size="Size.Small"
+                                       Variant="@(_activeStep?.Id == s.Id && _selection != null ? Variant.Filled : Variant.Outlined)"
+                                       Color="Color.Warning"
+                                       StartIcon="@Icons.Material.Filled.Link"
+                                       OnClick="@(() => OpenIngredientLinker(s, string.Empty))"
+                                       Disabled="@(!(_activeStep?.Id == s.Id && _selection != null))">
+                                🔗 Llinka ingredient
+                            </MudButton>
+
+                            <MudNumericField @bind-Value="s.TimerMinutes"
+                                             Placeholder="⏱ min (opcional)"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Style="max-width:160px;"/>
+                        </div>
+
+                        <!-- Ingredients linkats com a chips -->
+                        @if (s.Links.Any())
+                        {
+                            <div style="margin-top:8px;padding:8px;background:#FFF8F0;border-radius:8px;border:1px solid #FFD5B0;">
+                                <div style="font-size:11px;color:#999;margin-bottom:6px;">INGREDIENTS LINKATS</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var lk in s.Links.ToList())
+                                    {
+                                        var link = lk;
+                                        var ing = _recipe.Ingredients.FirstOrDefault(i => i.Id == link.IngredientId);
+                                        <MudChip Size="Size.Small" Color="Color.Warning"
+                                                 OnClose="@(() => { s.Links.Remove(link); StateHasChanged(); })">
+                                            @link.DisplayText
+                                            @if (ing != null)
+                                            {
+                                                <span style="opacity:0.65;font-size:10px;margin-left:3px;">(@ing.Name)</span>
+                                            }
+                                        </MudChip>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error"
+                                   Size="Size.Small" OnClick="@(() => RemoveStep(s))"/>
+                </div>
+            </MudPaper>
+        }
+
+        <MudDivider Class="my-4"/>
+
+        <!-- CONSELLS -->
+        <MudTextField @bind-Value="_recipe.Tips" Label="💡 Consells"
+                      Variant="Variant.Outlined" Lines="3" Class="mb-4"
+                      Placeholder="Consells, substitucions, notes..."/>
+
+        <!-- IMATGE -->
+        <MudText Typo="Typo.subtitle2" Class="mb-2">Foto (opcional)</MudText>
+        <InputFile id="imgInput" OnChange="LoadImage" accept="image/*" style="display:none"/>
+        <label for="imgInput">
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.PhotoCamera"
+                       HtmlTag="span">
+                Triar foto
+            </MudButton>
+        </label>
+        @if (!string.IsNullOrEmpty(_recipe.ImageBase64))
+        {
+            <div class="mb-4 mt-2">
+                <img src="@_recipe.ImageBase64" style="max-height:200px;border-radius:8px;" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                               Size="Size.Small"
+                               OnClick="@(() => _recipe.ImageBase64 = string.Empty)"/>
+            </div>
+        }
+
+        <!-- BOTONS FINALS -->
+        <div class="d-flex gap-3 justify-end mt-4 mb-6">
+            <MudButton Variant="Variant.Outlined" OnClick="GoBack">Cancel·lar</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="Save" Disabled="AppState.IsSaving">
+                Desar recepta
+            </MudButton>
+        </div>
+
+    </MudForm>
+</MudContainer>
+
+<!-- DIÀLEG: Tria ingredient per linkar -->
+@if (_linkerOpen)
+{
+    <MudOverlay Visible="true" DarkBackground="true" ZIndex="1000" OnClick="CloseLinker"/>
+    <div style="position:fixed;bottom:0;left:0;right:0;z-index:1001;background:white;border-radius:16px 16px 0 0;padding:16px;max-height:60vh;overflow-y:auto;">
+        <MudText Typo="Typo.h6" Class="mb-1">🔗 Llinka ingredient</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">
+            Text seleccionat: <b style="color:#FF6B35;">"@_selection?.Text"</b>
+        </MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2 d-block">
+            Tria a quin ingredient correspon:
+        </MudText>
+        @if (!_recipe.Ingredients.Any())
+        {
+            <MudAlert Severity="Severity.Warning">
+                No hi ha ingredients a la recepta. Afegeix-ne primer.
+            </MudAlert>
+        }
+        else
+        {
+            @foreach (var ing in _recipe.Ingredients.Where(i => !string.IsNullOrWhiteSpace(i.Name)))
+            {
+                var i = ing;
+                <MudPaper Class="pa-3 mb-2" Style="cursor:pointer;border-radius:8px;"
+                          @onclick="@(() => ApplyLink(i))">
+                    <div class="d-flex justify-space-between align-center">
+                        <MudText><b>@i.Name</b></MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@i.DisplayText</MudText>
+                    </div>
+                </MudPaper>
+            }
+        }
+        <MudButton FullWidth="true" Variant="Variant.Outlined" Class="mt-2" OnClick="CloseLinker">
+            Cancel·lar
+        </MudButton>
+    </div>
+}
+
+@code {
+    [Parameter] public string? Id { get; set; }
+
+    private MudForm _form   = default!;
+    private Recipe  _recipe = new();
+    private bool    _isNew  => string.IsNullOrEmpty(Id);
+
+    // Estat del linker d'ingredients
+    private bool        _linkerOpen  = false;
+    private RecipeStep? _activeStep;
+    private TextSelection? _selection;
+
+    // Model de selecció de text
+    private record TextSelection(string Text, int Start, int End);
+
+    // Model d'un link dins el text: [text visible](ing:id)
+    private record IngredientLink(string DisplayText, string IngredientId, int Start, int End);
+
+    // Passos en mode previsualització
+    private HashSet<string> _previewSteps = new();
+    private void TogglePreview(string stepId)
+    {
+        if (_previewSteps.Contains(stepId)) _previewSteps.Remove(stepId);
+        else _previewSteps.Add(stepId);
+    }
+
+    /// <summary>Renderitza el text del pas amb els ingredients linkats ressaltats.</summary>
+    private string RenderPreview(RecipeStep step)
+    {
+        if (string.IsNullOrEmpty(step.Description)) return string.Empty;
+        var ingMap  = _recipe.Ingredients.ToDictionary(i => i.Id);
+        var result  = System.Net.WebUtility.HtmlEncode(step.Description);
+
+        foreach (var link in step.Links)
+        {
+            if (!ingMap.TryGetValue(link.IngredientId, out _)) continue;
+            var encodedDisplay = System.Net.WebUtility.HtmlEncode(link.DisplayText);
+            var highlighted    = string.Format(
+                "<span style='background:#FFE0CC;color:#E55A24;font-weight:600;border-radius:4px;padding:1px 5px;border-bottom:2px solid #FF6B35;'>{0}</span>",
+                encodedDisplay);
+            result = result.Replace(encodedDisplay, highlighted);
+        }
+        return result;
+    }
+
+    private bool _dbReady = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await IngDb.EnsureLoadedAsync();
+        _dbReady = true;
+        if (!_isNew)
+        {
+            var existing = AppState.GetRecipe(Id!);
+            if (existing != null)
+                _recipe = System.Text.Json.JsonSerializer.Deserialize<Recipe>(
+                          System.Text.Json.JsonSerializer.Serialize(existing))!;
+        }
+    }
+
+    private void GoBack() => Nav.NavigateTo(_isNew ? "/" : string.Format("/recipe/{0}", Id));
+
+    private void ToggleCategory(string catId)
+    {
+        if (_recipe.CategoryIds.Contains(catId)) _recipe.CategoryIds.Remove(catId);
+        else _recipe.CategoryIds.Add(catId);
+    }
+
+    private void AddIngredient()
+        => _recipe.Ingredients.Add(new Ingredient { Order = _recipe.Ingredients.Count + 1 });
+
+    private void OnIngredientConfirmed(Ingredient ing, string nom, string? categoriaId)
+    {
+        ing.Name        = nom;
+        ing.CategoriaId = categoriaId ?? "altres";
+        StateHasChanged();
+    }
+
+    private string GetIngredientEmoji(Ingredient ing)
+    {
+        if (string.IsNullOrEmpty(ing.CategoriaId)) return string.Empty;
+        var cat = IngDb.Categories.FirstOrDefault(c => c.Id == ing.CategoriaId);
+        return cat?.Emoji ?? "🛒";
+    }
+
+    private string GetCategoryName(Ingredient ing)
+    {
+        if (string.IsNullOrEmpty(ing.CategoriaId)) return string.Empty;
+        var cat = IngDb.Categories.FirstOrDefault(c => c.Id == ing.CategoriaId);
+        return cat?.Nom ?? string.Empty;
+    }
+
+    private void RemoveIngredient(Ingredient ing)
+    {
+        // Eliminar també tots els links que referencien aquest ingredient
+        foreach (var step in _recipe.Steps)
+            step.Links.RemoveAll(l => l.IngredientId == ing.Id);
+        _recipe.Ingredients.Remove(ing);
+        for (int i = 0; i < _recipe.Ingredients.Count; i++) _recipe.Ingredients[i].Order = i + 1;
+    }
+
+    private void AddEquipment()
+        => _recipe.Equipment.Add(new Equipment { Order = _recipe.Equipment.Count + 1 });
+
+    private void AddStep()
+        => _recipe.Steps.Add(new RecipeStep { StepNumber = _recipe.Steps.Count + 1 });
+
+    private void RemoveStep(RecipeStep step)
+    {
+        _recipe.Steps.Remove(step);
+        for (int i = 0; i < _recipe.Steps.Count; i++) _recipe.Steps[i].StepNumber = i + 1;
+    }
+
+    private async Task LoadImage(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        _recipe.ImageBase64 = string.Format("data:{0};base64,{1}", file.ContentType, Convert.ToBase64String(ms.ToArray()));
+    }
+
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        await AppState.SaveRecipeAsync(_recipe);
+        Snackbar.Add("Recepta desada! ✓", Severity.Success);
+        Nav.NavigateTo(string.Format("/recipe/{0}", _recipe.Id));
+    }
+
+    // ═══════════════════════════════════════════
+    //  SISTEMA DE LINKATGE D'INGREDIENTS
+    // ═══════════════════════════════════════════
+
+    // Format intern al text: [text visible](ing:INGREDIENT_ID)
+    // Exemple: "afegeix [la farina tamisada](ing:abc-123) i remenar"
+
+    private void OnRichSelection(RecipeStep step, string? selectedText)
+    {
+        var hadSelection = _selection != null;
+        if (!string.IsNullOrWhiteSpace(selectedText))
+        {
+            _activeStep       = step;
+            _selection        = new TextSelection(selectedText, 0, 0);
+            if (!hadSelection) StateHasChanged();
+        }
+        else if (_activeStep?.Id == step.Id && hadSelection)
+        {
+            _selection = null;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenIngredientLinker(RecipeStep step, string _)
+    {
+        if (_selection == null) return;
+        _activeStep = step;
+        _linkerOpen = true;
+    }
+
+    private void CloseLinker()
+    {
+        _linkerOpen = false;
+        _selection  = null;
+    }
+
+    private async Task ApplyLink(Ingredient ing)
+    {
+        if (_activeStep == null || _selection == null) return;
+
+        // Evitar duplicats del mateix ingredient
+        if (!_activeStep.Links.Any(l => l.IngredientId == ing.Id && l.DisplayText == _selection.Text))
+        {
+            _activeStep.Links.Add(new StepIngredientLink
+            {
+                IngredientId = ing.Id,
+                DisplayText  = _selection.Text
+            });
+        }
+
+        _linkerOpen = false;
+        _selection  = null;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    // Classe per deserialitzar el resultat JS
+    private class SelectionResult
+    {
+        public string Text  { get; set; } = string.Empty;
+        public int    Start { get; set; }
+        public int    End   { get; set; }
+    }
+}

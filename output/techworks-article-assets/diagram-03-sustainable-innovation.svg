@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Sustainable Innovation</title>
+  <desc id="desc">A five-stage vertical progression from Idea to Sustainable Innovation, becoming more structured and connected at every stage.</desc>
+  <defs>
+    <linearGradient id="stageFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#102B46"/>
+      <stop offset="100%" stop-color="#081A2B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4FBFF"/>
+      <stop offset="48%" stop-color="#67D7E8"/>
+      <stop offset="100%" stop-color="#8B7BE4"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="56%" r="58%">
+      <stop offset="0%" stop-color="#1D3B5E" stop-opacity="0.78"/>
+      <stop offset="76%" stop-color="#0C1B2F" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#07121F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#01070E" flood-opacity="0.34"/>
+    </filter>
+    <pattern id="grid" width="76" height="76" patternUnits="userSpaceOnUse">
+      <path d="M76 0H0V76" fill="none" stroke="#DFF4FF" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#07121F"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <ellipse cx="800" cy="565" rx="430" ry="365" fill="url(#glow)"/>
+
+  <text x="92" y="108" fill="#FFFFFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="29" font-weight="650">SUSTAINABLE INNOVATION</text>
+  <text x="92" y="148" fill="#9FDCF3" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" letter-spacing="1.2">Innovation becomes sustainable when operational capability grows with it</text>
+
+  <g fill="none" stroke="url(#accent)" stroke-width="3" stroke-linecap="round">
+    <path d="M800 252V768"/>
+    <path d="M789 347L800 363L811 347"/>
+    <path d="M789 477L800 493L811 477"/>
+    <path d="M789 607L800 623L811 607"/>
+    <path d="M789 737L800 753L811 737"/>
+  </g>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" text-anchor="middle" filter="url(#shadow)">
+    <g transform="translate(800 230)">
+      <rect x="-140" y="-48" width="280" height="96" rx="8" fill="url(#stageFill)" stroke="#EAF8FF" stroke-width="2"/>
+      <circle cx="-95" cy="0" r="8" fill="#FFFFFF"/>
+      <text x="16" y="10" fill="#FFFFFF" font-size="34" font-weight="650">Idea</text>
+    </g>
+
+    <g transform="translate(800 360)">
+      <rect x="-190" y="-50" width="380" height="100" rx="8" fill="url(#stageFill)" stroke="#C8EFFF" stroke-width="2"/>
+      <path d="M-142 6H-88M-115 -22V34M-66 -12H-28M-66 12H-28" stroke="#60D0E4" stroke-width="2.3" stroke-linecap="round"/>
+      <text x="82" y="10" fill="#FFFFFF" font-size="34" font-weight="650">Engineering</text>
+    </g>
+
+    <g transform="translate(800 490)">
+      <rect x="-260" y="-54" width="520" height="108" rx="8" fill="url(#stageFill)" stroke="#BFE8FF" stroke-width="2"/>
+      <g fill="none" stroke="#67D7E8" stroke-width="1.7">
+        <path d="M-190 0L-150 -27L-104 -4L-66 -30L-24 2"/>
+        <path d="M-150 -27L-132 30L-66 -30"/>
+      </g>
+      <g fill="#EAF8FF">
+        <circle cx="-190" cy="0" r="5"/>
+        <circle cx="-150" cy="-27" r="5"/>
+        <circle cx="-104" cy="-4" r="5"/>
+        <circle cx="-66" cy="-30" r="5"/>
+        <circle cx="-24" cy="2" r="5"/>
+        <circle cx="-132" cy="30" r="5"/>
+      </g>
+      <text x="92" y="-3" fill="#FFFFFF" font-size="32" font-weight="650">Operational</text>
+      <text x="92" y="34" fill="#FFFFFF" font-size="32" font-weight="650">Capability</text>
+    </g>
+
+    <g transform="translate(800 625)">
+      <rect x="-280" y="-50" width="560" height="100" rx="8" fill="url(#stageFill)" stroke="#C8EFFF" stroke-width="2"/>
+      <g fill="none" stroke="#7EDFF0" stroke-width="2.2" stroke-linecap="round">
+        <path d="M-214 -18H-150V18H-214Z"/>
+        <path d="M-142 -18H-78V18H-142Z"/>
+        <path d="M-70 -18H-6V18H-70Z"/>
+        <path d="M-150 0H-142M-78 0H-70"/>
+      </g>
+      <text x="140" y="10" fill="#FFFFFF" font-size="34" font-weight="650">Repeatability</text>
+    </g>
+
+    <g transform="translate(800 770)">
+      <path d="M-326 -62H326L366 0L326 62H-326L-366 0Z" fill="#0F2E4C" stroke="#EAF8FF" stroke-width="2.3"/>
+      <path d="M-235 0C-145 -50-46 -54 28 -6C107 45 201 40 272 -10" fill="none" stroke="#61D3E6" stroke-width="2.2" opacity="0.8"/>
+      <path d="M-236 22C-130 70 8 65 104 18C162 -10 218 -14 278 9" fill="none" stroke="#8B7BE4" stroke-width="2.2" opacity="0.64"/>
+      <text x="0" y="12" fill="#FFFFFF" font-size="38" font-weight="700">Sustainable Innovation</text>
+    </g>
+  </g>
+
+  <g fill="#DFF4FF" opacity="0.18">
+    <circle cx="535" cy="260" r="4"/>
+    <circle cx="1030" cy="310" r="5"/>
+    <circle cx="500" cy="540" r="4"/>
+    <circle cx="1100" cy="615" r="4"/>
+    <circle cx="512" cy="805" r="5"/>
+    <circle cx="1094" cy="806" r="4"/>
+  </g>
+</svg>

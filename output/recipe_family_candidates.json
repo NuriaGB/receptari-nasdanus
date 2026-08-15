@@ -1,0 +1,1015 @@
+{
+  "source": {
+    "docx_path": "input/_receptes Núria.docx",
+    "generated_on": "2026-06-26",
+    "xupxup_saved_json": "input/recetari_data.json"
+  },
+  "summary": {
+    "family_candidate_count": 17,
+    "template_recipe_candidate_count": 13,
+    "note": "Families are review candidates based on source recipe names and explicit shared structures; they are not automatic merges."
+  },
+  "modeling_note": "Template Recipe is a first-class concept: a pattern with slots. Variants fill slots. User examples such as Rotllets de primavera or Pollastre al forn variants are supported by the model, but are not added as source recipes unless present in the sources.",
+  "recipe_family_candidates": [
+    {
+      "family_name": "Canelons de carbassó",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: canelons/rolls with carbassó wrapper",
+      "template_slots": [
+        "wrapper vegetable",
+        "filling protein/cheese",
+        "sauce layer",
+        "gratin topping"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-002",
+          "name": "Canelons de carbassó i llagostins",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-061",
+          "name": "Canelons de carbassó amb formatge",
+          "category": "Receptes a provar",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-002",
+          "recipe": "Canelons de carbassó i llagostins",
+          "snippet": "Renta els carbassons, i retira les puntes. Lamina’ls amb l’ajuda d’una mandolina amb tires fines."
+        },
+        {
+          "source_id": "docx-061",
+          "recipe": "Canelons de carbassó amb formatge",
+          "snippet": "Barrejar els ingredients del farcit, el formatge crema, l’ou i les herbes fresques. Afegir formatge ratllat i tornar a barrejar."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Create a TemplateRecipe for carbassó rolls; keep seafood and cheese as variants.",
+      "notes": ""
+    },
+    {
+      "family_name": "Coca de Sant Joan",
+      "family_type": "template_recipe_with_versions",
+      "template_recipe_candidate": "Template: coca sweet dough + cream/topping",
+      "template_slots": [
+        "preferment/massa mare",
+        "aromatized milk",
+        "dough",
+        "cream or topping",
+        "decoration",
+        "proofing schedule"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-038",
+          "name": "Coca de Sant Joan",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-057",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-058",
+          "name": "Coca de Sant Joan (versió millorada)",
+          "category": "Receptes a provar",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-038",
+          "recipe": "Coca de Sant Joan",
+          "snippet": "Plat típic de la nit de Sant Joan. Recepta de Daniel Jordà."
+        },
+        {
+          "source_id": "docx-057",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans): Barreja tots els ingredients de la massa mare i deixa-ho tapat 12 h a temperatura ambient (20–25 °C)."
+        },
+        {
+          "source_id": "docx-058",
+          "recipe": "Coca de Sant Joan (versió millorada)",
+          "snippet": "Fer la massa mare (la nit abans): Barreja tots els ingredients de la massa mare i deixa-ho tapat 12 h a temperatura ambient (20–25 °C)."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Merge duplicate improved copy, then model original/improved as versioned variants.",
+      "notes": ""
+    },
+    {
+      "family_name": "Filet de porc",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: pork tenderloin + cooking method + sauce/rub",
+      "template_slots": [
+        "primary cut",
+        "marinade/rub",
+        "cooking method",
+        "sauce",
+        "resting/serving"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-022",
+          "name": "Filet de porc amb salsa al pebre verd",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-060",
+          "name": "Filet de porc al forn",
+          "category": "Receptes a provar",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-022",
+          "recipe": "Filet de porc amb salsa al pebre verd",
+          "snippet": "L’ingredient estrella Una bona barra de pa per sucar i deixar el plat ben llustrós!"
+        },
+        {
+          "source_id": "docx-060",
+          "recipe": "Filet de porc al forn",
+          "snippet": "Folrem el recipient amb paper alumini i el ruixem amb oli. Rentem el filet de porc amb aigua freda i retallem qualsevol excés de greix. Assecar i col·locar la safata de forn."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Keep separate variants under one family; useful for freezer and shopping logic.",
+      "notes": ""
+    },
+    {
+      "family_name": "Magdalenes",
+      "family_type": "template_recipe_or_adaptation",
+      "template_recipe_candidate": "Template: magdalena batter",
+      "template_slots": [
+        "flour/protein base",
+        "sweetener",
+        "fat/dairy",
+        "aroma",
+        "bake profile"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-043",
+          "name": "Magdalenes",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-044",
+          "name": "Magdalenes Dukan",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-043",
+          "recipe": "Magdalenes",
+          "snippet": "Recepte treta del receptari de “AlmaCupCakes”, es podenm fer amb diferents variants, està de llepar-se els dits!"
+        },
+        {
+          "source_id": "docx-044",
+          "recipe": "Magdalenes Dukan",
+          "snippet": "Aquestes magdalenes son una adaptació de les magdalenes dukan per la dieta hiperproteica."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Model Dukan as diet adaptation if review confirms it replaces the same eating occasion.",
+      "notes": ""
+    },
+    {
+      "family_name": "Pa de pessic",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: sponge cake / cake base",
+      "template_slots": [
+        "sponge/base",
+        "aroma/flavor",
+        "filling/topping",
+        "bake profile"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-045",
+          "name": "Pa de pessic de Vic",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-062",
+          "name": "Pa de pessic taronja i civada",
+          "category": "Receptes a provar",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-011",
+          "name": "Pastís de salmó i formatge",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-045",
+          "recipe": "Pa de pessic de Vic",
+          "snippet": "Pa de pessic de vic és un brioix suau, lleuger i boníssim on no es fan servir grases i es ideal per fer servir com a base de qualsevol pastís o per menjar sol. Aquesta recepta l’hem tret de “Anna Recetas Fáciles” i sempre és un encert."
+        },
+        {
+          "source_id": "docx-062",
+          "recipe": "Pa de pessic taronja i civada",
+          "snippet": "A Arròs tres delícies 7 B Bacallà amb samfaina 40 amb seques 26 crespells 42 Bunyols de l’Empordà 72 de vent 70 C Canelons de carbassó i formatge 113, 114 de carbassó i llagostins 8 Coca de Brioix 76 de iogurt 74 de Sant Joan 76 Cous cous Marroquí 9 Crema Cata"
+        },
+        {
+          "source_id": "docx-011",
+          "recipe": "Pastís de salmó i formatge",
+          "snippet": "Posar en un bol els ous ben batuts, el sucre, la sal, la salsa de tomàquet, la farina, la maicena i el llevat. Ho barregem fins que quedi una pasta. La posem al motlle sobre un paper de forn untat amb mantega."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Separate sweet and savory uses; Pa de pessic can also be a BasePreparation.",
+      "notes": ""
+    },
+    {
+      "family_name": "Pans i masses fermentades",
+      "family_type": "recipe_family_with_base_preparations",
+      "template_recipe_candidate": "Template: fermented dough process",
+      "template_slots": [
+        "starter/preferment",
+        "flour mix",
+        "hydration",
+        "kneading method",
+        "fermentation schedule",
+        "bake profile"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-048",
+          "name": "Massa Mare Iban Yarza",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-049",
+          "name": "Pa de Massa Mare Iban Yarza",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-050",
+          "name": "Pizza Iban Yarza",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-051",
+          "name": "Pa Rústic Webos",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-052",
+          "name": "Panets de llavors Webos",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-053",
+          "name": "Pa Turris",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-054",
+          "name": "Molletes",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-055",
+          "name": "Pa de Llet Alma",
+          "category": "Pa",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-048",
+          "recipe": "Massa Mare Iban Yarza",
+          "snippet": "Aquesta recepta correspon a la recepta de massa mare d’Iban Yarza #retocucharilla Guardem sempre una petita quantitat (5g) a la nevera i així només l’haurem de refrescar abans de fer-la servir amb farina i aigua dos o tres cops."
+        },
+        {
+          "source_id": "docx-049",
+          "recipe": "Pa de Massa Mare Iban Yarza",
+          "snippet": "Aquesta recepta correspon a la recepta de pa de massa mare d’Iban Yarza."
+        },
+        {
+          "source_id": "docx-050",
+          "recipe": "Pizza Iban Yarza",
+          "snippet": "Aquesta recepta correspon a la recepta de massa de pizza d’Iban Yarza. Recomanació: quan es tregui la massa de pizza de la nevera, posar també els ingredients a fer servir en un colador perquè perdin el màxim d’aigua i la pizza quedi més bona."
+        },
+        {
+          "source_id": "docx-051",
+          "recipe": "Pa Rústic Webos",
+          "snippet": "Aquesta recepta correspon a la recepta de Pa Rústic de@WebosFritos"
+        },
+        {
+          "source_id": "docx-052",
+          "recipe": "Panets de llavors Webos",
+          "snippet": "Aquesta recepta correspon a la recepta de #PanecillosHarinaNormalySemillas de @WebosFritos"
+        },
+        {
+          "source_id": "docx-053",
+          "recipe": "Pa Turris",
+          "snippet": "Aquesta recepta correspon a la recepta de pa de Xavier Barriga de Can Turris. Un pa laboriós però molt bo."
+        },
+        {
+          "source_id": "docx-054",
+          "recipe": "Molletes",
+          "snippet": "Aquesta recepta correspon a la recepta de #Molletes de @WebosFritos"
+        },
+        {
+          "source_id": "docx-055",
+          "recipe": "Pa de Llet Alma",
+          "snippet": "Aquesta recepta correspon a la recepta de Pa de Motlle de @alma cupcakes"
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Promote Massa Mare and preferments to BasePreparations; keep breads as variants/templates.",
+      "notes": ""
+    },
+    {
+      "family_name": "Bunyols",
+      "family_type": "recipe_family",
+      "template_recipe_candidate": "Family: fried dough sweets",
+      "template_slots": [
+        "dough type",
+        "aroma",
+        "frying",
+        "filling/coating"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-035",
+          "name": "Bunyols de vent",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-036",
+          "name": "Bunyols de l’Empordà",
+          "category": "Postres",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-035",
+          "recipe": "Bunyols de vent",
+          "snippet": "Plat típic de Setmana Santa. N’hi ha un munt de varietats, bunyols de l’Empordà. Els Bunyols de vent permeten farcir-los amb crema catalana o pastissera-"
+        },
+        {
+          "source_id": "docx-036",
+          "recipe": "Bunyols de l’Empordà",
+          "snippet": "Preparem una infusió de matafaluga o anís sec en un quart de litre de llet. Opcionalment, podem afegir-hi uns 10 g de coriandre i mitja branca de canyella. Colem la llet mentre encara està tèbia."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Keep as separate recipes but group for search/seasonality.",
+      "notes": ""
+    },
+    {
+      "family_name": "Sopes i cremes fredes",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: cold soup/cream",
+      "template_slots": [
+        "fruit/vegetable base",
+        "dairy or bread thickener",
+        "blend/strain",
+        "chill time",
+        "garnish"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-007",
+          "name": "Gaspatxo de síndria",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-015",
+          "name": "Sopa de Meló",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-018",
+          "name": "Vichyssoise",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-007",
+          "recipe": "Gaspatxo de síndria",
+          "snippet": "Se trocea la sandía (solo la parte más roja) y se limpia bien de pepitas, en le caso de que las tenga. Podemos reservar unos daditos firmes para que nos sirvan como decoración al servir. Se lavan y se pelan los tomates. Se trocean y se ponen en un bol junto co"
+        },
+        {
+          "source_id": "docx-015",
+          "recipe": "Sopa de Meló",
+          "snippet": "Tallem a daus el meló i el posem al vas triturador, juntament amb la crema de llet, el mascarpone, l’AOVE i salpebrem Triturem i colem"
+        },
+        {
+          "source_id": "docx-018",
+          "recipe": "Vichyssoise",
+          "snippet": "Piquem la ceba i la part blanca dels porros, traient la primera capa i rentant-lo bé per treure tota la sorra. Piquem els porros i les cebes i ho saltarem a foc lent en una olla amb mantega i oli. No s’ha de daurar"
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Create a template only after review; useful for summer planning.",
+      "notes": ""
+    },
+    {
+      "family_name": "Bacallà",
+      "family_type": "hero_ingredient_family",
+      "template_recipe_candidate": "Family: bacallà dishes",
+      "template_slots": [
+        "bacalla preparation",
+        "base/sauce",
+        "side/starch/legume",
+        "cooking method"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-019",
+          "name": "Bacallà amb samfaina",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-020",
+          "name": "Crespells de Bacallà",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-013",
+          "name": "Seques amb bacallà",
+          "category": "Entrants i primers",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-019",
+          "recipe": "Bacallà amb samfaina",
+          "snippet": "Recepte de Bacallà amb samfaina de CCMA TV3. Recepta de Pere Bahí"
+        },
+        {
+          "source_id": "docx-020",
+          "recipe": "Crespells de Bacallà",
+          "snippet": "Recepte de Crespells de Bacallà de Granja Mora (de Girona)"
+        },
+        {
+          "source_id": "docx-013",
+          "recipe": "Seques amb bacallà",
+          "snippet": "Plat típic de quaresma i setmana santa."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Group by hero ingredient; not duplicates.",
+      "notes": ""
+    },
+    {
+      "family_name": "Pollastre",
+      "family_type": "hero_ingredient_family",
+      "template_recipe_candidate": "Family: pollastre dishes",
+      "template_slots": [
+        "cut",
+        "marinade/coating",
+        "cooking method",
+        "serving role"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-021",
+          "name": "Brotxetes de pollastre amb pinya picant",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-025",
+          "name": "Nuggets de pollastre",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-027",
+          "name": "Pollastre al curry",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-028",
+          "name": "Pollastre Rostit",
+          "category": "Segons",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-021",
+          "recipe": "Brotxetes de pollastre amb pinya picant",
+          "snippet": "Talleu a daus els pits de pollastre i els barregeu bé en un bol amb la marinada, reservant-ho a la nevera unes tres hortes. Talleu la pinya a trossos i poseu-la en una olla mb 30 g de sucre, la cúrcuma i aigua a cobrir. Bulliu-ho deu minuts. Coleu i reserveu e"
+        },
+        {
+          "source_id": "docx-025",
+          "recipe": "Nuggets de pollastre",
+          "snippet": "Marinar les contra-cuixes, la llet i ½ culleradeta de sal . barregem bé i cobrim amb film transparent i deixem marinar a la nevera 30 minuts. Ratllem el formatge, afegim els flocs de blat de moro un pesic de sal i pebre i el pebre vermell i ho triturem."
+        },
+        {
+          "source_id": "docx-027",
+          "recipe": "Pollastre al curry",
+          "snippet": "L’ingredient estrella Una bona barra de pa per poder sucar a la salsa."
+        },
+        {
+          "source_id": "docx-028",
+          "recipe": "Pollastre Rostit",
+          "snippet": "L’ingredient estrella Una bona barra de pa per poder sucar a la salsa."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Group by hero ingredient; future TemplateRecipe can support pollastre al forn variants.",
+      "notes": ""
+    },
+    {
+      "family_name": "Salses emulsionades",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: emulsified sauce",
+      "template_slots": [
+        "emulsion base",
+        "acid",
+        "seasoning",
+        "variant additions"
+      ],
+      "variants_or_members": [
+        {
+          "source_id": "docx-033",
+          "name": "Mahonesa / Lactonesa",
+          "category": "Salses",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        },
+        {
+          "source_id": "docx-034",
+          "name": "Salsa BURGER",
+          "category": "Salses",
+          "source": "docx",
+          "migration_status": "source_recipe"
+        }
+      ],
+      "evidence": [
+        {
+          "source_id": "docx-033",
+          "recipe": "Mahonesa / Lactonesa",
+          "snippet": "Mahonesa, salsa exquisita per acompanyar infinits plats."
+        },
+        {
+          "source_id": "docx-034",
+          "recipe": "Salsa BURGER",
+          "snippet": "Salsa molt gustosa, forta de gust, però que està boníssima per acompanyar una hamburguesa menjada a l’estil “McDonald’s” o “Burger King” En comptes de fer-ho amb llet (a l’estil de la lactonesa), es pot fer amb un ou (mahonesa), quedará un sabor més potent."
+        }
+      ],
+      "confidence": "candidate",
+      "recommendation": "Model as BasePreparation plus TemplateRecipe for variants.",
+      "notes": ""
+    },
+    {
+      "family_name": "Rotllets de primavera",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: spring roll wrapper + protein/vegetable filling + cooking method + dipping sauce",
+      "template_slots": [
+        "wrapper",
+        "protein filling",
+        "vegetable filling",
+        "aromatics",
+        "cooking method",
+        "sauce"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-050",
+          "name": "Rotllets de primavera amb pavo",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-050",
+          "recipe": "Rotllets de primavera amb pavo",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        }
+      ],
+      "confidence": "template_candidate_but_recipe_incomplete",
+      "recommendation": "Create TemplateRecipe support, but keep the current pavo entry as meal idea/draft until ingredients and steps are added.",
+      "notes": "Matches the user-provided modeling example; this source contains only one draft variant so far."
+    },
+    {
+      "family_name": "Iogurt amb fruita/fruits secs/xocolata",
+      "family_type": "template_recipe_or_meal_idea_family",
+      "template_recipe_candidate": "Template: yogurt bowl/snack with fruit + nuts + optional chocolate",
+      "template_slots": [
+        "yogurt base",
+        "fruit",
+        "nut/seed",
+        "chocolate or sweet topping"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-054",
+          "name": "Iogurt",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-034",
+          "name": "Iogurt amb maduixes i xocolata negra",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-035",
+          "name": "Iogurt amb kiwi",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-036",
+          "name": "Iogurt amb avellanes i xocolata negra",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-038",
+          "name": "Iogurt amb nabius i mores",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-039",
+          "name": "Iogurt amb noux i xocolata negra",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-054",
+          "recipe": "Iogurt",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-034",
+          "recipe": "Iogurt amb maduixes i xocolata negra",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-035",
+          "recipe": "Iogurt amb kiwi",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-036",
+          "recipe": "Iogurt amb avellanes i xocolata negra",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-038",
+          "recipe": "Iogurt amb nabius i mores",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-039",
+          "recipe": "Iogurt amb noux i xocolata negra",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        }
+      ],
+      "confidence": "meal_idea_family",
+      "recommendation": "Do not create six full recipes; model as a snack template or meal idea pattern.",
+      "notes": "All current entries are placeholders without steps."
+    },
+    {
+      "family_name": "Amanides ràpides",
+      "family_type": "template_recipe_or_meal_idea_family",
+      "template_recipe_candidate": "Template: salad base + protein + extras + dressing",
+      "template_slots": [
+        "greens/base",
+        "protein",
+        "extras",
+        "dressing",
+        "starch/bread optional"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-051",
+          "name": "Amanida verda",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-021",
+          "name": "Amanida de tonyina i pipes",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-023",
+          "name": "Amanida amb pit de pollastre a la planxa",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-028",
+          "name": "Amanida de sardinetes i escopinyes",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-066",
+          "name": "Amanida caprese",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-011",
+          "name": "Amanida d'esqueixada de Bacallà",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-061",
+          "name": "Amanida amb esqueixada de bacallà",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-051",
+          "recipe": "Amanida verda",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-021",
+          "recipe": "Amanida de tonyina i pipes",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-023",
+          "recipe": "Amanida amb pit de pollastre a la planxa",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-028",
+          "recipe": "Amanida de sardinetes i escopinyes",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-066",
+          "recipe": "Amanida caprese",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-011",
+          "recipe": "Amanida d'esqueixada de Bacallà",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-061",
+          "recipe": "Amanida amb esqueixada de bacallà",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        }
+      ],
+      "confidence": "meal_idea_family",
+      "recommendation": "Keep as meal-plan patterns; only promote individual salads to full recipes if preparation details matter.",
+      "notes": "Several are menu placeholders and likely better represented as template slot values."
+    },
+    {
+      "family_name": "Truita francesa",
+      "family_type": "template_recipe_or_meal_idea_family",
+      "template_recipe_candidate": "Template: egg omelette + optional filling + side",
+      "template_slots": [
+        "egg base",
+        "filling",
+        "side",
+        "bread/starch optional"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-013",
+          "name": "Truita Francesa amb pa integral i amanida",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-032",
+          "name": "Truita francesa amb crema de carbassó",
+          "category": "Sopar",
+          "migration_status": "meal_idea_or_placeholder"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-049",
+          "name": "Truita Francesa amb formatge ratllat i carbassó",
+          "category": "",
+          "migration_status": "meal_idea_or_placeholder"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-013",
+          "recipe": "Truita Francesa amb pa integral i amanida",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-032",
+          "recipe": "Truita francesa amb crema de carbassó",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-049",
+          "recipe": "Truita Francesa amb formatge ratllat i carbassó",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        }
+      ],
+      "confidence": "meal_idea_family",
+      "recommendation": "Model as a quick dinner template instead of repeated standalone recipes.",
+      "notes": "All current entries are placeholders."
+    },
+    {
+      "family_name": "Samuses",
+      "family_type": "template_recipe",
+      "template_recipe_candidate": "Template: samosa wrapper + protein + vegetable filling + air fryer/oven method",
+      "template_slots": [
+        "wrapper",
+        "protein",
+        "vegetables",
+        "spice profile",
+        "cooking method",
+        "side salad"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-006",
+          "name": "Samuses de vedella amb verduretes a l'airfryer",
+          "category": "Dinar",
+          "migration_status": "complete"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-012",
+          "name": "Samuses de pollastre amb limona i amanida",
+          "category": "Dinar",
+          "migration_status": "meal_idea_or_placeholder"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-006",
+          "recipe": "Samuses de vedella amb verduretes a l'airfryer",
+          "snippet": "Talla els ingredients Vedella:→ tires fines tipus wok. Verdures (pastanaga i carbassó):→ juliana fina. Gingebre:→ molt picat. Saltejat ràpid (important foc alt) Paella gran: Oli oliva. Primer: vedella salpebreda 1–2 minuts màxim ."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-012",
+          "recipe": "Samuses de pollastre amb limona i amanida",
+          "snippet": "Meal idea from XupXup with no structured ingredients or steps."
+        }
+      ],
+      "confidence": "template_candidate_mixed_completeness",
+      "recommendation": "Use the vedella recipe as the structured base candidate; keep pollastre as variant draft.",
+      "notes": "One complete recipe and one placeholder."
+    },
+    {
+      "family_name": "Llenties amb verduretes",
+      "family_type": "template_recipe_or_variant_group",
+      "template_recipe_candidate": "Template: lentil base + vegetables + starch/protein/dairy variant",
+      "template_slots": [
+        "lentil base",
+        "vegetables",
+        "starch",
+        "protein/egg",
+        "dairy optional"
+      ],
+      "variants_or_members": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-055",
+          "name": "Llenties estofades amb verduretes i arròs",
+          "category": "",
+          "migration_status": "complete"
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-072",
+          "name": "Llenties amb verduretes, ou poché i mozzarella",
+          "category": "Dinar",
+          "migration_status": "complete"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-055",
+          "recipe": "Llenties estofades amb verduretes i arròs",
+          "snippet": "Si tens all… frega mig gra a l’olla abans de la ceba, per donar aroma subtil. Sofregeix la ceba 12–15 min a foc mig-baix fins transparent i dolça. No torrada. Puja foc, afegeix el vi blanc i deixa evaporar gairebé del tot."
+        },
+        {
+          "source": "xupxup",
+          "source_id": "xupxup-072",
+          "recipe": "Llenties amb verduretes, ou poché i mozzarella",
+          "snippet": "Marca una mica el carbassó Talla’l a daus i:salta’l fort en una paella fins que agafi color. Reserva'l Fes el sofregit En una olla gran, posa un bon raig d’oli. Sofregeix: ceba, porro i l'api durant uns 10-15 minuts a foc mig."
+        }
+      ],
+      "confidence": "template_candidate",
+      "recommendation": "Group as variants; both have structured ingredients and steps.",
+      "notes": "Useful for weekly legume balance."
+    }
+  ]
+}

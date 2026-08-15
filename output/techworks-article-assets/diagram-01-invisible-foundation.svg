@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">The Invisible Foundation of Innovation</title>
+  <desc id="desc">A central Innovation circle supported by six invisible operational foundations: People, Information, Processes, Connected Systems, Knowledge and Traceability.</desc>
+  <defs>
+    <radialGradient id="foundationGlow" cx="50%" cy="47%" r="52%">
+      <stop offset="0%" stop-color="#173553" stop-opacity="0.9"/>
+      <stop offset="58%" stop-color="#0B2036" stop-opacity="0.58"/>
+      <stop offset="100%" stop-color="#07121F" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="blueLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EAF8FF"/>
+      <stop offset="52%" stop-color="#86D9F7"/>
+      <stop offset="100%" stop-color="#6C63D8"/>
+    </linearGradient>
+    <linearGradient id="pillarFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#143251"/>
+      <stop offset="100%" stop-color="#0A1B2D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#01070E" flood-opacity="0.36"/>
+    </filter>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" fill="none" stroke="#DFF4FF" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#07121F"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <circle cx="800" cy="472" r="430" fill="url(#foundationGlow)"/>
+
+  <g opacity="0.34" fill="none" stroke="#DFF4FF" stroke-width="1.2">
+    <path d="M310 695H1290"/>
+    <path d="M360 745H1240"/>
+    <path d="M430 795H1170"/>
+  </g>
+
+  <g fill="none" stroke="url(#blueLine)" stroke-width="2.2" stroke-linecap="round" opacity="0.78">
+    <path d="M800 470C735 414 648 366 548 328"/>
+    <path d="M800 470C862 404 956 362 1052 328"/>
+    <path d="M800 470C704 484 596 526 468 598"/>
+    <path d="M800 470C898 486 1009 528 1132 598"/>
+    <path d="M800 470C762 568 712 646 650 704"/>
+    <path d="M800 470C838 568 888 646 950 704"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <g transform="translate(648 318)">
+      <path d="M0 138C0 54 68 0 152 0s152 54 152 138c0 80-65 144-152 144S0 218 0 138Z" fill="#07121F" stroke="#EAF8FF" stroke-width="2.5"/>
+      <path d="M38 156c45 22 185 22 228 0" fill="none" stroke="#55C8E8" stroke-width="3" opacity="0.6"/>
+      <circle cx="152" cy="125" r="82" fill="#122A43" stroke="#BFE8FF" stroke-width="1.4" opacity="0.9"/>
+      <text x="152" y="117" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="42" font-weight="650">Innovation</text>
+      <text x="152" y="154" text-anchor="middle" fill="#9FDCF3" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" letter-spacing="1.8">VISIBLE OUTCOME</text>
+    </g>
+  </g>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" font-weight="620" text-anchor="middle">
+    <g transform="translate(548 328)">
+      <path d="M-112 92L-70 0H70L112 92Z" fill="url(#pillarFill)" stroke="#BFE8FF" stroke-width="1.8"/>
+      <path d="M-85 92V205M85 92V205M-112 205H112" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="58" fill="#FFFFFF">People</text>
+    </g>
+    <g transform="translate(1052 328)">
+      <path d="M-112 92L-70 0H70L112 92Z" fill="url(#pillarFill)" stroke="#BFE8FF" stroke-width="1.8"/>
+      <path d="M-85 92V205M85 92V205M-112 205H112" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="58" fill="#FFFFFF">Information</text>
+    </g>
+    <g transform="translate(468 598)">
+      <path d="M-122 86L-72 0H72L122 86Z" fill="url(#pillarFill)" stroke="#BFE8FF" stroke-width="1.8"/>
+      <path d="M-92 86V178M92 86V178M-122 178H122" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="55" fill="#FFFFFF">Processes</text>
+    </g>
+    <g transform="translate(1132 598)">
+      <path d="M-142 86L-86 0H86L142 86Z" fill="url(#pillarFill)" stroke="#C8EFFF" stroke-width="1.8"/>
+      <path d="M-107 86V178M107 86V178M-142 178H142" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="46" fill="#FFFFFF">Connected</text>
+      <text x="0" y="80" fill="#FFFFFF">Systems</text>
+    </g>
+    <g transform="translate(650 704)">
+      <path d="M-118 82L-74 0H74L118 82Z" fill="url(#pillarFill)" stroke="#BFE8FF" stroke-width="1.8"/>
+      <path d="M-88 82V155M88 82V155M-118 155H118" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="53" fill="#FFFFFF">Knowledge</text>
+    </g>
+    <g transform="translate(950 704)">
+      <path d="M-124 82L-78 0H78L124 82Z" fill="url(#pillarFill)" stroke="#BFE8FF" stroke-width="1.8"/>
+      <path d="M-93 82V155M93 82V155M-124 155H124" fill="none" stroke="#7EDFF0" stroke-width="1.4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF"/>
+      <text x="0" y="53" fill="#FFFFFF">Traceability</text>
+    </g>
+  </g>
+
+  <g fill="none" opacity="0.42">
+    <path d="M287 242C410 195 507 198 640 252" stroke="#52CFE4" stroke-width="1.1"/>
+    <path d="M960 250C1099 193 1200 200 1322 252" stroke="#8A7BDA" stroke-width="1.1"/>
+    <path d="M235 812C412 872 605 883 800 850C1008 815 1187 828 1370 796" stroke="#DFF4FF" stroke-width="1.1" stroke-dasharray="6 10"/>
+  </g>
+
+  <text x="92" y="108" fill="#FFFFFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="29" font-weight="650">THE INVISIBLE FOUNDATION OF INNOVATION</text>
+  <text x="92" y="148" fill="#9FDCF3" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" letter-spacing="2">Great ideas do not scale on their own</text>
+</svg>

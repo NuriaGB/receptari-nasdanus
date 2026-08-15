@@ -1,0 +1,129 @@
+@using Microsoft.JSInterop
+@using RecetariBlazor.Models
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<!-- Barra de format -->
+<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;background:#F5F5F5;border:1px solid #E0E0E0;border-bottom:none;border-radius:8px 8px 0 0;">
+    <MudTooltip Text="Negreta (Ctrl+B)">
+        <MudIconButton Icon="@Icons.Material.Filled.FormatBold" Size="Size.Small"
+                       OnClick="@(() => ExecCmd("bold"))"/>
+    </MudTooltip>
+    <MudTooltip Text="Cursiva (Ctrl+I)">
+        <MudIconButton Icon="@Icons.Material.Filled.FormatItalic" Size="Size.Small"
+                       OnClick="@(() => ExecCmd("italic"))"/>
+    </MudTooltip>
+    <MudTooltip Text="Subratllat">
+        <MudIconButton Icon="@Icons.Material.Filled.FormatUnderlined" Size="Size.Small"
+                       OnClick="@(() => ExecCmd("underline"))"/>
+    </MudTooltip>
+    <div style="width:1px;height:20px;background:#E0E0E0;margin:0 4px;"></div>
+    <MudTooltip Text="Llista">
+        <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Size="Size.Small"
+                       OnClick="@(() => ExecCmd("insertUnorderedList"))"/>
+    </MudTooltip>
+    <div style="flex:1;"></div>
+    <!-- Afegir foto al pas -->
+    <MudTooltip Text="Afegir foto al pas">
+        <label style="cursor:pointer;display:flex;align-items:center;">
+            <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Size="Size.Small"
+                     Color="Color.Secondary" Style="cursor:pointer;"/>
+            <InputFile id="@_imgInputId" OnChange="LoadStepImage" accept="image/*"
+                       style="display:none;"/>
+        </label>
+    </MudTooltip>
+</div>
+
+<!-- Editor contenteditable -->
+<div id="@EditorId"
+     contenteditable="true"
+     @onmouseup="OnSelectionChange"
+     @onkeyup="OnSelectionChange"
+     style="min-height:90px;padding:10px;border:1px solid #E0E0E0;border-radius:0 0 8px 8px;font-size:14px;font-family:inherit;outline:none;line-height:1.7;background:white;"
+     suppressContentEditableWarning="true">
+</div>
+
+<!-- Foto del pas (si n'hi ha) -->
+@if (!string.IsNullOrEmpty(Step.ImageBase64))
+{
+    <div style="margin-top:8px;position:relative;display:inline-block;">
+        <img src="@Step.ImageBase64" style="max-height:160px;border-radius:8px;border:1px solid #E0E0E0;" />
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size="Size.Small"
+                       Style="position:absolute;top:2px;right:2px;background:white;"
+                       OnClick="RemoveStepImage"/>
+    </div>
+}
+
+@code {
+    [Parameter] public RecipeStep Step        { get; set; } = default!;
+    [Parameter] public EventCallback<string>  OnSelectionChanged { get; set; }
+
+    private string EditorId    => string.Format("rich-editor-{0}", Step.Id);
+    private string _imgInputId => string.Format("step-img-{0}",   Step.Id);
+    private DotNetObjectReference<RichStepEditor>? _dotnetRef;
+    private bool _initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_initialized)
+        {
+            _dotnetRef   = DotNetObjectReference.Create(this);
+            _initialized = true;
+            await JS.InvokeVoidAsync("richEditor.init", EditorId,
+                string.IsNullOrEmpty(Step.DescriptionHtml) ? Step.Description : Step.DescriptionHtml,
+                _dotnetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnHtmlChanged(string html)
+    {
+        Step.DescriptionHtml = html;
+        Step.SyncPlainText();
+    }
+
+    private async Task OnSelectionChange()
+    {
+        var result = await JS.InvokeAsync<SelectionInfo?>("richEditor.getSelection", EditorId);
+        if (result != null)
+            await OnSelectionChanged.InvokeAsync(result.Text);
+        else
+            await OnSelectionChanged.InvokeAsync(null);
+    }
+
+    private async Task ExecCmd(string cmd)
+    {
+        await JS.InvokeVoidAsync("eval",
+            string.Format("document.getElementById('{0}').focus(); document.execCommand('{1}');",
+                EditorId, cmd));
+    }
+
+    private async Task LoadStepImage(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        using var stream = file.OpenReadStream(maxAllowedSize: 3 * 1024 * 1024);
+        using var ms     = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        Step.ImageBase64 = string.Format("data:{0};base64,{1}",
+            file.ContentType, Convert.ToBase64String(ms.ToArray()));
+        StateHasChanged();
+    }
+
+    private void RemoveStepImage()
+    {
+        Step.ImageBase64 = string.Empty;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _dotnetRef?.Dispose();
+        await Task.CompletedTask;
+    }
+
+    private class SelectionInfo
+    {
+        public string Text { get; set; } = string.Empty;
+    }
+}
