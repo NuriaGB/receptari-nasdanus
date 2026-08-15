@@ -1233,7 +1233,8 @@ h3:focus {
 .planner-print-grid,
 .planner-print-card,
 .planner-print-meal,
-.planner-print-notes-body {
+.planner-print-notes-body,
+.planner-print-nutrition-table {
     box-sizing: border-box;
 }
 
@@ -1402,6 +1403,86 @@ h3:focus {
         #ececec 1.95rem,
         #ececec 2rem
     );
+}
+
+.planner-print-nutrition {
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    padding: 0.55rem;
+    background: #fff;
+    background-image: none;
+}
+
+.planner-print-nutrition-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.45rem;
+    color: #202020;
+}
+
+.planner-print-nutrition-title strong {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.planner-print-nutrition-title span {
+    color: #626262;
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.planner-print-nutrition-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    color: #1f1f1f;
+    font-size: 0.64rem;
+    line-height: 1.2;
+}
+
+.planner-print-nutrition-table th,
+.planner-print-nutrition-table td {
+    padding: 0.24rem 0.12rem;
+    border-bottom: 1px solid #e1e1e1;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.planner-print-nutrition-table th:first-child,
+.planner-print-nutrition-table td:first-child {
+    text-align: left;
+}
+
+.planner-print-nutrition-table thead th {
+    color: #5b5b5b;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.planner-print-nutrition-table tbody th {
+    font-weight: 650;
+}
+
+.planner-print-nutrition-table tfoot th,
+.planner-print-nutrition-table tfoot td {
+    border-top: 1px solid #4c4c4c;
+    border-bottom: 0;
+    font-weight: 800;
+}
+
+.planner-print-nutrition-note {
+    margin: 0;
+    color: #6a4b1d;
+    font-size: 0.6rem;
+    line-height: 1.25;
 }
 
 .quick-add-form {
@@ -2139,12 +2220,12 @@ h3:focus {
     .planner-print-card-header {
         min-height: 8mm;
         padding: 1.6mm 2.2mm;
-        font-size: 9pt;
+        font-size: 9.8pt;
         letter-spacing: 0.18em;
     }
 
     .planner-print-card-header small {
-        font-size: 6.5pt;
+        font-size: 7pt;
     }
 
     .planner-print-meal {
@@ -2152,14 +2233,46 @@ h3:focus {
     }
 
     .planner-print-meal h2 {
-        font-size: 6.7pt;
+        font-size: 7.4pt;
     }
 
     .planner-print-meal li {
-        font-size: 7.2pt;
+        font-size: 8.1pt;
+        line-height: 1.25;
     }
 
     .planner-print-empty-line {
         min-height: 4mm;
+    }
+
+    .planner-print-nutrition {
+        gap: 1.9mm;
+        padding: 2mm 2.2mm;
+    }
+
+    .planner-print-nutrition-title strong {
+        font-size: 7.6pt;
+    }
+
+    .planner-print-nutrition-title span {
+        font-size: 6.4pt;
+    }
+
+    .planner-print-nutrition-table {
+        font-size: 7.2pt;
+        line-height: 1.25;
+    }
+
+    .planner-print-nutrition-table th,
+    .planner-print-nutrition-table td {
+        padding: 1.05mm 0.45mm;
+    }
+
+    .planner-print-nutrition-table thead th {
+        font-size: 6.4pt;
+    }
+
+    .planner-print-nutrition-note {
+        font-size: 6.6pt;
     }
 }

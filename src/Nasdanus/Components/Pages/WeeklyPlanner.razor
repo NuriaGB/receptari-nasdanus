@@ -265,7 +265,52 @@
                         <header class="planner-print-card-header">
                             <span>Notes</span>
                         </header>
-                        <div class="planner-print-notes-body"></div>
+                        <div class="planner-print-notes-body planner-print-nutrition">
+                            <div class="planner-print-nutrition-title">
+                                <strong>Resum nutricional</strong>
+                                <span>Per persona</span>
+                            </div>
+                            <table class="planner-print-nutrition-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Dia</th>
+                                        <th scope="col">Kcal</th>
+                                        <th scope="col">Prot. g</th>
+                                        <th scope="col">HC g</th>
+                                        <th scope="col">Greix g</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var day in _days)
+                                    {
+                                        var totals = DayNutritionTotals(day);
+                                        <tr>
+                                            <th scope="row">@FormatPrintNutritionDay(day.Date)</th>
+                                            <td>@FormatPrintNutritionNumber(totals.CaloriesKcal)</td>
+                                            <td>@FormatPrintNutritionNumber(totals.ProteinGrams)</td>
+                                            <td>@FormatPrintNutritionNumber(totals.CarbohydrateGrams)</td>
+                                            <td>@FormatPrintNutritionNumber(totals.FatGrams)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    @{
+                                        var weekTotals = WeekNutritionTotals(_days);
+                                    }
+                                    <tr>
+                                        <th scope="row">Setmana</th>
+                                        <td>@FormatPrintNutritionNumber(weekTotals.CaloriesKcal)</td>
+                                        <td>@FormatPrintNutritionNumber(weekTotals.ProteinGrams)</td>
+                                        <td>@FormatPrintNutritionNumber(weekTotals.CarbohydrateGrams)</td>
+                                        <td>@FormatPrintNutritionNumber(weekTotals.FatGrams)</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            @if (WeekHasMissingNutritionData(_days))
+                            {
+                                <p class="planner-print-nutrition-note">Hi ha ingredients amb dades nutricionals pendents.</p>
+                            }
+                        </div>
                     </article>
                 </div>
             </section>
@@ -431,6 +476,9 @@
     private static string FormatPrintDate(DateOnly date) =>
         date.ToString("d/M", CultureInfo.InvariantCulture);
 
+    private static string FormatPrintNutritionDay(DateOnly date) =>
+        $"{CatalanShortDayNames[(int)date.DayOfWeek].TrimEnd('.')} {date.ToString("d/M", CultureInfo.InvariantCulture)}";
+
     private static IReadOnlyList<MealPlanRecipe> PrintPlannedRecipes(MealPlanSlot? slot) =>
         slot?.PlannedRecipes
             .OrderBy(plannedRecipe => plannedRecipe.Order)
@@ -548,6 +596,20 @@
         return totals;
     }
 
+    private static NutritionTotals WeekNutritionTotals(IEnumerable<DayPlan> days)
+    {
+        var totals = new NutritionTotals();
+        foreach (var day in days)
+        {
+            totals.Add(DayNutritionTotals(day));
+        }
+
+        return totals;
+    }
+
+    private static bool WeekHasMissingNutritionData(IEnumerable<DayPlan> days) =>
+        days.Any(day => DayNutritionTotals(day).HasMissingData);
+
     private static MealPlanSlot[] DaySlots(DayPlan day) =>
     [
         day.Breakfast,
@@ -591,6 +653,9 @@
             : "Revisa objectiu del dia";
 
     private static string FormatGoalNumber(decimal value) =>
+        Math.Round(value, 0).ToString("0", CultureInfo.InvariantCulture);
+
+    private static string FormatPrintNutritionNumber(decimal value) =>
         Math.Round(value, 0).ToString("0", CultureInfo.InvariantCulture);
 
     private sealed record RecipeIdeaCategorySummary(string Name, int Count);
