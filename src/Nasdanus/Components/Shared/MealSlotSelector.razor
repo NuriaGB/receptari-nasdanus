@@ -124,9 +124,13 @@
     private string MealSlotClass => DraggedRecipeId is null && DraggedPlannedRecipeId is null
         ? "meal-slot-selector"
         : "meal-slot-selector is-drop-target";
-    private string MealIcon => Slot.MealKind == MealKind.Lunch
-        ? Icons.Material.Filled.Restaurant
-        : Icons.Material.Filled.DarkMode;
+    private string MealIcon => Slot.MealKind switch
+    {
+        MealKind.Breakfast => Icons.Material.Filled.FreeBreakfast,
+        MealKind.Lunch => Icons.Material.Filled.Restaurant,
+        MealKind.Dinner => Icons.Material.Filled.DarkMode,
+        _ => Icons.Material.Filled.Restaurant
+    };
 
     private async Task OpenPickerAsync()
     {

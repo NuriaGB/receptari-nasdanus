@@ -60,6 +60,15 @@
         </div>
 
         <MudStack Row Justify="Justify.FlexEnd" Class="summary-actions">
+            @if (OnDelete.HasDelegate)
+            {
+                <MudButton OnClick="DeleteAsync"
+                           Variant="Variant.Text"
+                           Color="Color.Error"
+                           StartIcon="@Icons.Material.Filled.Delete">
+                    Esborrar
+                </MudButton>
+            }
             @if (Recipe.IsDraft && OnConsolidate.HasDelegate)
             {
                 <MudButton OnClick="ConsolidateAsync"
@@ -94,6 +103,9 @@
 
     [Parameter]
     public EventCallback<Recipe> OnConsolidate { get; set; }
+
+    [Parameter]
+    public EventCallback<Recipe> OnDelete { get; set; }
 
     private RecipeLibraryProfile Profile => RecipeLibraryAnalysis.Analyze(Recipe);
     private bool HasImage => !string.IsNullOrWhiteSpace(Recipe.ImageUrl);
@@ -138,6 +150,14 @@
         if (OnConsolidate.HasDelegate)
         {
             await OnConsolidate.InvokeAsync(Recipe);
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (OnDelete.HasDelegate)
+        {
+            await OnDelete.InvokeAsync(Recipe);
         }
     }
 }

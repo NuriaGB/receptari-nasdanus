@@ -68,7 +68,13 @@ public sealed class ProductBacklogService(
             {
                 context.PlannerWeek = PlannerService.WeekStart(plannedContext.Slot.Date);
                 context.PlannerDay = plannedContext.Slot.Date;
-                context.Meal = plannedContext.Slot.MealKind == MealKind.Lunch ? "Lunch" : "Dinner";
+                context.Meal = plannedContext.Slot.MealKind switch
+                {
+                    MealKind.Breakfast => "Breakfast",
+                    MealKind.Lunch => "Lunch",
+                    MealKind.Dinner => "Dinner",
+                    _ => plannedContext.Slot.MealKind.ToString()
+                };
             }
         }
 

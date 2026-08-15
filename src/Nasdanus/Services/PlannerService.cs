@@ -16,6 +16,7 @@ public sealed class PlannerService(BrowserAppStore store)
                 var day = weekStart.AddDays(offset);
                 return new DayPlan(
                     day,
+                    store.CloneSlot(state, SlotFor(state, day, MealKind.Breakfast)),
                     store.CloneSlot(state, SlotFor(state, day, MealKind.Lunch)),
                     store.CloneSlot(state, SlotFor(state, day, MealKind.Dinner)));
             })
@@ -204,7 +205,7 @@ public sealed class PlannerService(BrowserAppStore store)
         for (var dayOffset = 0; dayOffset < 7; dayOffset++)
         {
             var date = weekStart.AddDays(dayOffset);
-            foreach (var mealKind in new[] { MealKind.Lunch, MealKind.Dinner })
+            foreach (var mealKind in MealKindExtensions.PlanningOrder)
             {
                 if (state.MealPlanSlots.Any(slot => slot.Date == date && slot.MealKind == mealKind))
                 {
@@ -234,4 +235,4 @@ public sealed class PlannerService(BrowserAppStore store)
     }
 }
 
-public sealed record DayPlan(DateOnly Date, MealPlanSlot Lunch, MealPlanSlot Dinner);
+public sealed record DayPlan(DateOnly Date, MealPlanSlot Breakfast, MealPlanSlot Lunch, MealPlanSlot Dinner);

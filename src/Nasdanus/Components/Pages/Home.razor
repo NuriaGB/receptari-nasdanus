@@ -24,16 +24,19 @@
         else
         {
             <MudGrid Spacing="3">
-                <MudItem xs="12" sm="6">
+                <MudItem xs="12" sm="6" md="4">
+                    @MealCard("Esmorzar d'avui", _breakfast)
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
                     @MealCard("Dinar d'avui", _lunch)
                 </MudItem>
-                <MudItem xs="12" sm="6">
+                <MudItem xs="12" sm="6" md="4">
                     @MealCard("Sopar d'avui", _dinner)
                 </MudItem>
             </MudGrid>
 
-            <NutritionSummary Title="Today"
-                              Subtitle="Approximate total for planned lunch + dinner"
+            <NutritionSummary Title="Avui"
+                              Subtitle="Total aproximat de l'esmorzar + dinar + sopar planificats"
                               Totals="@TodayNutrition"
                               ShowApproximateNote="true" />
 
@@ -86,8 +89,8 @@
                 </MudStack>
             </MudPaper>
 
-            <NutritionSummary Title="Week average"
-                              Subtitle="Per person/day, planned lunch + dinner"
+            <NutritionSummary Title="Mitjana setmanal"
+                              Subtitle="Per persona/dia, esmorzar + dinar + sopar planificats"
                               Totals="@WeekAverageNutrition"
                               ShowApproximateNote="true" />
 
@@ -169,6 +172,7 @@
 </MudContainer>
 
 @code {
+    private MealPlanSlot? _breakfast;
     private MealPlanSlot? _lunch;
     private MealPlanSlot? _dinner;
     private WeekNutritionSummary? _weekNutrition;
@@ -182,6 +186,7 @@
         get
         {
             var totals = new NutritionTotals();
+            totals.Add(NutritionService.CalculateMeal(_breakfast).Totals);
             totals.Add(NutritionService.CalculateMeal(_lunch).Totals);
             totals.Add(NutritionService.CalculateMeal(_dinner).Totals);
             return totals;
@@ -196,9 +201,11 @@
         _weekStatus?.Settings.NutritionGoals.MinimumProteinGramsPerPerson ?? 85;
     private bool IsProteinLow => WeekAverageNutrition.ProteinGrams + 1m < ProteinTarget;
     private MealKind SuggestionMealKind =>
-        _lunch?.PlannedRecipes.Count is not > 0 ? MealKind.Lunch : MealKind.Dinner;
+        TargetSlotForSuggestion()?.MealKind ?? MealKind.Dinner;
     private bool HasMissingMeal =>
-        _lunch?.PlannedRecipes.Count is not > 0 || _dinner?.PlannedRecipes.Count is not > 0;
+        _breakfast?.PlannedRecipes.Count is not > 0
+        || _lunch?.PlannedRecipes.Count is not > 0
+        || _dinner?.PlannedRecipes.Count is not > 0;
     private string SuggestionActionLabel => HasMissingMeal ? "Add" : "Replace";
     private string SuggestionContextText => HasMissingMeal
         ? $"Missing {SuggestionMealKind.ToDisplayName().ToLowerInvariant()}"
@@ -215,11 +222,13 @@
         var today = DateOnly.FromDateTime(DateTime.Today);
         var tomorrow = today.AddDays(1);
         _recipes = await Recipes.GetAllAsync();
+        _breakfast = await Planner.GetSlotAsync(today, MealKind.Breakfast);
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
+        var tomorrowBreakfast = await Planner.GetSlotAsync(tomorrow, MealKind.Breakfast);
         var tomorrowLunch = await Planner.GetSlotAsync(tomorrow, MealKind.Lunch);
         var tomorrowDinner = await Planner.GetSlotAsync(tomorrow, MealKind.Dinner);
-        _tomorrowReminders = BuildTomorrowReminders(tomorrowLunch, tomorrowDinner);
+        _tomorrowReminders = BuildTomorrowReminders(tomorrowBreakfast, tomorrowLunch, tomorrowDinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
         _weekStatus = await Suggestions.GetWeekStatusAsync(today);
         _todaySuggestions = await Suggestions.GetSuggestionsAsync(today, SuggestionMealKind, 3);
@@ -396,6 +405,7 @@
     private async Task RefreshTodayAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
+        _breakfast = await Planner.GetSlotAsync(today, MealKind.Breakfast);
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
@@ -407,11 +417,12 @@
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
         var targetSlot = TargetSlotForSuggestion();
+        var targetMealKind = targetSlot?.MealKind ?? SuggestionMealKind;
         var plannedServings = suggestion.Recipe.Servings > 0 ? suggestion.Recipe.Servings : 3;
 
         if (targetSlot?.PlannedRecipes.Count is not > 0)
         {
-            await Planner.AddRecipeAsync(today, SuggestionMealKind, suggestion.Recipe.Id, plannedServings);
+            await Planner.AddRecipeAsync(today, targetMealKind, suggestion.Recipe.Id, plannedServings);
             Snackbar.Add("Suggested recipe added.", Severity.Success);
         }
         else
@@ -426,6 +437,11 @@
 
     private MealPlanSlot? TargetSlotForSuggestion()
     {
+        if (_breakfast?.PlannedRecipes.Count is not > 0)
+        {
+            return _breakfast;
+        }
+
         if (_lunch?.PlannedRecipes.Count is not > 0)
         {
             return _lunch;

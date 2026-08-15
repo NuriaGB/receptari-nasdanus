@@ -138,6 +138,9 @@
                                                  AriaLabel="Assignar idea">
                                             @foreach (var day in _days)
                                             {
+                                                <MudMenuItem OnClick="@(() => AssignRecipeIdeaAsync(recipe.Id, day.Date, MealKind.Breakfast))">
+                                                    @FormatDay(day.Date) esmorzar
+                                                </MudMenuItem>
                                                 <MudMenuItem OnClick="@(() => AssignRecipeIdeaAsync(recipe.Id, day.Date, MealKind.Lunch))">
                                                     @FormatDay(day.Date) dinar
                                                 </MudMenuItem>
@@ -174,6 +177,18 @@
                             }
                         </div>
 
+                        <MealSlotSelector Slot="@day.Breakfast"
+                                          Recipes="_recipes"
+                                          AddRecipe="AddRecipeAsync"
+                                          RemoveRecipe="RemoveRecipeAsync"
+                                          ReplaceRecipe="ReplaceRecipeAsync"
+                                          UpdateServings="UpdatePlannedServingsAsync"
+                                          DraggedRecipeId="_draggedRecipeIdeaId"
+                                          DraggedPlannedRecipeId="_draggedPlannedRecipeId"
+                                          RecipeDropped="DropRecipeIdeaAsync"
+                                          PlannedRecipeDragStarted="BeginPlannedRecipeDrag"
+                                          PlannedRecipeDragEnded="EndPlannedRecipeDrag"
+                                          PlannedRecipeDropped="DropPlannedRecipeAsync" />
                         <MealSlotSelector Slot="@day.Lunch"
                                           Recipes="_recipes"
                                           AddRecipe="AddRecipeAsync"
@@ -199,7 +214,7 @@
                                           PlannedRecipeDragEnded="EndPlannedRecipeDrag"
                                           PlannedRecipeDropped="DropPlannedRecipeAsync" />
                         <NutritionSummary Title="Total dia"
-                                          Subtitle="Per racio - dinar + sopar"
+                                          Subtitle="Per racio - esmorzar + dinar + sopar"
                                           Totals="@dayTotals"
                                           Dense="true"
                                           MissingDataHref="nutrition-gaps?view=planned" />
@@ -239,7 +254,7 @@
                                 <span>@FormatPrintDayName(day.Date)</span>
                                 <small>@FormatPrintDate(day.Date)</small>
                             </header>
-                            @PrintMealSection("Esmorzar", null)
+                            @PrintMealSection("Esmorzar", day.Breakfast)
                             @PrintMealSection("Dinar", day.Lunch)
                             @PrintMealSection("Sopar", day.Dinner)
                             @PrintMealSection("Snacks", null)
@@ -323,7 +338,7 @@
     {
         _days = await Planner.GetWeekAsync(_weekStart);
         _plannedRecipeIds = _days
-            .SelectMany(day => day.Lunch.PlannedRecipes.Concat(day.Dinner.PlannedRecipes))
+            .SelectMany(day => DaySlots(day).SelectMany(slot => slot.PlannedRecipes))
             .Select(plannedRecipe => plannedRecipe.RecipeId)
             .ToHashSet();
         _dismissedRecipeIdeaIds = await Planner.GetDismissedRecipeIdeaIdsAsync(_weekStart);
@@ -525,10 +540,20 @@
     private static NutritionTotals DayNutritionTotals(DayPlan day)
     {
         var totals = new NutritionTotals();
-        totals.Add(NutritionService.PerPersonMeal(NutritionService.CalculateMeal(day.Lunch)));
-        totals.Add(NutritionService.PerPersonMeal(NutritionService.CalculateMeal(day.Dinner)));
+        foreach (var slot in DaySlots(day))
+        {
+            totals.Add(NutritionService.PerPersonMeal(NutritionService.CalculateMeal(slot)));
+        }
+
         return totals;
     }
+
+    private static MealPlanSlot[] DaySlots(DayPlan day) =>
+    [
+        day.Breakfast,
+        day.Lunch,
+        day.Dinner
+    ];
 
     private DailyNutritionGoal DailyGoal(NutritionTotals totals)
     {

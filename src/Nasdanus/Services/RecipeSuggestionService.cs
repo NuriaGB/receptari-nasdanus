@@ -238,12 +238,14 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
             .Select(offset =>
             {
                 var day = weekStart.AddDays(offset);
+                var breakfast = NutritionService.CalculateMeal(SlotOrEmpty(state, day, MealKind.Breakfast));
                 var lunch = NutritionService.CalculateMeal(SlotOrEmpty(state, day, MealKind.Lunch));
                 var dinner = NutritionService.CalculateMeal(SlotOrEmpty(state, day, MealKind.Dinner));
                 var totals = new NutritionTotals();
+                totals.Add(breakfast.Totals);
                 totals.Add(lunch.Totals);
                 totals.Add(dinner.Totals);
-                return new DayNutritionSummary(day, lunch, dinner, totals);
+                return new DayNutritionSummary(day, breakfast, lunch, dinner, totals);
             })
             .ToList();
 
@@ -329,8 +331,7 @@ public sealed class RecipeSuggestionService(BrowserAppStore store)
             return false;
         }
 
-        return RecipeCategory.Contains(recipe.Category, mealKind.ToDisplayName())
-            || RecipeCategory.Contains(recipe.Category, mealKind.ToString());
+        return mealKind.MatchesRecipeCategory(recipe.Category);
     }
 
     private static int TotalMinutes(Recipe recipe) =>

@@ -13,12 +13,14 @@ public sealed class NutritionService(BrowserAppStore store)
             .Select(offset =>
             {
                 var day = weekStart.AddDays(offset);
+                var breakfast = CalculateMeal(SlotFor(state, day, MealKind.Breakfast));
                 var lunch = CalculateMeal(SlotFor(state, day, MealKind.Lunch));
                 var dinner = CalculateMeal(SlotFor(state, day, MealKind.Dinner));
                 var totals = new NutritionTotals();
+                totals.Add(breakfast.Totals);
                 totals.Add(lunch.Totals);
                 totals.Add(dinner.Totals);
-                return new DayNutritionSummary(day, lunch, dinner, totals);
+                return new DayNutritionSummary(day, breakfast, lunch, dinner, totals);
             })
             .ToList();
 
@@ -35,7 +37,7 @@ public sealed class NutritionService(BrowserAppStore store)
     {
         if (slot is null)
         {
-            return new MealNutritionSummary(DateOnly.MinValue, MealKind.Lunch, [], new NutritionTotals());
+            return new MealNutritionSummary(DateOnly.MinValue, MealKind.Breakfast, [], new NutritionTotals());
         }
 
         var recipeSummaries = slot.PlannedRecipes
@@ -98,6 +100,7 @@ public sealed class NutritionService(BrowserAppStore store)
     public static NutritionTotals PerPersonDay(DayNutritionSummary day)
     {
         var totals = new NutritionTotals();
+        totals.Add(PerPersonMeal(day.Breakfast));
         totals.Add(PerPersonMeal(day.Lunch));
         totals.Add(PerPersonMeal(day.Dinner));
         return totals;

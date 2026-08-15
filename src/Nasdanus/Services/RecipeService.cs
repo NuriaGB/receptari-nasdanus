@@ -90,6 +90,44 @@ public sealed class RecipeService(BrowserAppStore store)
         await store.SaveAsync();
     }
 
+    public async Task<RecipeDeleteResult> DeleteAsync(int id)
+    {
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, id);
+        if (recipe is null)
+        {
+            return new RecipeDeleteResult(false, 0, 0, 0, 0);
+        }
+
+        var removedPlannedRecipes = 0;
+        foreach (var slot in state.MealPlanSlots)
+        {
+            removedPlannedRecipes += slot.PlannedRecipes.RemoveAll(plannedRecipe => plannedRecipe.RecipeId == id);
+            NormalizePlannedRecipeOrders(slot);
+        }
+
+        var removedIdeas = state.RecipeIdeas.RemoveAll(idea => idea.RecipeId == id);
+        var detachedShoppingItems = 0;
+        foreach (var item in state.ShoppingLists.SelectMany(list => list.Items).Where(item => item.RecipeId == id))
+        {
+            item.RecipeId = null;
+            item.Recipe = null;
+            detachedShoppingItems++;
+        }
+
+        var detachedVariations = 0;
+        foreach (var variation in state.Recipes.Where(candidate => candidate.VariationOfRecipeId == id))
+        {
+            variation.VariationOfRecipeId = null;
+            detachedVariations++;
+        }
+
+        state.Recipes.Remove(recipe);
+        await store.SaveAsync();
+
+        return new RecipeDeleteResult(true, removedPlannedRecipes, removedIdeas, detachedShoppingItems, detachedVariations);
+    }
+
     public async Task<Recipe?> CreateVariationAsync(int id)
     {
         var state = await store.GetStateAsync();
@@ -383,6 +421,15 @@ public sealed class RecipeService(BrowserAppStore store)
             ? section
             : RecipeNoteSection.General;
 
+    private static void NormalizePlannedRecipeOrders(MealPlanSlot slot)
+    {
+        var order = 1;
+        foreach (var plannedRecipe in slot.PlannedRecipes.OrderBy(plannedRecipe => plannedRecipe.Order))
+        {
+            plannedRecipe.Order = order++;
+        }
+    }
+
     private static List<string> ParseLines(string text) => text
         .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(CleanLinePrefix)
@@ -401,3 +448,10 @@ public sealed class RecipeService(BrowserAppStore store)
         return cleaned;
     }
 }
+
+public sealed record RecipeDeleteResult(
+    bool Deleted,
+    int RemovedPlannedRecipes,
+    int RemovedRecipeIdeas,
+    int DetachedShoppingItems,
+    int DetachedVariations);

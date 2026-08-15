@@ -193,7 +193,9 @@
                 <div class="recipe-list">
                     @foreach (var recipe in FilteredRecipes)
                     {
-                        <RecipeSummaryCard Recipe="recipe" OnConsolidate="ConsolidateAsync" />
+                        <RecipeSummaryCard Recipe="recipe"
+                                           OnConsolidate="ConsolidateAsync"
+                                           OnDelete="ConfirmDeleteAsync" />
                     }
                 </div>
             }
@@ -390,6 +392,61 @@
         await Recipes.ConsolidateAsync(recipe.Id);
         await LoadRecipesAsync();
         Snackbar.Add("Recepta consolidada.", Severity.Success);
+    }
+
+    private async Task ConfirmDeleteAsync(Recipe recipe)
+    {
+        var parameters = new DialogParameters<DeleteRecipeDialog>
+        {
+            { dialog => dialog.Recipe, recipe }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.ExtraSmall
+        };
+
+        var dialog = await DialogService.ShowAsync<DeleteRecipeDialog>("Esborrar recepta", parameters, options);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        var deleteResult = await Recipes.DeleteAsync(recipe.Id);
+        if (!deleteResult.Deleted)
+        {
+            Snackbar.Add("No s'ha trobat la recepta.", Severity.Warning);
+            await LoadRecipesAsync();
+            return;
+        }
+
+        await LoadRecipesAsync();
+        Snackbar.Add(DeleteSuccessText(deleteResult), Severity.Success);
+    }
+
+    private static string DeleteSuccessText(RecipeDeleteResult result)
+    {
+        var details = new List<string>();
+        if (result.RemovedPlannedRecipes > 0)
+        {
+            details.Add($"{result.RemovedPlannedRecipes} planning");
+        }
+
+        if (result.RemovedRecipeIdeas > 0)
+        {
+            details.Add($"{result.RemovedRecipeIdeas} idees");
+        }
+
+        if (result.DetachedShoppingItems > 0)
+        {
+            details.Add($"{result.DetachedShoppingItems} items de compra desenllacats");
+        }
+
+        return details.Count == 0
+            ? "Recepta esborrada."
+            : $"Recepta esborrada ({string.Join(", ", details)}).";
     }
 
     private static RenderFragment DashboardMetric(string label, int value, string suffix) => @<MudPaper Class="recipe-dashboard-metric" Elevation="0">

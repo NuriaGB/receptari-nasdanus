@@ -397,7 +397,7 @@
         var issues = new List<IngredientIssue>();
         foreach (var day in days)
         {
-            foreach (var slot in new[] { day.Lunch, day.Dinner })
+            foreach (var slot in new[] { day.Breakfast, day.Lunch, day.Dinner })
             {
                 foreach (var plannedRecipe in slot.PlannedRecipes.OrderBy(recipe => recipe.Order))
                 {

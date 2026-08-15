@@ -1,0 +1,50 @@
+@using Nasdanus.Domain
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                Aquesta accio no es pot desfer.
+            </MudAlert>
+            <MudText Typo="Typo.body1">
+                Vols esborrar <strong>@RecipeName</strong> del receptari?
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Tambe es trauran les seves aparicions del planning i de les idees de recepta.
+            </MudText>
+            <MudStack Row Spacing="1" Class="summary-badges">
+                <MudChip T="string" Color="@StatusColor" Variant="Variant.Outlined" Size="Size.Small">@StatusText</MudChip>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Servings racions</MudChip>
+                @if (!string.IsNullOrWhiteSpace(Recipe.Category))
+                {
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Small">@Recipe.Category</MudChip>
+                }
+            </MudStack>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
+        <MudButton OnClick="Confirm"
+                   Variant="Variant.Filled"
+                   Color="Color.Error"
+                   StartIcon="@Icons.Material.Filled.Delete">
+            Esborrar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Recipe Recipe { get; set; } = default!;
+
+    private string RecipeName => string.IsNullOrWhiteSpace(Recipe.Name) ? "Recepta sense nom" : Recipe.Name;
+    private string StatusText => Recipe.IsDraft ? "Draft" : "Activa";
+    private Color StatusColor => Recipe.IsDraft ? Color.Warning : Color.Success;
+
+    private void Confirm() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

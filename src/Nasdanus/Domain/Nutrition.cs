@@ -100,6 +100,7 @@ public sealed record MealNutritionSummary(
 
 public sealed record DayNutritionSummary(
     DateOnly Date,
+    MealNutritionSummary Breakfast,
     MealNutritionSummary Lunch,
     MealNutritionSummary Dinner,
     NutritionTotals Totals);

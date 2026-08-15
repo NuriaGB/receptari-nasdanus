@@ -39,6 +39,7 @@
                                        Adornment="Adornment.Start"
                                        AdornmentIcon="@Icons.Material.Filled.Restaurant">
                                 <MudSelectItem T="string" Value="@string.Empty">Tots els apats</MudSelectItem>
+                                <MudSelectItem T="string" Value="@MealKind.Breakfast.ToString()">Esmorzar</MudSelectItem>
                                 <MudSelectItem T="string" Value="@MealKind.Lunch.ToString()">Dinar</MudSelectItem>
                                 <MudSelectItem T="string" Value="@MealKind.Dinner.ToString()">Sopar</MudSelectItem>
                             </MudSelect>
@@ -266,7 +267,7 @@
 
     protected override void OnParametersSet()
     {
-        if (string.IsNullOrWhiteSpace(_mealType) && SlotMealKind is MealKind.Lunch or MealKind.Dinner)
+        if (string.IsNullOrWhiteSpace(_mealType) && MealKindExtensions.PlanningOrder.Contains(SlotMealKind))
         {
             _mealType = SlotMealKind.ToString();
         }
@@ -401,8 +402,8 @@
             return true;
         }
 
-        var displayName = Enum.Parse<MealKind>(_mealType).ToDisplayName();
-        return RecipeCategory.Contains(recipe.Category, displayName);
+        return Enum.TryParse<MealKind>(_mealType, out var mealKind)
+            && mealKind.MatchesRecipeCategory(recipe.Category);
     }
 
     private void OnQuickAddCategoriesChanged(IEnumerable<string> categories)

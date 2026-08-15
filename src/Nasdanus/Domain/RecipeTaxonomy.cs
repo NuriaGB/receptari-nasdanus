@@ -2,6 +2,7 @@ namespace Nasdanus.Domain;
 
 public static class RecipeCategory
 {
+    public const string Breakfast = "Esmorzar";
     public const string Lunch = "Dinar";
     public const string Dinner = "Sopar";
     public const string Salad = "Amanida";
@@ -25,6 +26,7 @@ public static class RecipeCategory
 
     public static readonly string[] All =
     [
+        Breakfast,
         Lunch,
         Dinner,
         Salad,
