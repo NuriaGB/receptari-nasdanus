@@ -3,6 +3,8 @@
 @inject RecipeService Recipes
 @inject IngredientKnowledgeService IngredientKnowledge
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <PageTitle>@(_recipe is null ? "Editar recepta" : $"Editar {_recipe.Name}")</PageTitle>
 
@@ -192,6 +194,14 @@
                                                  Size="Size.Small">
                                             @IngredientLinkText(ingredient)
                                         </MudChip>
+                                        <MudButton OnClick="@(() => OpenIngredientKnowledgeDialogAsync(ingredient))"
+                                                   Disabled="@string.IsNullOrWhiteSpace(ingredient.Name)"
+                                                   Variant="Variant.Outlined"
+                                                   Color="@IngredientKnowledgeButtonColor(ingredient)"
+                                                   Size="Size.Small"
+                                                   StartIcon="@IngredientKnowledgeButtonIcon(ingredient)">
+                                            @IngredientKnowledgeButtonText(ingredient)
+                                        </MudButton>
                                         <MudIconButton OnClick="@(() => ClearIngredientLink(ingredient))"
                                                        Disabled="@(ingredient.IngredientId is null && string.IsNullOrWhiteSpace(ingredient.KnownIngredientSearch))"
                                                        Icon="@Icons.Material.Filled.LinkOff"
@@ -416,8 +426,7 @@
     {
         _isLoading = true;
         _categoryOptions = await Recipes.GetCategoriesAsync();
-        _knownIngredients = await IngredientKnowledge.GetKnownIngredientsAsync();
-        _knownIngredientsById = _knownIngredients.ToDictionary(ingredient => ingredient.Id);
+        await LoadKnownIngredientsAsync();
         _recipe = await Recipes.GetByIdAsync(Id);
         if (_recipe is not null)
         {
@@ -425,6 +434,12 @@
         }
 
         _isLoading = false;
+    }
+
+    private async Task LoadKnownIngredientsAsync()
+    {
+        _knownIngredients = await IngredientKnowledge.GetKnownIngredientsAsync();
+        _knownIngredientsById = _knownIngredients.ToDictionary(ingredient => ingredient.Id);
     }
 
     private void MapRecipe(Recipe recipe)
@@ -547,6 +562,85 @@
         ingredient.IngredientId = null;
         ingredient.KnownIngredientSearch = string.Empty;
         ingredient.ShowKnownIngredientSuggestions = false;
+    }
+
+    private async Task OpenIngredientKnowledgeDialogAsync(IngredientRow ingredient)
+    {
+        if (string.IsNullOrWhiteSpace(ingredient.Name))
+        {
+            Snackbar.Add("Primer cal informar el nom de l'ingredient.", Severity.Warning);
+            return;
+        }
+
+        var knownIngredient = ingredient.IngredientId is int ingredientId
+            && _knownIngredientsById.TryGetValue(ingredientId, out var existing)
+                ? existing
+                : null;
+
+        var dialogIngredient = knownIngredient is not null
+            ? knownIngredient
+            : DraftIngredientFor(ingredient);
+
+        var parameters = new DialogParameters<IngredientKnowledgeDialog>
+        {
+            { dialog => dialog.Ingredient, dialogIngredient }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var title = knownIngredient is null
+            ? $"Crear ingredient: {ingredient.Name}"
+            : $"Editar ingredient: {knownIngredient.Name}";
+        var dialog = await DialogService.ShowAsync<IngredientKnowledgeDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled || result.Data is not IngredientKnowledgeManualEdit edit)
+        {
+            return;
+        }
+
+        IngredientKnowledgeManualSaveResult? created = null;
+        if (knownIngredient is null)
+        {
+            created = await IngredientKnowledge.CreateManualIngredientAsync(edit);
+            if (created is null)
+            {
+                Snackbar.Add("Cal informar el nom de l'ingredient.", Severity.Warning);
+                return;
+            }
+
+            ingredient.IngredientId = created.Ingredient.Id;
+            ingredient.IsManualLink = true;
+            ingredient.KnownIngredientSearch = KnownIngredientDisplayName(created.Ingredient);
+            if (string.IsNullOrWhiteSpace(ingredient.Name))
+            {
+                ingredient.Name = created.Ingredient.Name;
+            }
+        }
+        else
+        {
+            var saved = await IngredientKnowledge.SaveIngredientAsync(knownIngredient.KnowledgeId, edit);
+            if (!saved)
+            {
+                Snackbar.Add("No s'ha pogut desar l'ingredient.", Severity.Error);
+                return;
+            }
+
+            ingredient.IngredientId = knownIngredient.Id;
+            ingredient.IsManualLink = true;
+        }
+
+        await LoadKnownIngredientsAsync();
+        if (ingredient.IngredientId is int refreshedId && _knownIngredientsById.TryGetValue(refreshedId, out var refreshed))
+        {
+            ingredient.KnownIngredientSearch = KnownIngredientDisplayName(refreshed);
+        }
+
+        ingredient.ShowKnownIngredientSuggestions = false;
+        Snackbar.Add(ManualIngredientSavedText(knownIngredient, created), Severity.Success);
     }
 
     private void RemoveIngredient(IngredientRow ingredient)
@@ -701,6 +795,39 @@
                 Order = notes.Count + 1
             });
         }
+    }
+
+    private static Ingredient DraftIngredientFor(IngredientRow ingredient) => new()
+    {
+        Name = ingredient.Name.Trim(),
+        CatalanName = ingredient.Name.Trim(),
+        DefaultUnit = string.IsNullOrWhiteSpace(ingredient.Unit) ? "g" : IngredientUnits.Normalize(ingredient.Unit),
+        NutritionSource = "manual",
+        NutritionSourceId = ingredient.Name.Trim()
+    };
+
+    private string IngredientKnowledgeButtonText(IngredientRow ingredient) =>
+        HasKnownIngredient(ingredient) ? "Editar fitxa" : "Crear fitxa";
+
+    private string IngredientKnowledgeButtonIcon(IngredientRow ingredient) =>
+        HasKnownIngredient(ingredient) ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+
+    private Color IngredientKnowledgeButtonColor(IngredientRow ingredient) =>
+        HasKnownIngredient(ingredient) ? Color.Primary : Color.Warning;
+
+    private bool HasKnownIngredient(IngredientRow ingredient) =>
+        ingredient.IngredientId is int ingredientId && _knownIngredientsById.ContainsKey(ingredientId);
+
+    private static string ManualIngredientSavedText(Ingredient? knownIngredient, IngredientKnowledgeManualSaveResult? created)
+    {
+        if (knownIngredient is not null)
+        {
+            return "Fitxa d'ingredient actualitzada.";
+        }
+
+        return created?.Created == true
+            ? "Ingredient creat i vinculat a la recepta."
+            : "Ingredient existent vinculat i actualitzat.";
     }
 
     private string IngredientNameFor(StepIngredientRow reference) =>
