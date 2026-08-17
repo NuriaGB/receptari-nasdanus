@@ -81,6 +81,14 @@
                            StartIcon="@Icons.Material.Filled.ContentCopy">
                     Fer variacio
                 </MudButton>
+                <MudButton OnClick="OpenImportDialogAsync"
+                           Disabled="@_isMutating"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.UploadFile">
+                    Importar
+                </MudButton>
                 <MudButton OnClick="ExportRecipeAsync"
                            Disabled="@_isExporting"
                            Variant="Variant.Outlined"
@@ -359,6 +367,12 @@
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
+        await LoadRecipeContextAsync();
+        _isLoading = false;
+    }
+
+    private async Task LoadRecipeContextAsync()
+    {
         _recipe = await Recipes.GetByIdAsync(Id);
         _sourceRecipe = _recipe?.VariationOfRecipeId is int sourceId && sourceId != _recipe.Id
             ? await Recipes.GetByIdAsync(sourceId)
@@ -380,7 +394,6 @@
                 : _recipe?.Servings > 0
                     ? _recipe.Servings
                     : 1;
-        _isLoading = false;
     }
 
     private async Task ConsolidateAsync()
@@ -428,6 +441,35 @@
         {
             Navigation.NavigateTo($"recipes/{variation.Id}/edit");
         }
+    }
+
+    private async Task OpenImportDialogAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        var parameters = new DialogParameters<RecipeImportDialog>
+        {
+            { dialog => dialog.Recipe, _recipe }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        var dialog = await DialogService.ShowAsync<RecipeImportDialog>("Importar sobre aquesta recepta", parameters, options);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        await LoadRecipeContextAsync();
+        Snackbar.Add("Recepta actualitzada amb la fitxa importada.", Severity.Success);
     }
 
     private async Task ExportRecipeAsync()

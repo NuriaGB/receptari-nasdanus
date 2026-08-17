@@ -1,0 +1,157 @@
+@inject RecipeExchangeService RecipeExchange
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2" Class="recipe-import-dialog">
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                Aquesta importacio actualitzara <strong>@RecipeName</strong> i no creara cap recepta nova.
+            </MudAlert>
+
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Se substituiran dades basiques, ingredients, passos, notes i tags. Es mantindran l'identificador de la recepta i les aparicions existents al planner.
+            </MudText>
+
+            <label class="data-file-picker">
+                <span>Seleccionar fitxa JSON d'una recepta</span>
+                <InputFile OnChange="OnFileSelectedAsync" accept=".json,application/json" />
+            </label>
+
+            @if (!string.IsNullOrWhiteSpace(_selectedFileName))
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Fitxer: @_selectedFileName</MudText>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_fileError))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_fileError</MudAlert>
+            }
+
+            @if (_validation is not null)
+            {
+                @if (_validation.IsValid && ImportSummary is not null)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                        Fitxa validada. Pots actualitzar aquesta recepta quan estiguis segura.
+                    </MudAlert>
+                    <div class="data-summary-grid">
+                        @SummaryMetric("Receptes", ImportSummary.Recipes)
+                        @SummaryMetric("Ingredients", ImportSummary.Ingredients)
+                        @SummaryMetric("Passos", ImportSummary.Steps)
+                        @SummaryMetric("Notes", ImportSummary.Notes)
+                        @SummaryMetric("Tags", ImportSummary.Tags)
+                    </div>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                        La fitxa no es pot aplicar sobre aquesta recepta.
+                    </MudAlert>
+                    <MudList T="string" Dense="true">
+                        @foreach (var error in _validation.Errors)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.ErrorOutline">@error</MudListItem>
+                        }
+                    </MudList>
+                }
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_importError))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_importError</MudAlert>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel-lar</MudButton>
+        <MudButton OnClick="ImportAsync"
+                   Disabled="@(!CanImport)"
+                   Variant="Variant.Filled"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.UploadFile">
+            Actualitzar recepta
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private const long MaxImportBytes = 10 * 1024 * 1024;
+
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Recipe Recipe { get; set; } = default!;
+
+    private string? _selectedFileName;
+    private string? _pendingJson;
+    private string? _fileError;
+    private string? _importError;
+    private bool _isImporting;
+    private RecipeImportValidationResult? _validation;
+
+    private bool CanImport => !_isImporting && _validation?.IsValid == true && !string.IsNullOrWhiteSpace(_pendingJson);
+    private RecipeExchangeSummary? ImportSummary => _validation?.Summary;
+    private string RecipeName => string.IsNullOrWhiteSpace(Recipe.Name) ? "aquesta recepta" : Recipe.Name;
+
+    private async Task OnFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        _selectedFileName = null;
+        _pendingJson = null;
+        _validation = null;
+        _fileError = null;
+        _importError = null;
+
+        var file = args.File;
+        _selectedFileName = file.Name;
+        if (file.Size > MaxImportBytes)
+        {
+            _fileError = "El fitxer es massa gran per importar-lo.";
+            return;
+        }
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxImportBytes);
+            using var reader = new StreamReader(stream);
+            _pendingJson = await reader.ReadToEndAsync();
+            _validation = await RecipeExchange.ValidateSingleRecipeImportJsonAsync(_pendingJson);
+        }
+        catch (Exception ex)
+        {
+            _fileError = $"No s'ha pogut llegir el fitxer: {ex.Message}";
+        }
+    }
+
+    private async Task ImportAsync()
+    {
+        if (!CanImport || _pendingJson is null)
+        {
+            return;
+        }
+
+        _isImporting = true;
+        _importError = null;
+        try
+        {
+            var result = await RecipeExchange.ImportIntoRecipeAsync(Recipe.Id, _pendingJson);
+            if (!result.IsValid)
+            {
+                _importError = string.Join(" ", result.Errors);
+                return;
+            }
+
+            MudDialog.Close(DialogResult.Ok(result));
+        }
+        finally
+        {
+            _isImporting = false;
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private static RenderFragment SummaryMetric(string label, int value) => @<MudPaper Class="data-metric" Elevation="0">
+        <MudText Typo="Typo.overline">@label</MudText>
+        <MudText Typo="Typo.h6">@value</MudText>
+    </MudPaper>;
+}

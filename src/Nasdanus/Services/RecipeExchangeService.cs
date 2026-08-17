@@ -130,6 +130,21 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
             : RecipeImportValidationResult.Invalid(errors));
     }
 
+    public async Task<RecipeImportValidationResult> ValidateSingleRecipeImportJsonAsync(string json)
+    {
+        var validation = await ValidateImportJsonAsync(json);
+        if (!validation.IsValid)
+        {
+            return validation;
+        }
+
+        return validation.Cards.Count == 1
+            ? validation
+            : RecipeImportValidationResult.Invalid([
+                $"Aquest import ha de contenir una sola recepta. El fitxer en conte {validation.Cards.Count}."
+            ]);
+    }
+
     public async Task<RecipeImportResult> ImportAsync(string json)
     {
         var validation = await ValidateImportJsonAsync(json);
@@ -160,6 +175,30 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
             RecipeExchangeSummary.FromRecipes(state.Recipes.Where(recipe => importedIds.Contains(recipe.Id))),
             importedIds,
             importedNames);
+    }
+
+    public async Task<RecipeImportResult> ImportIntoRecipeAsync(int recipeId, string json)
+    {
+        var validation = await ValidateSingleRecipeImportJsonAsync(json);
+        if (!validation.IsValid)
+        {
+            return RecipeImportResult.Invalid(validation.Errors);
+        }
+
+        var state = await store.GetStateAsync();
+        var recipe = store.FindRecipe(state, recipeId);
+        if (recipe is null)
+        {
+            return RecipeImportResult.Invalid(["No s'ha trobat la recepta que vols actualitzar."]);
+        }
+
+        ApplyCardToExistingRecipe(validation.Cards[0], recipe, state);
+        await store.SaveAsync();
+
+        return RecipeImportResult.Valid(
+            RecipeExchangeSummary.FromRecipes([recipe]),
+            [recipe.Id],
+            [recipe.Name]);
     }
 
     private static string SerializeFile(IReadOnlyList<Recipe> recipes) =>
@@ -391,6 +430,160 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
         }
 
         return errors.Distinct(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private void ApplyCardToExistingRecipe(RecipeCard card, Recipe recipe, LocalAppState state)
+    {
+        recipe.Name = string.IsNullOrWhiteSpace(card.Name) ? recipe.Name : card.Name.Trim();
+        recipe.Description = card.Description.Trim();
+        recipe.Category = RecipeCategory.Format(card.Categories.Count > 0
+            ? card.Categories
+            : RecipeCategory.Parse(card.Category));
+        recipe.Status = string.IsNullOrWhiteSpace(card.Status)
+            ? string.Empty
+            : NormalizeStatus(card.Status);
+        recipe.PreparationTimeMinutes = Math.Max(0, card.PreparationTimeMinutes);
+        recipe.CookingTimeMinutes = Math.Max(0, card.CookingTimeMinutes);
+        recipe.Difficulty = Math.Clamp(card.Difficulty, 0, 5);
+        recipe.Servings = Math.Max(0, card.Servings);
+        recipe.IsFavourite = card.IsFavourite;
+        recipe.Rating = card.Rating is int rating ? Math.Clamp(rating, 0, 5) : null;
+        recipe.SeasonalRecommendation = card.SeasonalRecommendation.Trim();
+        recipe.ImageUrl = card.ImageUrl.Trim();
+
+        recipe.Ingredients = [];
+        recipe.Steps = [];
+        recipe.Notes = [];
+        recipe.Tags = [];
+
+        var ingredientsByKey = new Dictionary<string, RecipeIngredient>(StringComparer.OrdinalIgnoreCase);
+        var ingredientsByName = new Dictionary<string, RecipeIngredient>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in card.Ingredients
+            .Where(ingredient => !IsBlank(ingredient))
+            .Select((ingredient, index) => (Ingredient: ingredient, Order: index + 1)))
+        {
+            var ingredient = new RecipeIngredient
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Order = item.Order,
+                Name = item.Ingredient.Name.Trim(),
+                Quantity = item.Ingredient.Quantity.Trim(),
+                Unit = IngredientUnits.Normalize(item.Ingredient.Unit),
+                ScalingMode = NormalizeScalingMode(item.Ingredient.ScalingMode)
+            };
+
+            recipe.Ingredients.Add(ingredient);
+            var key = string.IsNullOrWhiteSpace(item.Ingredient.Key)
+                ? IngredientKey(ingredient.Name, item.Order)
+                : item.Ingredient.Key.Trim();
+            ingredientsByKey[key] = ingredient;
+
+            var normalizedName = FoodText.Normalize(ingredient.Name);
+            if (!ingredientsByName.ContainsKey(normalizedName))
+            {
+                ingredientsByName[normalizedName] = ingredient;
+            }
+        }
+
+        foreach (var item in card.Steps
+            .Where(step => !IsBlank(step))
+            .Select((step, index) => (Step: step, Order: index + 1)))
+        {
+            var step = new RecipeStep
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Order = item.Order,
+                Title = item.Step.Title.Trim(),
+                Instruction = item.Step.Instruction.Trim(),
+                TimerMinutes = item.Step.TimerMinutes
+            };
+
+            foreach (var referenceItem in item.Step.IngredientReferences
+                .Where(reference => !IsBlank(reference))
+                .Select((reference, index) => (Reference: reference, Order: index + 1)))
+            {
+                var ingredient = ResolveStepIngredient(referenceItem.Reference, ingredientsByKey, ingredientsByName);
+                step.IngredientReferences.Add(new RecipeStepIngredientReference
+                {
+                    Id = store.NextId(state),
+                    RecipeStepId = step.Id,
+                    RecipeIngredientId = ingredient?.Id,
+                    Ingredient = ingredient,
+                    IngredientName = ingredient?.Name ?? referenceItem.Reference.IngredientName.Trim(),
+                    Quantity = IngredientScaling.ParseQuantity(referenceItem.Reference.QuantityText),
+                    QuantityText = referenceItem.Reference.QuantityText.Trim(),
+                    Unit = IngredientUnits.Normalize(referenceItem.Reference.Unit),
+                    Order = referenceItem.Order
+                });
+            }
+
+            recipe.Steps.Add(step);
+        }
+
+        recipe.Notes = card.Notes
+            .Where(note => !string.IsNullOrWhiteSpace(note.Content))
+            .Select((note, index) => new RecipeNote
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Section = RecipeNoteSection.DisplayOrder.Contains(note.Section) ? note.Section : RecipeNoteSection.General,
+                Content = note.Content.Trim(),
+                Order = index + 1,
+                CreatedAt = note.CreatedAt ?? DateTime.UtcNow
+            })
+            .ToList();
+
+        if (card.PlanningMetadata.Any(metadata => !IsBlank(metadata)))
+        {
+            recipe.PlanningMetadata = card.PlanningMetadata
+                .Where(metadata => !IsBlank(metadata))
+                .Select(metadata => new RecipePlanningMetadata
+                {
+                    Id = store.NextId(state),
+                    RecipeId = recipe.Id,
+                    Kind = NormalizePlanningKind(metadata.Kind),
+                    Value = metadata.Value.Trim(),
+                    Notes = metadata.Notes.Trim(),
+                    CreatedAt = metadata.CreatedAt ?? DateTime.UtcNow
+                })
+                .ToList();
+        }
+
+        recipe.Tags = card.Tags
+            .Where(tag => !string.IsNullOrWhiteSpace(tag))
+            .Select(tag => tag.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+            .Select(tag => new RecipeTag
+            {
+                Id = store.NextId(state),
+                RecipeId = recipe.Id,
+                Name = tag
+            })
+            .ToList();
+
+        if (card.CookingHistory.Count > 0)
+        {
+            recipe.CookingHistory = card.CookingHistory
+                .Select(session => new RecipeCookingSession
+                {
+                    Id = store.NextId(state),
+                    RecipeId = recipe.Id,
+                    CookedAt = session.CookedAt == default ? DateTime.UtcNow : session.CookedAt,
+                    PlannedServings = session.PlannedServings,
+                    ActualServings = session.ActualServings,
+                    Rating = session.Rating,
+                    Notes = session.Notes.Trim()
+                })
+                .ToList();
+        }
+
+        if (string.IsNullOrWhiteSpace(card.Status))
+        {
+            recipe.Status = IsIncomplete(recipe) ? RecipeStatus.Draft : RecipeStatus.Active;
+        }
     }
 
     private Recipe CreateRecipe(RecipeCard card, LocalAppState state, HashSet<string> existingNames)
