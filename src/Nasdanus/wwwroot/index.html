@@ -59,6 +59,15 @@
                 document.execCommand("copy");
                 textarea.remove();
             },
+            printRecipe: () => {
+                document.body.classList.add("recipe-print");
+                const cleanup = () => document.body.classList.remove("recipe-print");
+                window.addEventListener("afterprint", cleanup, { once: true });
+                setTimeout(() => {
+                    window.print();
+                    setTimeout(cleanup, 1000);
+                }, 50);
+            },
             getBrowserInfo: () => {
                 const viewport = `${window.innerWidth}x${window.innerHeight}`;
                 return `${navigator.userAgent} | ${navigator.language} | ${viewport}`;

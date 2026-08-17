@@ -1690,6 +1690,12 @@ h3:focus {
     flex-wrap: wrap;
 }
 
+.data-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
 .data-summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
@@ -2274,5 +2280,88 @@ h3:focus {
 
     .planner-print-nutrition-note {
         font-size: 6.6pt;
+    }
+
+    @page recipe {
+        size: A4 portrait;
+        margin: 12mm;
+    }
+
+    body.recipe-print .recipe-detail-shell {
+        page: recipe;
+    }
+
+    body.recipe-print .app-bar,
+    body.recipe-print .bottom-nav,
+    body.recipe-print .feedback-fab,
+    body.recipe-print .screen-only,
+    body.recipe-print .recipe-actions,
+    body.recipe-print .recipe-status-panel,
+    body.recipe-print .serving-scale-panel,
+    body.recipe-print #blazor-error-ui {
+        display: none !important;
+    }
+
+    body.recipe-print .mud-layout,
+    body.recipe-print .mud-main-content,
+    body.recipe-print .main-content,
+    body.recipe-print .recipe-detail-shell,
+    body.recipe-print .recipe-detail-shell > .mud-stack {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    body.recipe-print .recipe-heading {
+        max-width: none;
+        margin-bottom: 5mm;
+    }
+
+    body.recipe-print .recipe-heading .mud-typography-h3 {
+        color: #161616;
+        font-size: 24pt;
+        line-height: 1.1;
+    }
+
+    body.recipe-print .recipe-badges {
+        margin-bottom: 2mm;
+    }
+
+    body.recipe-print .recipe-meta-grid,
+    body.recipe-print .nutrition-summary-card,
+    body.recipe-print .detail-section {
+        margin-bottom: 5mm;
+        break-inside: avoid;
+    }
+
+    body.recipe-print .metric,
+    body.recipe-print .nutrition-summary-card,
+    body.recipe-print .detail-section,
+    body.recipe-print .detail-step {
+        border-color: #777 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+    }
+
+    body.recipe-print .metric {
+        min-height: 0;
+        padding: 3mm;
+    }
+
+    body.recipe-print .detail-section {
+        padding: 4mm;
+    }
+
+    body.recipe-print .detail-step {
+        padding: 3mm;
+    }
+
+    body.recipe-print .mud-chip {
+        border-color: #777 !important;
+        color: #161616 !important;
     }
 }

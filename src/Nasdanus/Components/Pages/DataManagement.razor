@@ -1,6 +1,7 @@
 @page "/data"
 @using System.Globalization
 @inject BrowserAppStore Store
+@inject RecipeExchangeService RecipeExchange
 @inject IJSRuntime JS
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
@@ -48,6 +49,92 @@
                             @SummaryMetric("Backlog", _summary.ProductBacklogItems)
                         </div>
                     }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Class="detail-section data-section" Elevation="0">
+                <MudStack Spacing="2">
+                    <div>
+                        <MudText Typo="Typo.h5">Fitxes de recepta</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            Exporta, importa o prepara receptes sense substituir totes les dades locals.
+                        </MudText>
+                    </div>
+
+                    <div class="data-action-row">
+                        <MudButton OnClick="DownloadRecipeTemplateAsync"
+                                   Disabled="@_isRecipeTemplateDownloading"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Article">
+                            Plantilla de fitxa
+                        </MudButton>
+                        <MudButton OnClick="ExportRecipesAsync"
+                                   Disabled="@_isRecipeExporting"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.FileDownload">
+                            Exportar receptes
+                        </MudButton>
+                    </div>
+
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                        La plantilla JSON inclou tots els camps de recepta i els valors acceptats per status, categories, unitats, escala, notes i planning.
+                    </MudAlert>
+
+                    <label class="data-file-picker">
+                        <span>Importar fitxes JSON</span>
+                        <InputFile OnChange="OnRecipeFileSelectedAsync" accept=".json,application/json" />
+                    </label>
+
+                    @if (!string.IsNullOrWhiteSpace(_selectedRecipeFileName))
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Fitxer de receptes: @_selectedRecipeFileName</MudText>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_recipeFileError))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_recipeFileError</MudAlert>
+                    }
+
+                    @if (_recipeValidation is not null)
+                    {
+                        @if (_recipeValidation.IsValid && RecipeImportSummary is not null)
+                        {
+                            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                                Fitxes validades. La importacio les afegira com a receptes noves.
+                            </MudAlert>
+                            <div class="data-summary-grid">
+                                @SummaryMetric("Receptes", RecipeImportSummary.Recipes)
+                                @SummaryMetric("Drafts", RecipeImportSummary.DraftRecipes)
+                                @SummaryMetric("Ingredients", RecipeImportSummary.Ingredients)
+                                @SummaryMetric("Passos", RecipeImportSummary.Steps)
+                                @SummaryMetric("Notes", RecipeImportSummary.Notes)
+                                @SummaryMetric("Tags", RecipeImportSummary.Tags)
+                            </div>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                                El fitxer de receptes no es pot importar.
+                            </MudAlert>
+                            <MudList T="string" Dense="true">
+                                @foreach (var error in _recipeValidation.Errors)
+                                {
+                                    <MudListItem Icon="@Icons.Material.Filled.ErrorOutline">@error</MudListItem>
+                                }
+                            </MudList>
+                        }
+                    }
+
+                    <MudButton OnClick="ImportRecipesAsync"
+                               Disabled="@(!CanImportRecipes)"
+                               Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.UploadFile">
+                        Importar receptes
+                    </MudButton>
                 </MudStack>
             </MudPaper>
 
@@ -158,14 +245,23 @@
     private bool _isLoading = true;
     private bool _isExporting;
     private bool _isImporting;
+    private bool _isRecipeTemplateDownloading;
+    private bool _isRecipeExporting;
+    private bool _isRecipeImporting;
     private bool _backupBeforeImport = true;
     private string? _selectedFileName;
     private string? _pendingImportJson;
     private string? _fileError;
     private DataImportValidationResult? _validation;
+    private string? _selectedRecipeFileName;
+    private string? _pendingRecipeImportJson;
+    private string? _recipeFileError;
+    private RecipeImportValidationResult? _recipeValidation;
 
     private bool CanImport => !_isImporting && _validation?.IsValid == true && !string.IsNullOrWhiteSpace(_pendingImportJson);
+    private bool CanImportRecipes => !_isRecipeImporting && _recipeValidation?.IsValid == true && !string.IsNullOrWhiteSpace(_pendingRecipeImportJson);
     private DataBackupSummary? ImportSummary => _validation?.Summary;
+    private RecipeExchangeSummary? RecipeImportSummary => _recipeValidation?.Summary;
     private string LastSavedText => _lastSavedAt is null
         ? "Encara no hi ha cap desat local registrat."
         : $"Ultim desat: {_lastSavedAt.Value.ToLocalTime().ToString("d/M/yyyy HH:mm", CultureInfo.InvariantCulture)}";
@@ -180,6 +276,103 @@
     {
         _summary = await Store.GetSummaryAsync();
         _lastSavedAt = await Store.GetLastSavedAtAsync();
+    }
+
+    private async Task DownloadRecipeTemplateAsync()
+    {
+        _isRecipeTemplateDownloading = true;
+        try
+        {
+            await DownloadAsync(RecipeExchange.CreateTemplateJson(), "nasdanus-recepta-template.json");
+            Snackbar.Add("Plantilla de recepta descarregada.", Severity.Success);
+        }
+        finally
+        {
+            _isRecipeTemplateDownloading = false;
+        }
+    }
+
+    private async Task ExportRecipesAsync()
+    {
+        _isRecipeExporting = true;
+        try
+        {
+            var json = await RecipeExchange.ExportAllAsync();
+            await DownloadAsync(json, RecipeExportFileName());
+            Snackbar.Add("Receptes exportades.", Severity.Success);
+        }
+        finally
+        {
+            _isRecipeExporting = false;
+        }
+    }
+
+    private async Task OnRecipeFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        _selectedRecipeFileName = null;
+        _pendingRecipeImportJson = null;
+        _recipeValidation = null;
+        _recipeFileError = null;
+
+        var file = args.File;
+        _selectedRecipeFileName = file.Name;
+        if (file.Size > MaxImportBytes)
+        {
+            _recipeFileError = "El fitxer es massa gran per importar-lo.";
+            return;
+        }
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxImportBytes);
+            using var reader = new StreamReader(stream);
+            _pendingRecipeImportJson = await reader.ReadToEndAsync();
+            _recipeValidation = await RecipeExchange.ValidateImportJsonAsync(_pendingRecipeImportJson);
+        }
+        catch (Exception ex)
+        {
+            _recipeFileError = $"No s'ha pogut llegir el fitxer: {ex.Message}";
+        }
+    }
+
+    private async Task ImportRecipesAsync()
+    {
+        if (!CanImportRecipes || _pendingRecipeImportJson is null)
+        {
+            return;
+        }
+
+        var recipeCount = RecipeImportSummary?.Recipes ?? 0;
+        var confirmed = await JS.InvokeAsync<bool>(
+            "confirm",
+            $"S'afegiran {recipeCount} recepta/es al receptari. Vols continuar?");
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        _isRecipeImporting = true;
+        try
+        {
+            var result = await RecipeExchange.ImportAsync(_pendingRecipeImportJson);
+            if (!result.IsValid)
+            {
+                _recipeValidation = RecipeImportValidationResult.Invalid(result.Errors);
+                Snackbar.Add("Import cancel.lat: el fitxer no es valid.", Severity.Error);
+                return;
+            }
+
+            _selectedRecipeFileName = null;
+            _pendingRecipeImportJson = null;
+            _recipeValidation = null;
+            await LoadSummaryAsync();
+            Snackbar.Add($"{result.ImportedRecipeIds.Count} recepta/es importada/es.", Severity.Success);
+        }
+        finally
+        {
+            _isRecipeImporting = false;
+        }
     }
 
     private async Task ExportAsync()
@@ -280,6 +473,12 @@
     {
         var stamp = DateTime.Now.ToString("yyyyMMdd-HHmm", CultureInfo.InvariantCulture);
         return $"nasdanus-backup-{stamp}{suffix}.json";
+    }
+
+    private static string RecipeExportFileName()
+    {
+        var stamp = DateTime.Now.ToString("yyyyMMdd-HHmm", CultureInfo.InvariantCulture);
+        return $"nasdanus-receptes-{stamp}.json";
     }
 
     private static RenderFragment SummaryMetric(string label, int value) => @<MudPaper Class="data-metric" Elevation="0">

@@ -18,6 +18,7 @@ builder.Services.AddScoped(_ => new HttpClient
 builder.Services.AddMudServices();
 builder.Services.AddScoped<BrowserAppStore>();
 builder.Services.AddScoped<RecipeService>();
+builder.Services.AddScoped<RecipeExchangeService>();
 builder.Services.AddScoped<PlannerService>();
 builder.Services.AddScoped<ShoppingListService>();
 builder.Services.AddScoped<PantryService>();

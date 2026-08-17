@@ -1,8 +1,12 @@
 @page "/recipes/{Id:int}"
+@using System.Globalization
 @inject RecipeService Recipes
+@inject RecipeExchangeService RecipeExchange
 @inject PlannerService Planner
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IJSRuntime JS
 
 <PageTitle>@(_recipe is null ? "Recepta" : _recipe.Name)</PageTitle>
 
@@ -21,6 +25,7 @@
 
         <MudStack Spacing="3">
             <MudButton Href="recipes"
+                       Class="screen-only"
                        Variant="Variant.Text"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.ArrowBack">
@@ -76,6 +81,21 @@
                            StartIcon="@Icons.Material.Filled.ContentCopy">
                     Fer variacio
                 </MudButton>
+                <MudButton OnClick="ExportRecipeAsync"
+                           Disabled="@_isExporting"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.FileDownload">
+                    Exportar
+                </MudButton>
+                <MudButton OnClick="PrintRecipeAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Print">
+                    Imprimir
+                </MudButton>
                 @if (_recipe.IsDraft)
                 {
                     <MudButton OnClick="ConsolidateAsync"
@@ -87,6 +107,14 @@
                         Consolidar
                     </MudButton>
                 }
+                <MudButton OnClick="ConfirmDeleteAsync"
+                           Disabled="@_isMutating"
+                           Variant="Variant.Outlined"
+                           Color="Color.Error"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Delete">
+                    Esborrar
+                </MudButton>
             </MudStack>
 
             <MudGrid Spacing="2" Class="recipe-meta-grid">
@@ -285,6 +313,7 @@
     private MealPlanRecipe? _plannedRecipe;
     private bool _isLoading = true;
     private bool _isMutating;
+    private bool _isExporting;
     private int _displayServings = 1;
     private string CategoryText => string.IsNullOrWhiteSpace(_recipe?.Category) ? "Sense categoria" : _recipe.Category;
     private bool IsPlannedContext => _plannedRecipe is not null;
@@ -399,5 +428,121 @@
         {
             Navigation.NavigateTo($"recipes/{variation.Id}/edit");
         }
+    }
+
+    private async Task ExportRecipeAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        _isExporting = true;
+        try
+        {
+            var json = await RecipeExchange.ExportRecipeAsync(_recipe.Id);
+            if (json is null)
+            {
+                Snackbar.Add("No s'ha trobat la recepta.", Severity.Warning);
+                return;
+            }
+
+            await JS.InvokeVoidAsync(
+                "nasdanusData.downloadTextFile",
+                RecipeFileName(_recipe),
+                json,
+                "application/json;charset=utf-8");
+            Snackbar.Add("Recepta exportada.", Severity.Success);
+        }
+        finally
+        {
+            _isExporting = false;
+        }
+    }
+
+    private async Task PrintRecipeAsync()
+    {
+        await JS.InvokeVoidAsync("nasdanusData.printRecipe");
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_recipe is null)
+        {
+            return;
+        }
+
+        var parameters = new DialogParameters<DeleteRecipeDialog>
+        {
+            { dialog => dialog.Recipe, _recipe }
+        };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.ExtraSmall
+        };
+
+        var dialog = await DialogService.ShowAsync<DeleteRecipeDialog>("Esborrar recepta", parameters, options);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        _isMutating = true;
+        var deleteResult = await Recipes.DeleteAsync(_recipe.Id);
+        _isMutating = false;
+        if (!deleteResult.Deleted)
+        {
+            Snackbar.Add("No s'ha trobat la recepta.", Severity.Warning);
+            Navigation.NavigateTo("recipes");
+            return;
+        }
+
+        Snackbar.Add(DeleteSuccessText(deleteResult), Severity.Success);
+        Navigation.NavigateTo("recipes");
+    }
+
+    private static string DeleteSuccessText(RecipeDeleteResult result)
+    {
+        var details = new List<string>();
+        if (result.RemovedPlannedRecipes > 0)
+        {
+            details.Add($"{result.RemovedPlannedRecipes} planning");
+        }
+
+        if (result.RemovedRecipeIdeas > 0)
+        {
+            details.Add($"{result.RemovedRecipeIdeas} idees");
+        }
+
+        if (result.DetachedShoppingItems > 0)
+        {
+            details.Add($"{result.DetachedShoppingItems} items de compra desenllacats");
+        }
+
+        return details.Count == 0
+            ? "Recepta esborrada."
+            : $"Recepta esborrada ({string.Join(", ", details)}).";
+    }
+
+    private static string RecipeFileName(Recipe recipe)
+    {
+        var stamp = DateTime.Now.ToString("yyyyMMdd-HHmm", CultureInfo.InvariantCulture);
+        var name = Slug(recipe.Name);
+        return $"nasdanus-recepta-{name}-{stamp}.json";
+    }
+
+    private static string Slug(string value)
+    {
+        var chars = value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(character => char.IsLetterOrDigit(character) ? character : '-')
+            .ToArray();
+        var slug = string.Join("-", new string(chars)
+            .Split('-', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        return string.IsNullOrWhiteSpace(slug) ? "recepta" : slug;
     }
 }
