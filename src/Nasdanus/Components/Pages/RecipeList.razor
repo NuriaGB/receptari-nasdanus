@@ -12,13 +12,22 @@
                 <MudText Typo="Typo.overline">Receptes</MudText>
                 <MudText Typo="Typo.h3">Receptari</MudText>
             </div>
-            <MudButton OnClick="OpenQuickAddAsync"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       StartIcon="@Icons.Material.Filled.Add">
-                Nova recepta
-            </MudButton>
+            <MudStack Row Spacing="1" Class="summary-actions">
+                <MudButton Href="data#recipe-cards"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.UploadFile">
+                    Importar
+                </MudButton>
+                <MudButton OnClick="OpenQuickAddAsync"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Add">
+                    Nova recepta
+                </MudButton>
+            </MudStack>
         </div>
 
         @if (_isLoading)
