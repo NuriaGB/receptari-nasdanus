@@ -210,6 +210,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IsFavourite = recipe.IsFavourite,
             Rating = recipe.Rating,
             SeasonalRecommendation = recipe.SeasonalRecommendation,
+            AdvancePreparation = recipe.AdvancePreparation,
             ImageUrl = recipe.ImageUrl,
             VariationOfRecipeId = recipe.VariationOfRecipeId,
             Ingredients = ingredients,
@@ -461,6 +462,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
             IsFavourite = recipe.IsFavourite,
             Rating = recipe.Rating,
             SeasonalRecommendation = recipe.SeasonalRecommendation,
+            AdvancePreparation = recipe.AdvancePreparation,
             ImageUrl = recipe.ImageUrl,
             VariationOfRecipeId = recipe.VariationOfRecipeId,
             Ingredients = ingredientSnapshots,
@@ -585,6 +587,7 @@ public sealed class BrowserAppStore(HttpClient httpClient, IJSRuntime jsRuntime)
         {
             AssignId(appState, recipe.Id, value => recipe.Id = value, ref maxId);
             recipe.ImageUrl = recipe.ImageUrl?.Trim() ?? string.Empty;
+            recipe.AdvancePreparation = recipe.AdvancePreparation?.Trim() ?? string.Empty;
             NormalizeRecipe(appState, recipe, ref maxId);
         }
 

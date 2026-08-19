@@ -225,6 +225,17 @@
                               Subtitle="Per racio"
                               Totals="@RecipeNutritionPerServing" />
 
+            @if (!string.IsNullOrWhiteSpace(_recipe.AdvancePreparation))
+            {
+                <MudPaper Class="detail-section advance-prep-section" Elevation="0">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Filled.EventRepeat" Color="Color.Primary" />
+                        <MudText Typo="Typo.h5">Preparacio amb antelacio</MudText>
+                    </MudStack>
+                    <MudText Typo="Typo.body1" Class="advance-prep-copy">@_recipe.AdvancePreparation</MudText>
+                </MudPaper>
+            }
+
             <MudPaper Class="detail-section ingredient-section" Elevation="0">
                 <MudText Typo="Typo.h5">Ingredients</MudText>
                 @if (_recipe.Ingredients.Count == 0)

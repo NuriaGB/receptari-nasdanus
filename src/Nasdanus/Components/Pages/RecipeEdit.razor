@@ -75,6 +75,17 @@
                     <MudItem xs="12">
                         <MudTextField T="string" Label="Descripcio" @bind-Value="_edit.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" />
                     </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string"
+                                      Label="Preparacio amb antelacio"
+                                      Placeholder="Posar cigrons en remull la nit abans; preparar massa de pizza 24h abans..."
+                                      @bind-Value="_edit.AdvancePreparation"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.EventRepeat" />
+                    </MudItem>
                     <MudItem xs="12" id="image">
                         <MudTextField T="string"
                                       Label="Imatge / URL"
@@ -452,6 +463,7 @@
             ImageUrl = recipe.ImageUrl,
             TagsText = TagsText(recipe),
             EquipmentText = EquipmentText(recipe),
+            AdvancePreparation = recipe.AdvancePreparation,
             Servings = recipe.Servings,
             PreparationTimeMinutes = recipe.PreparationTimeMinutes,
             CookingTimeMinutes = recipe.CookingTimeMinutes,
@@ -725,6 +737,7 @@
         PreparationTimeMinutes = _edit.PreparationTimeMinutes,
         CookingTimeMinutes = _edit.CookingTimeMinutes,
         Difficulty = _edit.Difficulty,
+        AdvancePreparation = _edit.AdvancePreparation,
         ImageUrl = _edit.ImageUrl,
         Tags = BuildTags(),
         Ingredients = _edit.Ingredients
@@ -1053,6 +1066,7 @@
         public string ImageUrl { get; set; } = string.Empty;
         public string TagsText { get; set; } = string.Empty;
         public string EquipmentText { get; set; } = string.Empty;
+        public string AdvancePreparation { get; set; } = string.Empty;
         public int Servings { get; set; }
         public int PreparationTimeMinutes { get; set; }
         public int CookingTimeMinutes { get; set; }

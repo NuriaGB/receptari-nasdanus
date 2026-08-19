@@ -58,9 +58,6 @@ public static class RecipeWorkflowActionKind
     public const string AddCookingTime = "AddCookingTime";
     public const string AddServings = "AddServings";
     public const string AddCategories = "AddCategories";
-    public const string AddTags = "AddTags";
-    public const string AddEquipment = "AddEquipment";
-    public const string AddNotes = "AddNotes";
     public const string AddImage = "AddImage";
     public const string TestRecipe = "TestRecipe";
     public const string ReviewAfterCooking = "ReviewAfterCooking";
@@ -143,9 +140,6 @@ public static class RecipeLibraryAnalysis
         new(RecipeWorkflowActionKind.AddCookingTime, "Add cooking time", "Need cooking time", "need cooking time", RecipeWorkflowTargetKind.Edit, "basics"),
         new(RecipeWorkflowActionKind.AddServings, "Add servings", "Need servings", "need servings", RecipeWorkflowTargetKind.Edit, "basics"),
         new(RecipeWorkflowActionKind.AddCategories, "Add categories", "Need categories", "need categories", RecipeWorkflowTargetKind.Edit, "basics"),
-        new(RecipeWorkflowActionKind.AddTags, "Add tags", "Need tags", "need tags", RecipeWorkflowTargetKind.Edit, "tags"),
-        new(RecipeWorkflowActionKind.AddEquipment, "Add equipment", "Need equipment", "need equipment", RecipeWorkflowTargetKind.Edit, "tags"),
-        new(RecipeWorkflowActionKind.AddNotes, "Add notes", "Need notes", "need notes", RecipeWorkflowTargetKind.Edit, "notes"),
         new(RecipeWorkflowActionKind.AddImage, "Add image", "Need images", "only need a photo", RecipeWorkflowTargetKind.Edit, "image"),
         new(RecipeWorkflowActionKind.TestRecipe, "Test recipe", "Need testing", "need testing", RecipeWorkflowTargetKind.Cook, string.Empty),
         new(RecipeWorkflowActionKind.ReviewAfterCooking, "Review after cooking", "Need review", "are ready for family approval", RecipeWorkflowTargetKind.Details, "recipe-status"),
@@ -230,6 +224,7 @@ public static class RecipeLibraryAnalysis
         return recipe.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase)
             || recipe.Category.Contains(normalized, StringComparison.OrdinalIgnoreCase)
             || recipe.Description.Contains(normalized, StringComparison.OrdinalIgnoreCase)
+            || (recipe.AdvancePreparation ?? string.Empty).Contains(normalized, StringComparison.OrdinalIgnoreCase)
             || recipe.Tags.Any(tag => tag.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase))
             || recipe.Ingredients.Any(ingredient => ingredient.DisplayName.Contains(normalized, StringComparison.OrdinalIgnoreCase));
     }
@@ -304,9 +299,6 @@ public static class RecipeLibraryAnalysis
         new("Cooking time", recipe.CookingTimeMinutes > 0),
         new("Servings", recipe.Servings > 0),
         new("Categories", !string.IsNullOrWhiteSpace(recipe.Category)),
-        new("Tags", recipe.Tags.Count > 0),
-        new("Equipment", HasEquipment(recipe)),
-        new("Notes", recipe.Notes.Count > 0),
         new("Photo", HasImage(recipe)),
         new("Tested", recipe.CookingHistory.Count > 0),
         new("Family approved", CookingStatus(recipe) is RecipeCookingStatus.FamilyApproved or RecipeCookingStatus.Favourite)
@@ -357,21 +349,6 @@ public static class RecipeLibraryAnalysis
         if (string.IsNullOrWhiteSpace(recipe.Category))
         {
             return Action(RecipeWorkflowActionKind.AddCategories);
-        }
-
-        if (recipe.Tags.Count == 0)
-        {
-            return Action(RecipeWorkflowActionKind.AddTags);
-        }
-
-        if (!HasEquipment(recipe))
-        {
-            return Action(RecipeWorkflowActionKind.AddEquipment);
-        }
-
-        if (recipe.Notes.Count == 0)
-        {
-            return Action(RecipeWorkflowActionKind.AddNotes);
         }
 
         if (!HasImage(recipe))
@@ -434,6 +411,7 @@ public static class RecipeLibraryAnalysis
         && recipe.PreparationTimeMinutes <= 0
         && recipe.CookingTimeMinutes <= 0
         && recipe.Servings <= 0
+        && string.IsNullOrWhiteSpace(recipe.AdvancePreparation)
         && string.IsNullOrWhiteSpace(recipe.ImageUrl)
         && recipe.Tags.Count == 0
         && recipe.Notes.Count == 0;
@@ -478,7 +456,7 @@ public static class RecipeLibraryAnalysis
     {
         var text = string.Join(
             " ",
-            new[] { recipe.Name, recipe.Category, recipe.Description, recipe.SeasonalRecommendation, recipe.ImageUrl }
+            new[] { recipe.Name, recipe.Category, recipe.Description, recipe.SeasonalRecommendation, recipe.AdvancePreparation, recipe.ImageUrl }
                 .Concat(recipe.Tags.Select(tag => tag.Name))
                 .Concat(recipe.PlanningMetadata.Select(metadata => $"{metadata.Kind} {metadata.Value} {metadata.Notes}"))
                 .Concat(recipe.Ingredients.Select(ingredient => ingredient.DisplayName)));

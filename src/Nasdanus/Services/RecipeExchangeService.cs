@@ -54,6 +54,7 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
                 IsFavourite = false,
                 Rating = null,
                 SeasonalRecommendation = string.Empty,
+                AdvancePreparation = "Posar els cigrons en remull la nit abans.",
                 ImageUrl = string.Empty,
                 Tags = ["sopar", RecipeTagConventions.EquipmentTag("forn")],
                 Ingredients =
@@ -449,6 +450,7 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
         recipe.IsFavourite = card.IsFavourite;
         recipe.Rating = card.Rating is int rating ? Math.Clamp(rating, 0, 5) : null;
         recipe.SeasonalRecommendation = card.SeasonalRecommendation.Trim();
+        recipe.AdvancePreparation = card.AdvancePreparation?.Trim() ?? string.Empty;
         recipe.ImageUrl = card.ImageUrl.Trim();
 
         recipe.Ingredients = [];
@@ -604,6 +606,7 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
             IsFavourite = card.IsFavourite,
             Rating = card.Rating is int rating ? Math.Clamp(rating, 0, 5) : null,
             SeasonalRecommendation = card.SeasonalRecommendation.Trim(),
+            AdvancePreparation = card.AdvancePreparation?.Trim() ?? string.Empty,
             ImageUrl = card.ImageUrl.Trim()
         };
 
@@ -772,6 +775,7 @@ public sealed class RecipeExchangeService(BrowserAppStore store)
             IsFavourite = recipe.IsFavourite,
             Rating = recipe.Rating,
             SeasonalRecommendation = recipe.SeasonalRecommendation,
+            AdvancePreparation = recipe.AdvancePreparation,
             ImageUrl = recipe.ImageUrl,
             Tags = recipe.Tags
                 .Select(tag => tag.Name)
@@ -1028,6 +1032,7 @@ public sealed class RecipeCard
     public bool IsFavourite { get; set; }
     public int? Rating { get; set; }
     public string SeasonalRecommendation { get; set; } = string.Empty;
+    public string AdvancePreparation { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public List<string> Tags { get; set; } = [];
     public List<RecipeCardIngredient> Ingredients { get; set; } = [];

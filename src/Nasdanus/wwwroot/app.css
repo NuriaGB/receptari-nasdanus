@@ -874,6 +874,10 @@ h3:focus {
     padding-right: 0;
 }
 
+.advance-prep-copy {
+    white-space: pre-line;
+}
+
 .recipe-edit-shell {
     max-width: 74rem;
 }

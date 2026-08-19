@@ -134,23 +134,6 @@
                 </MudPaper>
             }
 
-            <MudPaper Class="future-reminders" Elevation="0">
-                <MudStack Spacing="2">
-                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@Icons.Material.Filled.NotificationsActive" Color="Color.Primary" Size="Size.Small" />
-                        <MudText Typo="Typo.h6">Recordatoris</MudText>
-                    </MudStack>
-                    <MudList T="string" Dense="true" Class="future-reminder-list">
-                        @foreach (var reminder in _futureReminders)
-                        {
-                            <MudListItem Icon="@Icons.Material.Filled.Circle">
-                                @reminder
-                            </MudListItem>
-                        }
-                    </MudList>
-                </MudStack>
-            </MudPaper>
-
             <MudStack Row Class="home-actions">
                 <MudButton Href="planner"
                            Variant="Variant.Filled"
@@ -210,13 +193,6 @@
     private string SuggestionContextText => HasMissingMeal
         ? $"Missing {SuggestionMealKind.ToDisplayName().ToLowerInvariant()}"
         : "Replacement ideas to improve the week";
-    private readonly string[] _futureReminders =
-    [
-        "Recorda treure pollastre del congelador demà.",
-        "Posa cigrons en remull aquesta nit.",
-        "Objectiu de peix de la setmana encara pendent."
-    ];
-
     protected override async Task OnInitializedAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
@@ -254,76 +230,33 @@
 
         foreach (var slot in plannedSlots)
         {
-            var recipeNames = slot.PlannedRecipes
+            var recipesWithPrep = slot.PlannedRecipes
                 .OrderBy(plannedRecipe => plannedRecipe.Order)
-                .Select(plannedRecipe => plannedRecipe.Recipe?.Name)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name => name!)
+                .Select(plannedRecipe => plannedRecipe.Recipe)
+                .Where(recipe => recipe is not null)
+                .Select(recipe => recipe!)
                 .ToList();
 
-            if (recipeNames.Count == 0)
+            foreach (var recipe in recipesWithPrep)
             {
-                continue;
+                foreach (var prep in AdvancePreparationLines(recipe.AdvancePreparation))
+                {
+                    reminders.Add(new TomorrowPrepReminder(
+                        $"{slot.MealKind.ToDisplayName()} de dema - {recipe.Name}",
+                        prep,
+                        Icons.Material.Filled.EventRepeat));
+                }
             }
-
-            reminders.Add(new TomorrowPrepReminder(
-                $"{slot.MealKind.ToDisplayName()} de dema",
-                string.Join(" + ", recipeNames),
-                Icons.Material.Filled.Restaurant));
-        }
-
-        var freezerIngredients = plannedSlots
-            .SelectMany(slot => slot.PlannedRecipes)
-            .Select(plannedRecipe => plannedRecipe.Recipe)
-            .Where(recipe => recipe is not null)
-            .SelectMany(recipe => recipe!.Ingredients)
-            .Where(MightNeedDefrost)
-            .Select(ingredient => ingredient.DisplayName.Trim())
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct(StringComparer.CurrentCultureIgnoreCase)
-            .Take(6)
-            .ToList();
-
-        if (freezerIngredients.Count > 0)
-        {
-            reminders.Add(new TomorrowPrepReminder(
-                "Possible descongelacio",
-                string.Join(", ", freezerIngredients),
-                Icons.Material.Filled.AcUnit));
-        }
-
-        if (plannedSlots.Count > 0)
-        {
-            reminders.Add(new TomorrowPrepReminder(
-                "Revisa compra",
-                "Comprova que tens els ingredients dels apats de dema.",
-                Icons.Material.Filled.ShoppingCart));
         }
 
         return reminders;
     }
 
-    private static bool MightNeedDefrost(RecipeIngredient ingredient) =>
-        ingredient.Ingredient?.CanFreeze == true
-        || ContainsAny(
-            ingredient.DisplayName,
-            "pollastre",
-            "chicken",
-            "vedella",
-            "beef",
-            "porc",
-            "pork",
-            "peix",
-            "fish",
-            "salmo",
-            "bacalla",
-            "gamba",
-            "lluc",
-            "llagosti",
-            "marisc");
-
-    private static bool ContainsAny(string value, params string[] fragments) =>
-        fragments.Any(fragment => value.Contains(fragment, StringComparison.CurrentCultureIgnoreCase));
+    private static IReadOnlyList<string> AdvancePreparationLines(string? text) => (text ?? string.Empty)
+        .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(line => !string.IsNullOrWhiteSpace(line))
+        .Distinct(StringComparer.CurrentCultureIgnoreCase)
+        .ToList();
 
     private RenderFragment MealCard(string title, MealPlanSlot? slot) => @<MudPaper Class="@MealCardClass(slot)" Elevation="0">
         <MudStack Spacing="2">

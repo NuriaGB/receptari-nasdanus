@@ -148,6 +148,7 @@ public sealed class RecipeService(BrowserAppStore store)
             CookingTimeMinutes = source.CookingTimeMinutes,
             Difficulty = source.Difficulty,
             Servings = source.Servings,
+            AdvancePreparation = source.AdvancePreparation,
             ImageUrl = source.ImageUrl,
             VariationOfRecipeId = source.Id
         };
@@ -252,6 +253,7 @@ public sealed class RecipeService(BrowserAppStore store)
         recipe.PreparationTimeMinutes = Math.Max(0, request.PreparationTimeMinutes);
         recipe.CookingTimeMinutes = Math.Max(0, request.CookingTimeMinutes);
         recipe.Difficulty = Math.Clamp(request.Difficulty, 0, 5);
+        recipe.AdvancePreparation = request.AdvancePreparation?.Trim() ?? string.Empty;
         recipe.ImageUrl = request.ImageUrl?.Trim() ?? string.Empty;
 
         recipe.Ingredients = [];
