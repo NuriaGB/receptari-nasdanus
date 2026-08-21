@@ -1,31 +1,13 @@
-// In production, the service worker enables offline loading of the published static app.
-self.importScripts("./service-worker-assets.js");
-
+// Keep the app online-first on static hosting. Old PWA caches can serve stale
+// Blazor WASM files whose integrity hashes no longer match the current build.
 const cacheNamePrefix = "nasdanus-pwa-";
-const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
-const offlineAssetsInclude = [
-    /\.dll$/,
-    /\.pdb$/,
-    /\.wasm$/,
-    /\.html$/,
-    /\.js$/,
-    /\.json$/,
-    /\.css$/,
-    /\.svg$/,
-    /\.png$/,
-    /\.woff$/,
-    /\.woff2$/,
-    /\.dat$/
-];
-const offlineAssetsExclude = [/^service-worker\.js$/];
 
 self.addEventListener("install", event => {
     self.skipWaiting();
-    event.waitUntil(onInstall());
 });
 
 self.addEventListener("activate", event => {
-    event.waitUntil(onActivate());
+    event.waitUntil(clearOldCachesAndClaimClients());
 });
 
 self.addEventListener("fetch", event => {
@@ -33,32 +15,25 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    event.respondWith(onFetch(event));
+    event.respondWith(fetch(event.request).catch(() => fallbackFor(event.request)));
 });
 
-async function onInstall() {
-    const assetsRequests = self.assetsManifest.assets
-        .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))
-        .filter(asset => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
-        .map(asset => new Request(asset.url, { integrity: asset.hash, cache: "no-cache" }));
-
-    await caches.open(cacheName).then(cache => cache.addAll(assetsRequests));
-}
-
-async function onActivate() {
+async function clearOldCachesAndClaimClients() {
     const cacheKeys = await caches.keys();
-    await Promise.all(cacheKeys
-        .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
-        .map(key => caches.delete(key)));
+    await Promise.all(
+        cacheKeys
+            .filter(key => key.startsWith(cacheNamePrefix))
+            .map(key => caches.delete(key)));
+    await self.clients.claim();
 }
 
-async function onFetch(event) {
-    let cachedResponse = null;
-    if (event.request.mode === "navigate") {
-        cachedResponse = await caches.match("index.html");
-    } else {
-        cachedResponse = await caches.match(event.request);
+async function fallbackFor(request) {
+    if (request.mode === "navigate") {
+        const cachedIndex = await caches.match("index.html");
+        if (cachedIndex) {
+            return cachedIndex;
+        }
     }
 
-    return cachedResponse || fetch(event.request);
+    throw new Error(`Network request failed for ${request.url}`);
 }

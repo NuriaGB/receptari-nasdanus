@@ -29,8 +29,20 @@
     </div>
 
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
+        async function clearStalePwaCaches() {
+            if (!("caches" in window)) {
+                return;
+            }
+
+            const cacheKeys = await caches.keys();
+            await Promise.all(
+                cacheKeys
+                    .filter(key => key.startsWith("nasdanus-pwa-"))
+                    .map(key => caches.delete(key)));
+        }
+
         window.nasdanusData = {
             downloadTextFile: (fileName, content, contentType) => {
                 const blob = new Blob([content], { type: contentType || "application/json;charset=utf-8" });
@@ -74,9 +86,22 @@
             }
         };
 
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("service-worker.js");
-        }
+        (async () => {
+            try {
+                await clearStalePwaCaches();
+            } finally {
+                await Blazor.start();
+            }
+
+            if ("serviceWorker" in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" });
+                    registration.update();
+                } catch {
+                    // The app must still run if service workers are unavailable.
+                }
+            }
+        })();
     </script>
 </body>
 
