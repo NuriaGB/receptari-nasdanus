@@ -319,7 +319,7 @@
                                         {
                                             <div class="@PrintFoodRuleClass(rule)">
                                                 <span class="planner-print-food-rule-state">@PrintFoodRuleState(rule)</span>
-                                                <span class="planner-print-food-rule-name">@FoodGroupKind.ToDisplayName(rule.FoodGroup)</span>
+                                                <span class="planner-print-food-rule-name">@rule.Label</span>
                                                 <span class="planner-print-food-rule-progress">@PrintFoodRuleProgress(rule)</span>
                                             </div>
                                         }
@@ -364,8 +364,7 @@
         .OrderBy(recipe => PlannedRecipeCount(recipe.Id))
         .ThenBy(recipe => recipe.Name)
         .ToList();
-    private IReadOnlyList<FoodGroupTargetStatus> PrintFoodRuleStatuses =>
-        _weekStatus?.FoodGroupTargets ?? [];
+    private IReadOnlyList<PrintFoodRuleStatus> PrintFoodRuleStatuses => BuildPrintFoodRuleStatuses();
     private bool ArePrintFoodRulesMet =>
         PrintFoodRuleStatuses.Count > 0
         && PrintFoodRuleStatuses.All(IsFoodRuleMet);
@@ -657,24 +656,82 @@
     private static bool WeekHasMissingNutritionData(IEnumerable<DayPlan> days) =>
         days.Any(day => DayNutritionTotals(day).HasMissingData);
 
-    private static bool IsFoodRuleMet(FoodGroupTargetStatus rule) =>
-        rule.Target <= 0
-        || (rule.IsMaximum
-            ? rule.Current <= rule.Target
-            : rule.Current >= rule.Target);
+    private IReadOnlyList<PrintFoodRuleStatus> BuildPrintFoodRuleStatuses() =>
+    [
+        BuildPrintFoodRule(FoodGroupKind.Vegetables, "Verdures"),
+        BuildPrintFoodRule(FoodGroupKind.Legumes, "Llegums"),
+        BuildPrintFoodRule(FoodGroupKind.BlueFish, "Peix blau"),
+        BuildPrintFoodRule(FoodGroupKind.WhiteFish, "Peix blanc"),
+        BuildMeatAndPoultryPrintFoodRule(),
+        BuildPrintFoodRule(FoodGroupKind.Eggs, "Ous")
+    ];
 
-    private static string PrintFoodRuleClass(FoodGroupTargetStatus rule) =>
-        IsFoodRuleMet(rule)
+    private PrintFoodRuleStatus BuildPrintFoodRule(string foodGroup, string label)
+    {
+        var target = FoodTarget(foodGroup);
+        var current = CountMealsMatchingFoodGroup(foodGroup);
+        var targetValue = target?.Target ?? 0;
+        var isMaximum = target?.IsMaximum == true;
+
+        return new PrintFoodRuleStatus(
+            label,
+            current,
+            PrintFoodRuleProgress(current, targetValue, isMaximum),
+            IsFoodRuleMet(current, targetValue, isMaximum));
+    }
+
+    private PrintFoodRuleStatus BuildMeatAndPoultryPrintFoodRule()
+    {
+        var poultryTarget = FoodTarget(FoodGroupKind.Poultry);
+        var redMeatTarget = FoodTarget(FoodGroupKind.RedMeat);
+        var poultryCount = CountMealsMatchingFoodGroup(FoodGroupKind.Poultry);
+        var redMeatCount = CountMealsMatchingFoodGroup(FoodGroupKind.RedMeat);
+        var meatAndPoultryCount = CountMealsMatchingProfile(profile => profile.IsMeat);
+        var poultryTargetValue = poultryTarget?.Target ?? 0;
+        var redMeatTargetValue = redMeatTarget?.Target ?? 0;
+        var isMet = IsFoodRuleMet(poultryCount, poultryTargetValue, poultryTarget?.IsMaximum == true)
+            && IsFoodRuleMet(redMeatCount, redMeatTargetValue, redMeatTarget?.IsMaximum == true);
+        var progress = $"total {meatAndPoultryCount}; aus {poultryCount}/{poultryTargetValue}; carn {redMeatCount}/max {redMeatTargetValue}";
+
+        return new PrintFoodRuleStatus("Carn+aus", meatAndPoultryCount, progress, isMet);
+    }
+
+    private FoodGroupTargetStatus? FoodTarget(string foodGroup) =>
+        _weekStatus?.FoodGroupTargets.FirstOrDefault(target =>
+            string.Equals(target.FoodGroup, foodGroup, StringComparison.OrdinalIgnoreCase));
+
+    private int CountMealsMatchingFoodGroup(string foodGroup) =>
+        CountMealsMatchingProfile(profile => profile.Matches(foodGroup));
+
+    private int CountMealsMatchingProfile(Func<RecipeFoodProfile, bool> matches) =>
+        _days
+            .SelectMany(day => DaySlots(day))
+            .Count(slot => slot.PlannedRecipes
+                .Select(plannedRecipe => plannedRecipe.Recipe)
+                .Where(recipe => recipe is not null)
+                .Any(recipe => matches(RecipeFoodClassifier.Classify(recipe!))));
+
+    private static bool IsFoodRuleMet(PrintFoodRuleStatus rule) => rule.IsMet;
+
+    private static bool IsFoodRuleMet(int current, int target, bool isMaximum) =>
+        target <= 0
+        || (isMaximum ? current <= target : current >= target);
+
+    private static string PrintFoodRuleProgress(int current, int target, bool isMaximum) =>
+        isMaximum
+            ? $"{current} / max {target}"
+            : $"{current} / {target}";
+
+    private static string PrintFoodRuleClass(PrintFoodRuleStatus rule) =>
+        rule.IsMet
             ? "planner-print-food-rule is-ok"
             : "planner-print-food-rule is-warning";
 
-    private static string PrintFoodRuleState(FoodGroupTargetStatus rule) =>
-        IsFoodRuleMet(rule) ? "OK" : "Pendent";
+    private static string PrintFoodRuleState(PrintFoodRuleStatus rule) =>
+        rule.IsMet ? "OK" : "Pendent";
 
-    private static string PrintFoodRuleProgress(FoodGroupTargetStatus rule) =>
-        rule.IsMaximum
-            ? $"{rule.Current} / max {rule.Target}"
-            : $"{rule.Current} / {rule.Target}";
+    private static string PrintFoodRuleProgress(PrintFoodRuleStatus rule) =>
+        rule.ProgressText;
 
     private static MealPlanSlot[] DaySlots(DayPlan day) =>
     [
@@ -725,6 +782,12 @@
         Math.Round(value, 0).ToString("0", CultureInfo.InvariantCulture);
 
     private sealed record RecipeIdeaCategorySummary(string Name, int Count);
+
+    private sealed record PrintFoodRuleStatus(
+        string Label,
+        int Current,
+        string ProgressText,
+        bool IsMet);
 
     private sealed record DailyNutritionGoal(
         decimal CaloriesKcal,

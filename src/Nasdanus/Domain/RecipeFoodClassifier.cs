@@ -12,6 +12,45 @@ public static class RecipeFoodClassifier
 
         var isFish = HasIngredientCategory(recipe, IngredientCategory.Fish)
             || ContainsAny(text, "peix", "salmo", "tonyina", "bacalla", "lluc", "gamba", "llagosti", "marisc", "fish", "salmon", "tuna", "cod", "hake", "shrimp");
+        var isBlueFish = ContainsAny(
+            text,
+            "peix blau",
+            "salmo",
+            "salmon",
+            "tonyina",
+            "tuna",
+            "sardina",
+            "sardine",
+            "verat",
+            "mackerel",
+            "anxova",
+            "anchovy",
+            "seito",
+            "bonitol",
+            "bonito",
+            "arengada",
+            "herring");
+        var isWhiteFish = ContainsAny(
+            text,
+            "peix blanc",
+            "bacalla",
+            "cod",
+            "lluc",
+            "hake",
+            "rap",
+            "monkfish",
+            "llenguado",
+            "sole",
+            "orada",
+            "daurada",
+            "sea bream",
+            "llobarro",
+            "lubina",
+            "sea bass",
+            "mero",
+            "gall",
+            "halibut");
+        isFish = isFish || isBlueFish || isWhiteFish;
         var isLegume = HasIngredientCategory(recipe, IngredientCategory.Legumes)
             || ContainsAny(text, "llent", "cigro", "cigrons", "mongeta", "fesol", "beans", "lentil", "chickpea");
         var isChicken = ingredientNames.Any(name => ContainsAny(name, "pollastre", "chicken", "gall dindi", "turkey"))
@@ -52,6 +91,8 @@ public static class RecipeFoodClassifier
 
         return new RecipeFoodProfile(
             isFish,
+            isBlueFish,
+            isWhiteFish,
             isLegume,
             isVegetableRich,
             isRedMeat,

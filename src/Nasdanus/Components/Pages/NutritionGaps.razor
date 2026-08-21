@@ -33,7 +33,7 @@
         else
         {
             <div class="gap-metric-grid">
-                @GapMetric("Pla actual", FilteredPlannedIssues.Count, "incidencies", GapMode.Planned, Color.Warning)
+                @GapMetric("Setmana", FilteredPlannedIssues.Count, "incidencies", GapMode.Planned, Color.Warning)
                 @GapMetric("Sense nutricio", FilteredKnownMissingIngredients.Count, "ingredients", GapMode.MissingNutrition, MissingNutritionColor)
                 @GapMetric("Unresolved", FilteredUnresolvedGroups.Count, "ingredients", GapMode.Unresolved, UnresolvedColor)
                 @GapMetric("Quantitat", FilteredQuantityIssues.Count, "receptes", GapMode.Quantity, QuantityColor)
@@ -53,7 +53,7 @@
                     </MudItem>
                     <MudItem xs="12" md="7">
                         <div class="gap-mode-buttons" role="group" aria-label="Tipus de buits">
-                            @ModeButton(GapMode.Planned, "Pla actual", Icons.Material.Filled.CalendarMonth, Color.Warning)
+                            @ModeButton(GapMode.Planned, "Setmana", Icons.Material.Filled.CalendarMonth, Color.Warning)
                             @ModeButton(GapMode.MissingNutrition, "Sense nutricio", Icons.Material.Filled.Edit, MissingNutritionColor)
                             @ModeButton(GapMode.Unresolved, "Unresolved", Icons.Material.Filled.LinkOff, UnresolvedColor)
                             @ModeButton(GapMode.Quantity, "Quantitat", Icons.Material.Filled.Scale, QuantityColor)
@@ -92,6 +92,7 @@
     private List<Recipe> _recipes = [];
     private List<IngredientIssue> _recipeIssues = [];
     private List<IngredientIssue> _plannedIssues = [];
+    private DateOnly _selectedWeekStart;
     private string _mode = GapMode.Planned;
     private string _search = string.Empty;
     private bool _isLoading = true;
@@ -132,6 +133,8 @@
     private Color MissingNutritionColor => FilteredKnownMissingIngredients.Count == 0 ? Color.Success : Color.Warning;
     private Color UnresolvedColor => FilteredUnresolvedGroups.Count == 0 ? Color.Success : Color.Warning;
     private Color QuantityColor => FilteredQuantityIssues.Count == 0 ? Color.Success : Color.Warning;
+    private string SelectedWeekRangeText => $"{_selectedWeekStart.ToString("d/M", CultureInfo.InvariantCulture)} - {_selectedWeekStart.AddDays(6).ToString("d/M/yyyy", CultureInfo.InvariantCulture)}";
+    private bool IsCurrentWeekSelected => _selectedWeekStart == PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
 
     protected override void OnParametersSet()
     {
@@ -140,29 +143,63 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _selectedWeekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
         await LoadAsync();
         _isLoading = false;
     }
 
     private async Task LoadAsync()
     {
+        if (_selectedWeekStart == default)
+        {
+            _selectedWeekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
+        }
+
         _knownIngredients = await IngredientKnowledge.GetKnownIngredientsAsync();
         _recipes = await Recipes.GetAllAsync();
         _recipeIssues = BuildRecipeIssues(_recipes);
 
-        var weekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
-        var days = await Planner.GetWeekAsync(weekStart);
+        var days = await Planner.GetWeekAsync(_selectedWeekStart);
         _plannedIssues = BuildPlannedIssues(days);
     }
 
     private RenderFragment PlannedIssuesPanel() => @<MudPaper Class="gap-panel" Elevation="0">
-        <MudText Typo="Typo.h6">Pla actual</MudText>
+        <div class="gap-week-heading">
+            <div>
+                <MudText Typo="Typo.h6">Setmana seleccionada</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@SelectedWeekRangeText</MudText>
+            </div>
+            <MudStack Row Class="gap-week-nav">
+                <MudButton OnClick="PreviousWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.ChevronLeft">
+                    Anterior
+                </MudButton>
+                <MudButton OnClick="CurrentWeekAsync"
+                           Disabled="@IsCurrentWeekSelected"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Today">
+                    Actual
+                </MudButton>
+                <MudButton OnClick="NextWeekAsync"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                    Seguent
+                </MudButton>
+            </MudStack>
+        </div>
         <MudText Typo="Typo.body2" Color="Color.Secondary">
-            Aixo explica els avisos que surten al planner per la setmana actual.
+            Aixo explica els avisos que surten al planner per aquesta setmana del calendari.
         </MudText>
         @if (FilteredPlannedIssues.Count == 0)
         {
-            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">El pla actual no te buits de nutricio ni quantitat.</MudAlert>
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">La setmana seleccionada no te buits de nutricio ni quantitat.</MudAlert>
         }
         else
         {
@@ -342,6 +379,24 @@
     private void SetMode(string mode)
     {
         _mode = NormalizeMode(mode);
+    }
+
+    private async Task PreviousWeekAsync()
+    {
+        _selectedWeekStart = _selectedWeekStart.AddDays(-7);
+        await LoadAsync();
+    }
+
+    private async Task NextWeekAsync()
+    {
+        _selectedWeekStart = _selectedWeekStart.AddDays(7);
+        await LoadAsync();
+    }
+
+    private async Task CurrentWeekAsync()
+    {
+        _selectedWeekStart = PlannerService.WeekStart(DateOnly.FromDateTime(DateTime.Today));
+        await LoadAsync();
     }
 
     private async Task OpenNutritionDialogAsync(Ingredient ingredient)

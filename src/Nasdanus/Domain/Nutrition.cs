@@ -636,6 +636,8 @@ public static class FoodGroupKind
 
 public sealed record RecipeFoodProfile(
     bool IsFish,
+    bool IsBlueFish,
+    bool IsWhiteFish,
     bool IsLegume,
     bool IsVegetableRich,
     bool IsRedMeat,
@@ -652,8 +654,8 @@ public sealed record RecipeFoodProfile(
 {
     public bool Matches(string foodGroup) => foodGroup switch
     {
-        FoodGroupKind.BlueFish => IsFish,
-        FoodGroupKind.WhiteFish => IsFish,
+        FoodGroupKind.BlueFish => IsBlueFish,
+        FoodGroupKind.WhiteFish => IsWhiteFish,
         FoodGroupKind.Fish => IsFish,
         FoodGroupKind.Seafood => IsFish,
         FoodGroupKind.Legumes => IsLegume,

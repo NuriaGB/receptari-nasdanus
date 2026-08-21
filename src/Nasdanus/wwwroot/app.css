@@ -746,6 +746,19 @@ h3:focus {
     background: var(--nas-panel);
 }
 
+.gap-week-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.gap-week-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
 .gap-list {
     display: grid;
     gap: 0.65rem;
@@ -806,6 +819,15 @@ h3:focus {
 
     .gap-row {
         grid-template-columns: 1fr;
+    }
+
+    .gap-week-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gap-week-nav {
+        justify-content: flex-start;
     }
 
     .gap-row-actions {
@@ -1637,7 +1659,7 @@ h3:focus {
 .planner-print-food-rule-progress {
     color: #626262;
     font-weight: 650;
-    white-space: nowrap;
+    text-align: right;
 }
 
 .quick-add-form {
