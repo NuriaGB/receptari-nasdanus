@@ -94,45 +94,28 @@
                               Totals="@WeekAverageNutrition"
                               ShowApproximateNote="true" />
 
-            @if (_todaySuggestions.Count > 0)
-            {
-                <MudPaper Class="suggestion-panel" Elevation="0">
-                    <MudStack Spacing="2">
-                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="suggestion-heading">
-                            <div>
-                                <MudText Typo="Typo.h6">Suggested today</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">@SuggestionContextText</MudText>
-                            </div>
-                            <MudButton Href="planner"
-                                       Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       Size="Size.Small"
-                                       EndIcon="@Icons.Material.Filled.CalendarMonth">
-                                Planner
-                            </MudButton>
-                        </MudStack>
-                        <div class="home-suggestion-list">
-                            @foreach (var suggestion in _todaySuggestions)
-                            {
-                                <div class="home-suggestion-row">
-                                    <div class="suggestion-main">
-                                        <MudText Typo="Typo.subtitle2">@suggestion.Recipe.Name</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                            @FormatGrams(suggestion.NutritionPerServing.ProteinGrams) g protein/person - @string.Join(", ", suggestion.Reasons)
-                                        </MudText>
-                                    </div>
-                                    <MudButton OnClick="@(() => ApplySuggestionAsync(suggestion))"
-                                               Variant="Variant.Outlined"
-                                               Color="Color.Primary"
-                                               Size="Size.Small">
-                                        @SuggestionActionLabel
-                                    </MudButton>
-                                </div>
-                            }
+            <MudPaper Class="tomorrow-menu" Elevation="0">
+                <MudStack Spacing="2">
+                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="tomorrow-menu-heading">
+                        <div>
+                            <MudText Typo="Typo.h6">Menú de demà</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@TomorrowDateText</MudText>
                         </div>
+                        <MudButton Href="planner"
+                                   Variant="Variant.Text"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   EndIcon="@Icons.Material.Filled.CalendarMonth">
+                            Planner
+                        </MudButton>
                     </MudStack>
-                </MudPaper>
-            }
+                    <div class="tomorrow-menu-grid">
+                        @TomorrowMenuSlot("Esmorzar", _tomorrowBreakfast, Icons.Material.Filled.FreeBreakfast)
+                        @TomorrowMenuSlot("Dinar", _tomorrowLunch, Icons.Material.Filled.Restaurant)
+                        @TomorrowMenuSlot("Sopar", _tomorrowDinner, Icons.Material.Filled.DarkMode)
+                    </div>
+                </MudStack>
+            </MudPaper>
 
             <MudStack Row Class="home-actions">
                 <MudButton Href="planner"
@@ -158,9 +141,12 @@
     private MealPlanSlot? _breakfast;
     private MealPlanSlot? _lunch;
     private MealPlanSlot? _dinner;
+    private MealPlanSlot? _tomorrowBreakfast;
+    private MealPlanSlot? _tomorrowLunch;
+    private MealPlanSlot? _tomorrowDinner;
+    private DateOnly _tomorrow;
     private WeekNutritionSummary? _weekNutrition;
     private WeeklyNutritionGoalStatus? _weekStatus;
-    private IReadOnlyList<RecipeSuggestion> _todaySuggestions = [];
     private IReadOnlyList<TomorrowPrepReminder> _tomorrowReminders = [];
     private List<Recipe> _recipes = [];
     private bool _isLoading = true;
@@ -183,31 +169,12 @@
     private decimal ProteinTarget =>
         _weekStatus?.Settings.NutritionGoals.MinimumProteinGramsPerPerson ?? 85;
     private bool IsProteinLow => WeekAverageNutrition.ProteinGrams + 1m < ProteinTarget;
-    private MealKind SuggestionMealKind =>
-        TargetSlotForSuggestion()?.MealKind ?? MealKind.Dinner;
-    private bool HasMissingMeal =>
-        _breakfast?.PlannedRecipes.Count is not > 0
-        || _lunch?.PlannedRecipes.Count is not > 0
-        || _dinner?.PlannedRecipes.Count is not > 0;
-    private string SuggestionActionLabel => HasMissingMeal ? "Add" : "Replace";
-    private string SuggestionContextText => HasMissingMeal
-        ? $"Missing {SuggestionMealKind.ToDisplayName().ToLowerInvariant()}"
-        : "Replacement ideas to improve the week";
+    private string TomorrowDateText => FormatShortDay(_tomorrow);
+
     protected override async Task OnInitializedAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        var tomorrow = today.AddDays(1);
         _recipes = await Recipes.GetAllAsync();
-        _breakfast = await Planner.GetSlotAsync(today, MealKind.Breakfast);
-        _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
-        _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
-        var tomorrowBreakfast = await Planner.GetSlotAsync(tomorrow, MealKind.Breakfast);
-        var tomorrowLunch = await Planner.GetSlotAsync(tomorrow, MealKind.Lunch);
-        var tomorrowDinner = await Planner.GetSlotAsync(tomorrow, MealKind.Dinner);
-        _tomorrowReminders = BuildTomorrowReminders(tomorrowBreakfast, tomorrowLunch, tomorrowDinner);
-        _weekNutrition = await Nutrition.CalculateWeekAsync(today);
-        _weekStatus = await Suggestions.GetWeekStatusAsync(today);
-        _todaySuggestions = await Suggestions.GetSuggestionsAsync(today, SuggestionMealKind, 3);
+        await RefreshHomeAsync();
         _isLoading = false;
     }
 
@@ -219,6 +186,9 @@
 
     private static string MealCardClass(MealPlanSlot? slot) =>
         slot?.PlannedRecipes.Count is not > 0 ? "meal-card is-empty" : "meal-card";
+
+    private static string TomorrowMenuSlotClass(MealPlanSlot? slot) =>
+        slot?.PlannedRecipes.Count is not > 0 ? "tomorrow-menu-slot is-empty" : "tomorrow-menu-slot";
 
     private static IReadOnlyList<TomorrowPrepReminder> BuildTomorrowReminders(params MealPlanSlot?[] slots)
     {
@@ -307,6 +277,42 @@
         </MudStack>
     </MudPaper>;
 
+    private RenderFragment TomorrowMenuSlot(string label, MealPlanSlot? slot, string icon) => @<div class="@TomorrowMenuSlotClass(slot)">
+        <div class="tomorrow-menu-slot-heading">
+            <MudIcon Icon="@icon" Color="Color.Primary" Size="Size.Small" />
+            <MudText Typo="Typo.subtitle2">@label</MudText>
+        </div>
+
+        @if (slot?.PlannedRecipes.Count is not > 0)
+        {
+            <MudText Typo="Typo.body2" Color="Color.Secondary">Sense recepta planificada</MudText>
+        }
+        else
+        {
+            <div class="tomorrow-menu-recipes">
+                @foreach (var plannedRecipe in slot.PlannedRecipes.OrderBy(plannedRecipe => plannedRecipe.Order))
+                {
+                    if (plannedRecipe.Recipe is not null)
+                    {
+                        <div class="tomorrow-menu-recipe">
+                            <div class="tomorrow-menu-recipe-copy">
+                                <MudText Typo="Typo.subtitle2" Class="tomorrow-menu-recipe-name">@plannedRecipe.Recipe.Name</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @PlannedServingsText(plannedRecipe) - @TimeText(plannedRecipe.Recipe)
+                                </MudText>
+                            </div>
+                            <MudIconButton Href="@($"recipes/{plannedRecipe.Recipe.Id}")"
+                                           Icon="@Icons.Material.Filled.OpenInNew"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Obrir recepta" />
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>;
+
     private async Task OpenReplacementPickerAsync(MealPlanRecipe plannedRecipe, MealKind mealKind)
     {
         var parameters = new DialogParameters<MealRecipePickerDialog>
@@ -330,62 +336,24 @@
         if (result is not null && !result.Canceled && result.Data is PlannedRecipeSelection selection)
         {
             await Planner.ReplaceRecipeAsync(plannedRecipe.Id, selection.RecipeId, selection.PlannedServings);
-            await RefreshTodayAsync();
+            await RefreshHomeAsync();
             Snackbar.Add("Plat substituit.", Severity.Success);
         }
     }
 
-    private async Task RefreshTodayAsync()
+    private async Task RefreshHomeAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
+        _tomorrow = today.AddDays(1);
         _breakfast = await Planner.GetSlotAsync(today, MealKind.Breakfast);
         _lunch = await Planner.GetSlotAsync(today, MealKind.Lunch);
         _dinner = await Planner.GetSlotAsync(today, MealKind.Dinner);
+        _tomorrowBreakfast = await Planner.GetSlotAsync(_tomorrow, MealKind.Breakfast);
+        _tomorrowLunch = await Planner.GetSlotAsync(_tomorrow, MealKind.Lunch);
+        _tomorrowDinner = await Planner.GetSlotAsync(_tomorrow, MealKind.Dinner);
+        _tomorrowReminders = BuildTomorrowReminders(_tomorrowBreakfast, _tomorrowLunch, _tomorrowDinner);
         _weekNutrition = await Nutrition.CalculateWeekAsync(today);
         _weekStatus = await Suggestions.GetWeekStatusAsync(today);
-        _todaySuggestions = await Suggestions.GetSuggestionsAsync(today, SuggestionMealKind, 3);
-    }
-
-    private async Task ApplySuggestionAsync(RecipeSuggestion suggestion)
-    {
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        var targetSlot = TargetSlotForSuggestion();
-        var targetMealKind = targetSlot?.MealKind ?? SuggestionMealKind;
-        var plannedServings = suggestion.Recipe.Servings > 0 ? suggestion.Recipe.Servings : 3;
-
-        if (targetSlot?.PlannedRecipes.Count is not > 0)
-        {
-            await Planner.AddRecipeAsync(today, targetMealKind, suggestion.Recipe.Id, plannedServings);
-            Snackbar.Add("Suggested recipe added.", Severity.Success);
-        }
-        else
-        {
-            var plannedRecipe = targetSlot.PlannedRecipes.OrderBy(recipe => recipe.Order).First();
-            await Planner.ReplaceRecipeAsync(plannedRecipe.Id, suggestion.Recipe.Id, plannedServings);
-            Snackbar.Add("Meal replaced.", Severity.Success);
-        }
-
-        await RefreshTodayAsync();
-    }
-
-    private MealPlanSlot? TargetSlotForSuggestion()
-    {
-        if (_breakfast?.PlannedRecipes.Count is not > 0)
-        {
-            return _breakfast;
-        }
-
-        if (_lunch?.PlannedRecipes.Count is not > 0)
-        {
-            return _lunch;
-        }
-
-        if (_dinner?.PlannedRecipes.Count is not > 0)
-        {
-            return _dinner;
-        }
-
-        return _dinner;
     }
 
     private static int PlannedServingsValue(MealPlanRecipe plannedRecipe)
@@ -398,8 +366,17 @@
         return plannedRecipe.Recipe?.Servings > 0 ? plannedRecipe.Recipe.Servings : 3;
     }
 
+    private static string PlannedServingsText(MealPlanRecipe plannedRecipe) =>
+        $"{PlannedServingsValue(plannedRecipe)} racions";
+
     private static string FormatGrams(decimal value) =>
         value.ToString("0", CultureInfo.InvariantCulture);
+
+    private static string FormatShortDay(DateOnly date)
+    {
+        var catalanShortDayNames = new[] { "dg.", "dl.", "dt.", "dc.", "dj.", "dv.", "ds." };
+        return $"{catalanShortDayNames[(int)date.DayOfWeek]} {date.ToString("d/M", CultureInfo.InvariantCulture)}";
+    }
 
     private static string FoodTargetText(FoodGroupTargetStatus target)
     {

@@ -163,6 +163,79 @@ h3:focus {
     background: var(--nas-panel);
 }
 
+.tomorrow-menu {
+    padding: 1rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: var(--nas-panel);
+}
+
+.tomorrow-menu-heading {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.tomorrow-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.tomorrow-menu-slot {
+    display: grid;
+    align-content: start;
+    gap: 0.65rem;
+    min-width: 0;
+    min-height: 8.5rem;
+    padding: 0.85rem;
+    border: 1px solid var(--nas-border);
+    border-radius: 8px;
+    background: #fbfcfa;
+}
+
+.tomorrow-menu-slot.is-empty {
+    background: #f7f8f4;
+}
+
+.tomorrow-menu-slot-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.tomorrow-menu-recipes {
+    display: grid;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.tomorrow-menu-recipe {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: start;
+    min-width: 0;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--nas-border);
+}
+
+.tomorrow-menu-recipe:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.tomorrow-menu-recipe-copy {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.tomorrow-menu-recipe-name {
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+}
+
 .week-summary {
     padding: 0.85rem 1rem;
     border: 1px solid var(--nas-border);
@@ -252,6 +325,10 @@ h3:focus {
 @media (max-width: 480px) {
     .nutrition-summary-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tomorrow-menu-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1490,6 +1567,79 @@ h3:focus {
     line-height: 1.25;
 }
 
+.planner-print-food-rules {
+    display: grid;
+    gap: 0.3rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid #e1e1e1;
+}
+
+.planner-print-food-rules-summary {
+    margin: 0;
+    font-size: 0.58rem;
+    font-weight: 750;
+    line-height: 1.15;
+}
+
+.planner-print-food-rules-summary.is-ok {
+    color: #17623b;
+}
+
+.planner-print-food-rules-summary.is-warning {
+    color: #8a5a00;
+}
+
+.planner-print-food-rule-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.22rem 0.35rem;
+}
+
+.planner-print-food-rule {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    min-width: 0;
+    gap: 0.18rem;
+    color: #282828;
+    font-size: 0.54rem;
+    line-height: 1.15;
+}
+
+.planner-print-food-rule-state {
+    padding: 0.04rem 0.18rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    font-size: 0.46rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.planner-print-food-rule.is-ok .planner-print-food-rule-state {
+    border-color: #8cc5a0;
+    background: #eaf7ee;
+    color: #17623b;
+}
+
+.planner-print-food-rule.is-warning .planner-print-food-rule-state {
+    border-color: #e4c879;
+    background: #fff7df;
+    color: #7a5200;
+}
+
+.planner-print-food-rule-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.planner-print-food-rule-progress {
+    color: #626262;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
 .quick-add-form {
     min-width: 0;
 }
@@ -2285,6 +2435,29 @@ h3:focus {
 
     .planner-print-nutrition-note {
         font-size: 6.6pt;
+    }
+
+    .planner-print-food-rules {
+        gap: 1.2mm;
+        padding-top: 1.4mm;
+    }
+
+    .planner-print-food-rules-summary {
+        font-size: 6.1pt;
+    }
+
+    .planner-print-food-rule-list {
+        gap: 0.8mm 1.1mm;
+    }
+
+    .planner-print-food-rule {
+        gap: 0.8mm;
+        font-size: 5.6pt;
+    }
+
+    .planner-print-food-rule-state {
+        padding: 0.25mm 0.6mm;
+        font-size: 4.8pt;
     }
 
     @page recipe {

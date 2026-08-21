@@ -21,9 +21,38 @@
                 <MudText Typo="Typo.body2" Color="Color.Secondary">Fitxer: @_selectedFileName</MudText>
             }
 
+            <MudDivider />
+
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.subtitle2">O enganxar JSON directament</MudText>
+                <MudTextField T="string"
+                              Value="@_pastedJson"
+                              ValueChanged="OnPastedJsonChanged"
+                              Immediate="true"
+                              Label="JSON de la recepta"
+                              Placeholder="{ ... }"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="8" />
+                <MudStack Row Class="data-action-row">
+                    <MudButton OnClick="ValidatePastedJsonAsync"
+                               Disabled="@string.IsNullOrWhiteSpace(_pastedJson)"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.CheckCircle">
+                        Validar JSON
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+
             @if (!string.IsNullOrWhiteSpace(_fileError))
             {
                 <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_fileError</MudAlert>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_jsonError))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_jsonError</MudAlert>
             }
 
             @if (_validation is not null)
@@ -83,8 +112,10 @@
     public Recipe Recipe { get; set; } = default!;
 
     private string? _selectedFileName;
+    private string _pastedJson = string.Empty;
     private string? _pendingJson;
     private string? _fileError;
+    private string? _jsonError;
     private string? _importError;
     private bool _isImporting;
     private RecipeImportValidationResult? _validation;
@@ -99,7 +130,9 @@
         _pendingJson = null;
         _validation = null;
         _fileError = null;
+        _jsonError = null;
         _importError = null;
+        _pastedJson = string.Empty;
 
         var file = args.File;
         _selectedFileName = file.Name;
@@ -120,6 +153,36 @@
         {
             _fileError = $"No s'ha pogut llegir el fitxer: {ex.Message}";
         }
+    }
+
+    private void OnPastedJsonChanged(string value)
+    {
+        _pastedJson = value ?? string.Empty;
+        _selectedFileName = null;
+        _pendingJson = null;
+        _validation = null;
+        _fileError = null;
+        _jsonError = null;
+        _importError = null;
+    }
+
+    private async Task ValidatePastedJsonAsync()
+    {
+        _selectedFileName = null;
+        _pendingJson = null;
+        _validation = null;
+        _fileError = null;
+        _jsonError = null;
+        _importError = null;
+
+        if (string.IsNullOrWhiteSpace(_pastedJson))
+        {
+            _jsonError = "Enganxa el JSON abans de validar-lo.";
+            return;
+        }
+
+        _pendingJson = _pastedJson;
+        _validation = await RecipeExchange.ValidateSingleRecipeImportJsonAsync(_pendingJson);
     }
 
     private async Task ImportAsync()

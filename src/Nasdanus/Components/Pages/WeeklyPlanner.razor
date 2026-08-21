@@ -3,6 +3,7 @@
 @inject PlannerService Planner
 @inject RecipeService Recipes
 @inject PlanningSettingsService PlanningSettings
+@inject RecipeSuggestionService Suggestions
 @inject IJSRuntime JS
 
 <PageTitle>Nasdanus - Planner</PageTitle>
@@ -59,7 +60,7 @@
 
                 @if (RecipeIdeas.Count == 0)
                 {
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">Totes les receptes visibles ja estan assignades aquesta setmana.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No hi ha idees de recepta disponibles amb els filtres actuals.</MudText>
                 }
                 else
                 {
@@ -129,7 +130,7 @@
                                          @ondragend="EndRecipeIdeaDrag">
                                         <div class="recipe-idea-main">
                                             <span class="recipe-idea-name" title="@recipe.Name">@recipe.Name</span>
-                                            <span class="recipe-idea-meta">@RecipeIdeaCategoryText(recipe)</span>
+                                            <span class="recipe-idea-meta">@RecipeIdeaMetaText(recipe)</span>
                                         </div>
                                         <MudMenu Icon="@Icons.Material.Filled.MoreVert"
                                                  Size="Size.Small"
@@ -263,13 +264,10 @@
 
                     <article class="planner-print-card planner-print-notes">
                         <header class="planner-print-card-header">
-                            <span>Notes</span>
+                            <span>Resum setmanal</span>
+                            <small>Per persona</small>
                         </header>
                         <div class="planner-print-notes-body planner-print-nutrition">
-                            <div class="planner-print-nutrition-title">
-                                <strong>Resum nutricional</strong>
-                                <span>Per persona</span>
-                            </div>
                             <table class="planner-print-nutrition-table">
                                 <thead>
                                     <tr>
@@ -310,6 +308,24 @@
                             {
                                 <p class="planner-print-nutrition-note">Hi ha ingredients amb dades nutricionals pendents.</p>
                             }
+                            @if (PrintFoodRuleStatuses.Count > 0)
+                            {
+                                <div class="planner-print-food-rules">
+                                    <p class="@PrintFoodRulesSummaryClass">
+                                        Regles de categories: @PrintFoodRulesSummaryText
+                                    </p>
+                                    <div class="planner-print-food-rule-list">
+                                        @foreach (var rule in PrintFoodRuleStatuses)
+                                        {
+                                            <div class="@PrintFoodRuleClass(rule)">
+                                                <span class="planner-print-food-rule-state">@PrintFoodRuleState(rule)</span>
+                                                <span class="planner-print-food-rule-name">@FoodGroupKind.ToDisplayName(rule.FoodGroup)</span>
+                                                <span class="planner-print-food-rule-progress">@PrintFoodRuleProgress(rule)</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </article>
                 </div>
@@ -327,7 +343,8 @@
     private List<DayPlan> _days = [];
     private List<Recipe> _recipes = [];
     private HouseholdPlanningSettings? _settings;
-    private HashSet<int> _plannedRecipeIds = [];
+    private Dictionary<int, int> _plannedRecipeCounts = [];
+    private WeeklyNutritionGoalStatus? _weekStatus;
     private HashSet<int> _dismissedRecipeIdeaIds = [];
     private string _recipeIdeaSearch = string.Empty;
     private string _recipeIdeaCategory = string.Empty;
@@ -343,10 +360,21 @@
     private decimal ProteinTargetGrams => PositiveOrDefault(_settings?.NutritionGoals.MinimumProteinGramsPerPerson, 150m);
     private decimal CalorieLimit => PositiveOrDefault(_settings?.NutritionGoals.TargetCaloriesPerPerson, 2000m);
     private IReadOnlyList<Recipe> RecipeIdeas => _recipes
-        .Where(recipe => !_plannedRecipeIds.Contains(recipe.Id))
         .Where(recipe => !_dismissedRecipeIdeaIds.Contains(recipe.Id))
-        .OrderBy(recipe => recipe.Name)
+        .OrderBy(recipe => PlannedRecipeCount(recipe.Id))
+        .ThenBy(recipe => recipe.Name)
         .ToList();
+    private IReadOnlyList<FoodGroupTargetStatus> PrintFoodRuleStatuses =>
+        _weekStatus?.FoodGroupTargets ?? [];
+    private bool ArePrintFoodRulesMet =>
+        PrintFoodRuleStatuses.Count > 0
+        && PrintFoodRuleStatuses.All(IsFoodRuleMet);
+    private string PrintFoodRulesSummaryClass =>
+        ArePrintFoodRulesMet
+            ? "planner-print-food-rules-summary is-ok"
+            : "planner-print-food-rules-summary is-warning";
+    private string PrintFoodRulesSummaryText =>
+        ArePrintFoodRulesMet ? "totes complertes" : "pendents de revisar";
     private bool IsRecipeIdeaBrowseActive =>
         _showAllRecipeIdeas
         || !string.IsNullOrWhiteSpace(_recipeIdeaSearch)
@@ -363,7 +391,8 @@
         .ToList();
     private IReadOnlyList<Recipe> FilteredRecipeIdeas => RecipeIdeas
         .Where(MatchesRecipeIdeaFilters)
-        .OrderBy(recipe => recipe.Name)
+        .OrderBy(recipe => PlannedRecipeCount(recipe.Id))
+        .ThenBy(recipe => recipe.Name)
         .ToList();
     private IReadOnlyList<Recipe> VisibleRecipeIdeas => FilteredRecipeIdeas
         .Take(60)
@@ -382,10 +411,11 @@
     private async Task LoadWeekAsync()
     {
         _days = await Planner.GetWeekAsync(_weekStart);
-        _plannedRecipeIds = _days
+        _plannedRecipeCounts = _days
             .SelectMany(day => DaySlots(day).SelectMany(slot => slot.PlannedRecipes))
-            .Select(plannedRecipe => plannedRecipe.RecipeId)
-            .ToHashSet();
+            .GroupBy(plannedRecipe => plannedRecipe.RecipeId)
+            .ToDictionary(group => group.Key, group => group.Count());
+        _weekStatus = await Suggestions.GetWeekStatusAsync(_weekStart);
         _dismissedRecipeIdeaIds = await Planner.GetDismissedRecipeIdeaIdsAsync(_weekStart);
     }
 
@@ -585,6 +615,23 @@
     private static string RecipeIdeaCategoryText(Recipe recipe) =>
         string.Join(", ", RecipeIdeaCategoriesFor(recipe));
 
+    private string RecipeIdeaMetaText(Recipe recipe)
+    {
+        var count = PlannedRecipeCount(recipe.Id);
+        if (count == 0)
+        {
+            return RecipeIdeaCategoryText(recipe);
+        }
+
+        var repeatedText = count == 1
+            ? "1 cop aquesta setmana"
+            : $"{count} cops aquesta setmana";
+        return $"{RecipeIdeaCategoryText(recipe)} - {repeatedText}";
+    }
+
+    private int PlannedRecipeCount(int recipeId) =>
+        _plannedRecipeCounts.TryGetValue(recipeId, out var count) ? count : 0;
+
     private static NutritionTotals DayNutritionTotals(DayPlan day)
     {
         var totals = new NutritionTotals();
@@ -609,6 +656,25 @@
 
     private static bool WeekHasMissingNutritionData(IEnumerable<DayPlan> days) =>
         days.Any(day => DayNutritionTotals(day).HasMissingData);
+
+    private static bool IsFoodRuleMet(FoodGroupTargetStatus rule) =>
+        rule.Target <= 0
+        || (rule.IsMaximum
+            ? rule.Current <= rule.Target
+            : rule.Current >= rule.Target);
+
+    private static string PrintFoodRuleClass(FoodGroupTargetStatus rule) =>
+        IsFoodRuleMet(rule)
+            ? "planner-print-food-rule is-ok"
+            : "planner-print-food-rule is-warning";
+
+    private static string PrintFoodRuleState(FoodGroupTargetStatus rule) =>
+        IsFoodRuleMet(rule) ? "OK" : "Pendent";
+
+    private static string PrintFoodRuleProgress(FoodGroupTargetStatus rule) =>
+        rule.IsMaximum
+            ? $"{rule.Current} / max {rule.Target}"
+            : $"{rule.Current} / {rule.Target}";
 
     private static MealPlanSlot[] DaySlots(DayPlan day) =>
     [
