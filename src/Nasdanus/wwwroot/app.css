@@ -2429,8 +2429,8 @@ h3:focus {
     }
 
     .planner-print-nutrition {
-        gap: 1.9mm;
-        padding: 2mm 2.2mm;
+        gap: 1.15mm;
+        padding: 1.5mm 1.8mm;
     }
 
     .planner-print-nutrition-title strong {
@@ -2442,44 +2442,45 @@ h3:focus {
     }
 
     .planner-print-nutrition-table {
-        font-size: 7.2pt;
-        line-height: 1.25;
+        font-size: 6pt;
+        line-height: 1.12;
     }
 
     .planner-print-nutrition-table th,
     .planner-print-nutrition-table td {
-        padding: 1.05mm 0.45mm;
+        padding: 0.65mm 0.35mm;
     }
 
     .planner-print-nutrition-table thead th {
-        font-size: 6.4pt;
+        font-size: 5.3pt;
     }
 
     .planner-print-nutrition-note {
-        font-size: 6.6pt;
+        font-size: 5.4pt;
     }
 
     .planner-print-food-rules {
-        gap: 1.2mm;
-        padding-top: 1.4mm;
+        gap: 0.85mm;
+        padding-top: 1mm;
     }
 
     .planner-print-food-rules-summary {
-        font-size: 6.1pt;
+        font-size: 5.2pt;
     }
 
     .planner-print-food-rule-list {
-        gap: 0.8mm 1.1mm;
+        gap: 0.55mm 0.85mm;
     }
 
     .planner-print-food-rule {
-        gap: 0.8mm;
-        font-size: 5.6pt;
+        gap: 0.55mm;
+        font-size: 4.8pt;
+        line-height: 1.08;
     }
 
     .planner-print-food-rule-state {
-        padding: 0.25mm 0.6mm;
-        font-size: 4.8pt;
+        padding: 0.18mm 0.42mm;
+        font-size: 4pt;
     }
 
     @page recipe {
